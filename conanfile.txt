@@ -1,0 +1,18 @@
+[requires]
+cli11/1.5.3@bincrafters/stable
+FlatBuffers/1.9.0@ess-dmsc/stable
+librdkafka/0.11.4@ess-dmsc/stable
+
+
+[generators]
+cmake
+
+[options]
+librdkafka:shared=True
+FlatBuffers:shared=True
+
+[imports]
+lib, *.dylib* -> ./lib
+lib, *.so* -> ./lib
+lib64, *.so* -> ./lib
+., LICENSE* -> ./licenses @ folder=True, ignore_case=True
