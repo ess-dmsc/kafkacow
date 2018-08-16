@@ -15,3 +15,4 @@ if(NOT CONAN_DISABLE)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(test)
