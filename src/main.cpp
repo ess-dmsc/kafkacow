@@ -25,6 +25,6 @@ int main(int argc, char **argv) {
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  NewRequestHandler.GetAllTopics();
+  std::cout << NewRequestHandler.GetAllTopics() << std::endl;
   return 0;
 }

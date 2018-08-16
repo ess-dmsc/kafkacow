@@ -1,4 +1,4 @@
-#include "ConnectKafka.h"
+#include "ConnectKafkaFakeTestClass.h"
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
@@ -20,13 +20,10 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
 }
 }
 
-std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
+std::unique_ptr<RdKafka::Metadata> ConnectKafkaFakeTestClass::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
-  // API requires address of a pointer to the struct but compiler won't allow
-  // &metadata.get() as it is an rvalue
 
   Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
-  // Capture the pointer in an owning struct to take care of deletion
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
   if (!metadata) {
     throw std::runtime_error("Failed to query metadata from broker");
@@ -34,23 +31,16 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
-  this->Consumer =
-      std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
-          createGlobalConfiguration(Broker).get(), ErrStr));
-  this->MetadataPointer = this->queryMetadata();
+ConnectKafkaFakeTestClass::ConnectKafkaFakeTestClass(std::string Broker,
+                                                     std::string ErrStr) {
+  this->Consumer = nullptr;
 }
-
-std::shared_ptr<RdKafka::KafkaConsumer> ConnectKafka::GetConsumer() {
+std::shared_ptr<RdKafka::KafkaConsumer>
+ConnectKafkaFakeTestClass::GetConsumer() {
   return Consumer;
 }
 
-std::string ConnectKafka::GetAllTopics() {
-  auto Topics = MetadataPointer->topics();
-  std::string ListOfTopics = "";
-  for (const auto &TopicName : *Topics) {
-    ListOfTopics.append(TopicName->topic());
-    ListOfTopics += '\n';
-  }
-  return ListOfTopics;
+std::string ConnectKafkaFakeTestClass::GetAllTopics() {
+
+  return "Successful test 1\nSuccessful test 2";
 }

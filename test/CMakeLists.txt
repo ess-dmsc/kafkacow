@@ -1,4 +1,12 @@
-add_executable(UnitTests RequestHandlerTest.cpp)
+file(GLOB SRC_FILES
+        ../src/*.cpp
+        ../src/*.h)
+
+list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
+
+add_executable(UnitTests RequestHandlerTest.cpp ${SRC_FILES})
 
 target_link_libraries(UnitTests
-        CONAN_PKG::gtest)
+        CONAN_PKG::gtest
+        CONAN_PKG::cli11
+        CONAN_PKG::librdkafka)
