@@ -13,12 +13,12 @@ if(NOT CONAN_DISABLE)
             BUILD_TYPE "None"
             BUILD outdated)
 endif()
-
-add_subdirectory(src)
-add_subdirectory(test)
-
 if(CMAKE_COMPILER_IS_GNUCXX AND COV)
     include(CodeCoverage)
     setup_target_for_coverage(coverage UnitTests coverage)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_COVERAGE}")
 endif()
+add_subdirectory(src)
+add_subdirectory(test)
+
+
