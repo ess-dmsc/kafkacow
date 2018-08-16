@@ -1,23 +1,22 @@
-//
-// Created by michal on 15/08/18.
-//
+#pragma once
+
+#include "ConnectKafka.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
-
-#ifndef KAFKACOW_TOPICHANDLER_H
-#define KAFKACOW_TOPICHANDLER_H
 
 class RequestHandler {
 private:
   std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
-
+  std::unique_ptr<ConnectKafka> KafkaConnection;
 public:
-  explicit RequestHandler(std::shared_ptr<RdKafka::KafkaConsumer> Consumer)
-      : Consumer(std::move(Consumer)) {}
+  explicit RequestHandler(std::unique_ptr<ConnectKafka> KafkaConnection)
+      : KafkaConnection(std::move(KafkaConnection))
+      {
+        Consumer=this->KafkaConnection->GetConsumer();
+        MetadataPointer=this->KafkaConnection->queryMetadata();
+      }
 
   std::string PrintAllTopics();
 };
-
-#endif // KAFKACOW_TOPICHANDLER_H

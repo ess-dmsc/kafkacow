@@ -1,5 +1,4 @@
 #include "ConnectKafka.h"
-#include "ConsumerPrepare.h"
 #include "RequestHandler.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
@@ -23,11 +22,9 @@ int main(int argc, char **argv) {
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
 
-  ConsumerPrepare CP(Broker, ErrStr);
-  auto Consumer = CP.GetConsumer();
+  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  RequestHandler RH(Consumer);
-
-  RH.PrintAllTopics();
+  NewRequestHandler.PrintAllTopics();
   return 0;
 }
