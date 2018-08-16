@@ -1,0 +1,7 @@
+fixes:
+  - "kafkacow/::"
+
+comment:
+  layout: "header, diff, tree, changes, sunburst"
+  require_changes: no
+
