@@ -11,3 +11,12 @@ std::string RequestHandlerFakeTestClass::GetAllTopics() {
 bool RequestHandlerFakeTestClass::CheckIfTopicExists(std::string Topic) {
   return KafkaConnection->CheckIfTopicExists(Topic);
 }
+
+void RequestHandlerFakeTestClass::Consume(std::string Topic) {
+  KafkaConnection->Consume(Topic);
+}
+
+void RequestHandlerFakeTestClass::SubscribeToTopic(
+    const std::vector<std::string> &Topic) {
+  KafkaConnection->SubscribeToTopic(Topic);
+}

@@ -25,10 +25,11 @@ int main(int argc, char **argv) {
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  if (NewRequestHandler.CheckIfTopicExists("test")) {
-    std::cout << "Topic exists";
-  } else {
-    std::cout << "Topic does not exist";
-  }
+  // std::cout<<"_________"<<std::endl<<NewRequestHandler.GetAllTopics()<<std::endl<<"___________";
+
+  std::vector<std::string> ToSubscribe;
+  ToSubscribe.push_back("SANS2D_events");
+  NewRequestHandler.SubscribeToTopic(ToSubscribe);
+  NewRequestHandler.Consume("SANS2D_events");
   return 0;
 }

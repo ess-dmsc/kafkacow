@@ -16,6 +16,7 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
   conf->set("enable.auto.offset.store", "false", ErrStr);
   conf->set("offset.store.method", "none", ErrStr);
   conf->set("api.version.request", "true", ErrStr);
+  conf->set("auto.offset.reset", "largest", ErrStr);
   return conf;
 }
 }
@@ -51,13 +52,52 @@ std::string ConnectKafka::GetAllTopics() {
   return ListOfTopics;
 }
 
-std::string
-ConnectKafka::SubscribeToTopic(const std::vector<std::string> &Topic) {
-
+void ConnectKafka::SubscribeToTopic(const std::vector<std::string> &Topic) {
   this->Consumer->subscribe(Topic);
 }
 
 bool ConnectKafka::CheckIfTopicExists(std::string Topic) {
   std::string AllTopics = GetAllTopics();
   return AllTopics.find(Topic) != std::string::npos;
+}
+
+std::string ConnectKafka::Consume(std::string Topic) {
+  using RdKafka::Message;
+  std::string *payload;
+  std::string topic;
+
+  auto kfMsg = std::unique_ptr<Message>(Consumer->consume(100));
+  switch (kfMsg->err()) {
+  case RdKafka::ERR_NO_ERROR:
+    // Real message
+    if (kfMsg->len() > 0) {
+      payload->assign(static_cast<const char *>(kfMsg->payload()),
+                      static_cast<int>(kfMsg->len()));
+      //      offset = kfMsg->offset();
+      //      partition = kfMsg->partition();
+      topic = kfMsg->topic_name();
+      std::cout << *payload << std::endl;
+      std::cout << topic << std::endl;
+      std::cout << "did i even get here?" << std::endl;
+    } else {
+      // If RdKafka indicates no error then we should always get a
+      // non-zero length message
+      throw std::runtime_error("KafkaTopicSubscriber::consumeMessage() - Kafka "
+                               "indicated no error but a zero-length payload "
+                               "was received");
+    }
+    break;
+
+  case RdKafka::ERR__TIMED_OUT:
+  case RdKafka::ERR__PARTITION_EOF:
+    // Not errors as the broker might come back or more data might be pushed
+    break;
+
+  default:
+    /* All other errors */
+    std::ostringstream os;
+    os << "KafkaTopicSubscriber::consumeMessage() - "
+       << RdKafka::err2str(kfMsg->err());
+    throw std::runtime_error(os.str());
+  }
 }

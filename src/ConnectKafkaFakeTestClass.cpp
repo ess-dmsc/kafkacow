@@ -10,11 +10,13 @@ std::string ConnectKafkaFakeTestClass::GetAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-std::string ConnectKafkaFakeTestClass::SubscribeToTopic(
-    const std::vector<std::string> &Topic) {
-  return nullptr;
-}
+void ConnectKafkaFakeTestClass::SubscribeToTopic(
+    const std::vector<std::string> &Topic) {}
 
 bool ConnectKafkaFakeTestClass::CheckIfTopicExists(std::string Topic) {
   return Topic.compare("Topic that exists") == 0;
+}
+
+std::string ConnectKafkaFakeTestClass::Consume(std::string Topic) {
+  return "Subscribed";
 }
