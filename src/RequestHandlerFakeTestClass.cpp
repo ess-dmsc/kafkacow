@@ -7,3 +7,7 @@ void RequestHandlerFakeTestClass::PrintToScreen(std::string ToPrint) {
 std::string RequestHandlerFakeTestClass::GetAllTopics() {
   return this->KafkaConnection->GetAllTopics();
 }
+
+bool RequestHandlerFakeTestClass::CheckIfTopicExists(std::string Topic) {
+  return KafkaConnection->CheckIfTopicExists(Topic);
+}

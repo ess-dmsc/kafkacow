@@ -4,7 +4,9 @@
 
 class ConnectKafkaParentClass {
 public:
-  virtual std::shared_ptr<RdKafka::KafkaConsumer> GetConsumer() = 0;
   virtual std::unique_ptr<RdKafka::Metadata> queryMetadata() = 0;
   virtual std::string GetAllTopics() = 0;
+  virtual std::string
+  SubscribeToTopic(const std::vector<std::string> &Topic) = 0;
+  virtual bool CheckIfTopicExists(std::string Topic) = 0;
 };

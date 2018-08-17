@@ -25,6 +25,10 @@ int main(int argc, char **argv) {
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  std::cout << NewRequestHandler.GetAllTopics() << std::endl;
+  if (NewRequestHandler.CheckIfTopicExists("test")) {
+    std::cout << "Topic exists";
+  } else {
+    std::cout << "Topic does not exist";
+  }
   return 0;
 }

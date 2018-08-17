@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../src/ConnectKafka.h"
-#include "../src/RequestHandler.h"
+#include "ConnectKafka.h"
+#include "RequestHandler.h"
 #include "RequestHandlerParentClass.h"
 #include <CLI/CLI.hpp>
 
@@ -15,4 +15,5 @@ public:
       : KafkaConnection(std::move(KafkaConnection)) {}
   virtual void PrintToScreen(std::string ToPrint);
   virtual std::string GetAllTopics() override;
+  virtual bool CheckIfTopicExists(std::string Topic) override;
 };

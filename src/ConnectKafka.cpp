@@ -41,10 +41,6 @@ ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
   this->MetadataPointer = this->queryMetadata();
 }
 
-std::shared_ptr<RdKafka::KafkaConsumer> ConnectKafka::GetConsumer() {
-  return Consumer;
-}
-
 std::string ConnectKafka::GetAllTopics() {
   auto Topics = MetadataPointer->topics();
   std::string ListOfTopics = "";
@@ -53,4 +49,15 @@ std::string ConnectKafka::GetAllTopics() {
     ListOfTopics += '\n';
   }
   return ListOfTopics;
+}
+
+std::string
+ConnectKafka::SubscribeToTopic(const std::vector<std::string> &Topic) {
+
+  this->Consumer->subscribe(Topic);
+}
+
+bool ConnectKafka::CheckIfTopicExists(std::string Topic) {
+  std::string AllTopics = GetAllTopics();
+  return AllTopics.find(Topic) != std::string::npos;
 }

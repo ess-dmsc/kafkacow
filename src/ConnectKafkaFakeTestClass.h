@@ -5,12 +5,10 @@
 #include <librdkafka/rdkafkacpp.h>
 
 class ConnectKafkaFakeTestClass : public ConnectKafkaParentClass {
-  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
-  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
-
 public:
-  std::shared_ptr<RdKafka::KafkaConsumer> GetConsumer() override;
-  ConnectKafkaFakeTestClass(std::string Broker, std::string ErrStr);
+  ConnectKafkaFakeTestClass();
   std::unique_ptr<RdKafka::Metadata> queryMetadata() override;
   std::string GetAllTopics() override;
+  std::string SubscribeToTopic(const std::vector<std::string> &Topic) override;
+  bool CheckIfTopicExists(std::string Topic) override;
 };
