@@ -213,7 +213,7 @@ def get_macos_pipeline()
 
                     try {
                         sh "make all UnitTests VERBOSE=1"
-                        sh "./bin/UnitTests ../code/data/ --gtest_output=xml:TestResults.xml"
+                        sh ". ./activate_run.sh && ./bin/UnitTests ../code/data/ --gtest_output=xml:TestResults.xml"
                     } catch (e) {
                         failure_function(e, 'MacOSX / build+test failed')
                     }

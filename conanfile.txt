@@ -6,6 +6,7 @@ gtest/3121b20-dm3@ess-dmsc/stable
 
 [generators]
 cmake
+virtualrunenv
 
 [options]
 librdkafka:shared=True
