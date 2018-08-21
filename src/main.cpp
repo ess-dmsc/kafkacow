@@ -31,7 +31,8 @@ int main(int argc, char **argv) {
 
   std::vector<std::string> ToSubscribe;
   ToSubscribe.push_back("wordcount-lambda-example-Counts-changelog");
-  NewRequestHandler.SubscribeToTopic(ToSubscribe);
-  NewRequestHandler.GetHighLowOffsets("wordcount-lambda-example-Counts-changelog");
+  // NewRequestHandler.SubscribeToTopic(ToSubscribe);
+  NewRequestHandler.GetHighLowOffsets(
+      "wordcount-lambda-example-Counts-changelog");
   return 0;
 }

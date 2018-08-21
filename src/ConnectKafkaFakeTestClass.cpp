@@ -34,11 +34,21 @@ std::unique_ptr<int64_t> ConnectKafkaFakeTestClass::GetCurrentPartitionOffset(
 
 std::vector<OffsetsStruct>
 ConnectKafkaFakeTestClass::GetHighAndLowOffsets(std::string Topic) {
-  return std::vector<OffsetsStruct>();
+  std::vector<OffsetsStruct> VectorOfPartitions;
+  OffsetsStruct FirstPartition;
+  FirstPartition.PartitionId = 0;
+  FirstPartition.HighOffset = 12345;
+  FirstPartition.LowOffset = 1234;
+  OffsetsStruct SecondPartition;
+  SecondPartition.PartitionId = 1;
+  SecondPartition.HighOffset = 22345;
+  SecondPartition.LowOffset = 2234;
+  VectorOfPartitions.push_back(FirstPartition);
+  VectorOfPartitions.push_back(SecondPartition);
+  return VectorOfPartitions;
 }
 
 std::vector<int32_t>
 ConnectKafkaFakeTestClass::GetTopicPartitions(std::string Topic) {
-  std::vector<int32_t> VectorOfPartitions;
-  return VectorOfPartitions;
+  return std::vector<int32_t>();
 }

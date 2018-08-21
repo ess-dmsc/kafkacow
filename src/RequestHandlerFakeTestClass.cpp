@@ -15,8 +15,3 @@ bool RequestHandlerFakeTestClass::CheckIfTopicExists(std::string Topic) {
 void RequestHandlerFakeTestClass::Consume(std::string Topic) {
   KafkaConnection->Consume(Topic);
 }
-
-void RequestHandlerFakeTestClass::SubscribeToTopic(
-    const std::vector<std::string> &Topic) {
-  KafkaConnection->SubscribeToTopic(Topic);
-}
