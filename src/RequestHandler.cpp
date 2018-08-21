@@ -19,3 +19,12 @@ void RequestHandler::Consume(std::string Topic) {
 void RequestHandler::SubscribeToTopic(const std::vector<std::string> &Topic) {
   KafkaConnection->SubscribeToTopic(Topic);
 }
+
+void RequestHandler::GetHighLowOffsets(std::string Topic) {
+  std::vector<OffsetsStruct> HighLowOffsets =
+      KafkaConnection->GetHighAndLowOffsets(Topic);
+  for (auto Record : HighLowOffsets) {
+    std::cout << Record.PartitionId << " " << Record.LowOffset << " "
+              << Record.HighOffset << std::endl;
+  }
+}

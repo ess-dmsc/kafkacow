@@ -24,4 +24,6 @@ public:
   virtual void Consume(std::string Topic) override;
 
   virtual void SubscribeToTopic(const std::vector<std::string> &Topic) override;
+
+  virtual void GetHighLowOffsets(std::string Topic) override;
 };

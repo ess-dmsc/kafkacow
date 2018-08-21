@@ -10,4 +10,5 @@ protected:
   virtual bool CheckIfTopicExists(std::string Topic) = 0;
   virtual void Consume(std::string Topic) = 0;
   virtual void SubscribeToTopic(const std::vector<std::string> &Topic) = 0;
+  virtual void GetHighLowOffsets(std::string Topic)=0;
 };

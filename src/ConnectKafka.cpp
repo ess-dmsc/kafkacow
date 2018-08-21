@@ -1,4 +1,5 @@
 #include "ConnectKafka.h"
+#include "TopicMetadataStruct.h"
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
@@ -100,4 +101,51 @@ std::string ConnectKafka::Consume(std::string Topic) {
        << RdKafka::err2str(kfMsg->err());
     throw std::runtime_error(os.str());
   }
+}
+
+std::vector<int32_t> ConnectKafka::GetTopicPartitions(std::string Topic) {
+  auto TopicMetadata = GetTopicMetadata(Topic);
+  return TopicMetadata.Partitions;
+}
+
+TopicMetadataStruct ConnectKafka::GetTopicMetadata(std::string TopicName) {
+  auto Metadata = queryMetadata();
+  auto Topics = Metadata->topics();
+  auto iter = std::find_if(Topics->cbegin(), Topics->cend(),
+                           [TopicName](const RdKafka::TopicMetadata *tpc) {
+                             return tpc->topic() == TopicName;
+                           });
+  auto matchedTopic = *iter;
+  TopicMetadataStruct TopicMetadata;
+  TopicMetadata.Name = matchedTopic->topic();
+  auto PartitionMetadata = matchedTopic->partitions();
+
+  // save needed partition metadata here
+  for (auto &Partition : *PartitionMetadata) {
+    TopicMetadata.Partitions.push_back(Partition->id());
+  }
+  return TopicMetadata;
+}
+
+std::unique_ptr<int64_t> ConnectKafka::GetCurrentPartitionOffset(
+    const RdKafka::TopicMetadata::PartitionMetadataVector *) {
+  return std::unique_ptr<int64_t>();
+}
+std::vector<OffsetsStruct>
+ConnectKafka::GetHighAndLowOffsets(std::string Topic) {
+  auto TopicPartitions = GetTopicPartitions(Topic);
+
+  int64_t Low, High;
+  int Timeout = 100;
+  std::vector<OffsetsStruct> HighAndLowOffsets;
+
+  for (auto &PartitionID : TopicPartitions) {
+    Consumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, Timeout);
+    OffsetsStruct OffsetsToSave;
+    OffsetsToSave.HighOffset = High;
+    OffsetsToSave.LowOffset = Low;
+    OffsetsToSave.PartitionId = PartitionID;
+    HighAndLowOffsets.push_back(OffsetsToSave);
+  }
+  return HighAndLowOffsets;
 }

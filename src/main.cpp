@@ -25,11 +25,13 @@ int main(int argc, char **argv) {
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  // std::cout<<"_________"<<std::endl<<NewRequestHandler.GetAllTopics()<<std::endl<<"___________";
+  std::cout << "_________" << std::endl
+            << NewRequestHandler.GetAllTopics() << std::endl
+            << "___________" << std::endl;
 
   std::vector<std::string> ToSubscribe;
-  ToSubscribe.push_back("SANS2D_events");
+  ToSubscribe.push_back("wordcount-lambda-example-Counts-changelog");
   NewRequestHandler.SubscribeToTopic(ToSubscribe);
-  NewRequestHandler.Consume("SANS2D_events");
+  NewRequestHandler.GetHighLowOffsets("wordcount-lambda-example-Counts-changelog");
   return 0;
 }
