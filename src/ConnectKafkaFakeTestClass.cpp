@@ -17,8 +17,10 @@ bool ConnectKafkaFakeTestClass::CheckIfTopicExists(std::string Topic) {
   return Topic.compare("Topic that exists") == 0;
 }
 
-std::string ConnectKafkaFakeTestClass::Consume(std::string Topic) {
-  return "Subscribed";
+std::pair<std::string, bool>
+ConnectKafkaFakeTestClass::ConsumeFromOffset(std::string Topic) {
+  return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
+                                      true);
 }
 
 TopicMetadataStruct
@@ -49,6 +51,30 @@ ConnectKafkaFakeTestClass::GetHighAndLowOffsets(std::string Topic) {
 }
 
 std::vector<int32_t>
-ConnectKafkaFakeTestClass::GetTopicPartitions(std::string Topic) {
+ConnectKafkaFakeTestClass::GetTopicPartitionNumbers(std::string Topic) {
   return std::vector<int32_t>();
+}
+
+std::vector<RdKafka::TopicPartition *>
+ConnectKafkaFakeTestClass::GetTopicPartitions(std::string Topic) {
+  return std::vector<RdKafka::TopicPartition *>();
+}
+
+int64_t
+ConnectKafkaFakeTestClass::GetNumberOfTopicPartitions(std::string TopicName) {
+  return 1;
+}
+
+void ConnectKafkaFakeTestClass::SubscribeAtOffset(int64_t Offset,
+                                                  std::string TopicName) {}
+
+void ConnectKafkaFakeTestClass::SubscribeToLastNMessages(
+    int64_t NMessages, std::string TopicName) {}
+
+std::pair<std::string, bool>
+ConnectKafkaFakeTestClass::ConsumeLastNMessages(std::string Topic,
+                                                int64_t NumberOfMessages) {
+
+  return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
+                                      true);
 }

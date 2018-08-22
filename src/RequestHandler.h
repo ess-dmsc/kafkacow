@@ -15,14 +15,10 @@ public:
       std::unique_ptr<ConnectKafkaParentClass> KafkaConnection)
       : KafkaConnection(std::move(KafkaConnection)) {}
 
-  void PrintToScreen(std::string ToPrint) override;
-
-  virtual std::string GetAllTopics() override;
-
-  virtual bool CheckIfTopicExists(std::string Topic) override;
-
-  virtual void Consume(std::string Topic) override;
-
-  virtual std::vector<OffsetsStruct>
-  GetHighLowOffsets(std::string Topic) override;
+  virtual int Init() override;
+  virtual std::string SubscribeConsumeAtOffset(std::string TopicName,
+                                               int64_t Offset) override;
+  virtual std::string
+  SubscribeConsumeNLastMessages(std::string TopicName,
+                                int64_t NumberOfMessages) override;
 };

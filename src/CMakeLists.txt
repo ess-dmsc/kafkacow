@@ -4,8 +4,6 @@ add_executable(kafkaCow main.cpp
         RequestHandlerParentClass.h
         ConnectKafka.cpp
         ConnectKafka.h
-        RequestHandlerFakeTestClass.cpp
-        RequestHandlerFakeTestClass.h
         ConnectKafkaParentClass.h
         ConnectKafkaFakeTestClass.cpp
         ConnectKafkaFakeTestClass.h)

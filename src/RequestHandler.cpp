@@ -1,24 +1,72 @@
 #include "RequestHandler.h"
 #include "ConnectKafka.h"
+#include <thread>
+int RequestHandler::Init() {
+  std::string Topic = "MULTIPART_events";
 
-void RequestHandler::PrintToScreen(std::string ToPrint) {
-  std::cout << this->KafkaConnection->GetAllTopics() << std::endl;
-}
-std::string RequestHandler::GetAllTopics() {
-  return this->KafkaConnection->GetAllTopics();
+  std::cout << "_________" << std::endl
+            << KafkaConnection->GetAllTopics() << std::endl
+            << "___________" << std::endl;
+
+  std::vector<std::string> ToSubscribe;
+  if (KafkaConnection->CheckIfTopicExists(Topic)) {
+    ToSubscribe.push_back(Topic);
+    for (auto &SingleStruct : KafkaConnection->GetHighAndLowOffsets(Topic)) {
+      std::cout << SingleStruct.PartitionId << " " << SingleStruct.LowOffset
+                << " " << SingleStruct.HighOffset << std::endl;
+    }
+    SubscribeConsumeAtOffset(Topic, 6000);
+    std::cout << "##################\n##################\n##################\n#"
+                 "#################\n";
+    SubscribeConsumeNLastMessages(Topic, 3);
+  } else
+    std::cout << "No such topic" << std::endl;
+  return 0;
 }
 
-bool RequestHandler::CheckIfTopicExists(std::string Topic) {
-  return KafkaConnection->CheckIfTopicExists(Topic);
+std::string RequestHandler::SubscribeConsumeAtOffset(std::string TopicName,
+                                                     int64_t Offset) {
+  int EOFPartitionCounter = 0,
+      NumberOfPartitions =
+          KafkaConnection->GetNumberOfTopicPartitions(TopicName);
+  std::pair<std::string, bool> MessageAndEOF;
+  int i = 0;
+  // SUBSCRIBE AT AN OFFSET
+  KafkaConnection->SubscribeAtOffset(Offset, TopicName);
+  while (EOFPartitionCounter < NumberOfPartitions) {
+    MessageAndEOF = KafkaConnection->ConsumeFromOffset(TopicName);
+    i++;
+    if (MessageAndEOF.second) {
+      EOFPartitionCounter++;
+      std::cout << "__________________________" << EOFPartitionCounter
+                << std::endl;
+    }
+    std::cout << MessageAndEOF.first << std::endl;
+    std::cout << i << std::endl;
+  }
+  return MessageAndEOF.first;
 }
 
-void RequestHandler::Consume(std::string Topic) {
-  KafkaConnection->Consume(Topic);
-}
-
-std::vector<OffsetsStruct>
-RequestHandler::GetHighLowOffsets(std::string Topic) {
-  std::vector<OffsetsStruct> HighLowOffsets =
-      KafkaConnection->GetHighAndLowOffsets(Topic);
-  return HighLowOffsets;
+std::string
+RequestHandler::SubscribeConsumeNLastMessages(std::string TopicName,
+                                              int64_t NumberOfMessages) {
+  int EOFPartitionCounter = 0,
+      NumberOfPartitions =
+          KafkaConnection->GetNumberOfTopicPartitions(TopicName);
+  std::pair<std::string, bool> MessageAndEOF;
+  int i = 0;
+  KafkaConnection->SubscribeToLastNMessages(NumberOfMessages, TopicName);
+  while (EOFPartitionCounter < NumberOfPartitions) {
+    MessageAndEOF =
+        KafkaConnection->ConsumeLastNMessages(TopicName, NumberOfMessages);
+    i++;
+    if (MessageAndEOF.second) {
+      EOFPartitionCounter++;
+      std::cout << "__________________________" << EOFPartitionCounter
+                << std::endl;
+    }
+    std::cout << MessageAndEOF.first << std::endl;
+    std::cout << i << std::endl;
+  }
+  return MessageAndEOF.first;
 }

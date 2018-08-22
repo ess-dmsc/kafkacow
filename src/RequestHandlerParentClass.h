@@ -5,9 +5,10 @@
 
 class RequestHandlerParentClass {
 protected:
-  virtual void PrintToScreen(std::string ToPrint) = 0;
-  virtual std::string GetAllTopics() = 0;
-  virtual bool CheckIfTopicExists(std::string Topic) = 0;
-  virtual void Consume(std::string Topic) = 0;
-  virtual std::vector<OffsetsStruct> GetHighLowOffsets(std::string Topic) = 0;
+  virtual int Init() = 0;
+  virtual std::string SubscribeConsumeAtOffset(std::string TopicName,
+                                               int64_t Offset) = 0;
+  virtual std::string
+  SubscribeConsumeNLastMessages(std::string TopicName,
+                                int64_t NumberOfMessages) = 0;
 };

@@ -21,18 +21,9 @@ int main(int argc, char **argv) {
                  false);
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
-
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
+  NewRequestHandler.Init();
 
-  std::cout << "_________" << std::endl
-            << NewRequestHandler.GetAllTopics() << std::endl
-            << "___________" << std::endl;
-
-  std::vector<std::string> ToSubscribe;
-  ToSubscribe.push_back("wordcount-lambda-example-Counts-changelog");
-  // NewRequestHandler.SubscribeToTopic(ToSubscribe);
-  NewRequestHandler.GetHighLowOffsets(
-      "wordcount-lambda-example-Counts-changelog");
   return 0;
 }
