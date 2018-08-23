@@ -1,32 +1,13 @@
 #pragma once
-
 #include "ConnectKafkaInterface.h"
-#include "OffsetsStruct.h"
 #include "TopicMetadataStruct.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
-class ConnectKafka : public ConnectKafkaInterface {
-  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
-  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
-
+class ConnectKafkaFake : public ConnectKafkaInterface {
 public:
-  ConnectKafka(std::string Broker, std::string ErrStr);
-  ~ConnectKafka() {
-    if (Consumer) {
-      Consumer->close();
-      /*
-       * Wait for RdKafka to decommission.
-       * This is not strictly needed (with check outq_len() above), but
-       * allows RdKafka to clean up all its resources before the application
-       * exits so that memory profilers such as valgrind wont complain about
-       * memory leaks.
-       */
-      RdKafka::wait_destroyed(5000);
-    }
-  }
-
+  ConnectKafkaFake();
   std::unique_ptr<RdKafka::Metadata> queryMetadata() override;
 
   std::string getAllTopics() override;

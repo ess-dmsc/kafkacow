@@ -3,12 +3,12 @@
 #include "../src/ConnectKafka.h"
 #include <librdkafka/rdkafkacpp.h>
 
-class RequestHandlerParentClass {
+class RequestHandlerInterface {
 protected:
-  virtual int Init() = 0;
-  virtual std::string SubscribeConsumeAtOffset(std::string TopicName,
+  virtual int init() = 0;
+  virtual std::string subscribeConsumeAtOffset(std::string TopicName,
                                                int64_t Offset) = 0;
   virtual std::string
-  SubscribeConsumeNLastMessages(std::string TopicName,
+  subscribeConsumeNLastMessages(std::string TopicName,
                                 int64_t NumberOfMessages) = 0;
 };

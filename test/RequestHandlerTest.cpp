@@ -1,30 +1,28 @@
-#include "../src/ConnectKafkaFakeTestClass.h"
-#include "../src/ConnectKafkaParentClass.h"
+#include "../src/ConnectKafkaFake.h"
+#include "../src/ConnectKafkaInterface.h"
 #include "../src/RequestHandler.h"
 #include <gtest/gtest.h>
 
 class RequestHandlerTest : public ::testing::Test {};
 
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_test) {
-  auto KafkaConnection =
-      std::make_unique<ConnectKafkaFakeTestClass>(ConnectKafkaFakeTestClass());
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
   std::string Message =
-      NewRequestHandler.SubscribeConsumeNLastMessages("ExampleTestTopic", 100);
+      NewRequestHandler.subscribeConsumeNLastMessages("ExampleTestTopic", 100);
 
   EXPECT_EQ("HiddenSecretMessageFromLovingNeutron", Message);
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_test) {
-  auto KafkaConnection =
-      std::make_unique<ConnectKafkaFakeTestClass>(ConnectKafkaFakeTestClass());
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
   std::string Message =
-      NewRequestHandler.SubscribeConsumeAtOffset("ExampleTestTopic", 100);
+      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100);
 
   EXPECT_EQ("HiddenSecretMessageFromLovingNeutron", Message);
 }
