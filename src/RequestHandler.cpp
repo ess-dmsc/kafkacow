@@ -57,8 +57,7 @@ RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   int i = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName);
   while (EOFPartitionCounter < NumberOfPartitions) {
-    MessageAndEOF =
-        KafkaConnection->consumeLastNMessages();
+    MessageAndEOF = KafkaConnection->consumeLastNMessages();
     i++;
     if (MessageAndEOF.second) {
       EOFPartitionCounter++;

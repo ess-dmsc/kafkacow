@@ -16,8 +16,7 @@ public:
 
   std::pair<std::string, bool> consumeFromOffset() override;
 
-  std::pair<std::string, bool>
-  consumeLastNMessages() override;
+  std::pair<std::string, bool> consumeLastNMessages() override;
 
   std::vector<int32_t>
 

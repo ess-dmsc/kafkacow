@@ -183,8 +183,7 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string TopicName) {
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
 }
 
-std::pair<std::string, bool>
-ConnectKafka::consumeLastNMessages() {
+std::pair<std::string, bool> ConnectKafka::consumeLastNMessages() {
   return consumeFromOffset();
 }
 

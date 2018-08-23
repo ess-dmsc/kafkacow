@@ -13,8 +13,7 @@ public:
   virtual bool checkIfTopicExists(std::string Topic) = 0;
 
   virtual std::pair<std::string, bool> consumeFromOffset() = 0;
-  virtual std::pair<std::string, bool>
-  consumeLastNMessages() = 0;
+  virtual std::pair<std::string, bool> consumeLastNMessages() = 0;
 
   virtual std::vector<int32_t> getTopicPartitionNumbers(std::string Topic) = 0;
 
