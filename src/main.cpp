@@ -13,7 +13,9 @@ int main(int argc, char **argv) {
   std::int16_t GoBack = -1;
   bool ShowAllTopics;
 
-  App.add_option("-g, --go", GoBack, "How many records back to show");
+  App.add_option(
+      "-g, --go", GoBack,
+      "How many records back to show. Otherwise retrieve entire topic.");
   App.add_option("-t, --topic", Name, "Show records of specified topic");
   App.add_option("-b,--Broker", Broker, "Hostname or IP of Kafka broker");
   App.add_flag("-a, --all", ShowAllTopics, "Show a list of topics");
@@ -21,18 +23,9 @@ int main(int argc, char **argv) {
                  false);
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
-
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
+  NewRequestHandler.init();
 
-  std::cout << "_________" << std::endl
-            << NewRequestHandler.GetAllTopics() << std::endl
-            << "___________" << std::endl;
-
-  std::vector<std::string> ToSubscribe;
-  ToSubscribe.push_back("wordcount-lambda-example-Counts-changelog");
-  // NewRequestHandler.SubscribeToTopic(ToSubscribe);
-  NewRequestHandler.GetHighLowOffsets(
-      "wordcount-lambda-example-Counts-changelog");
   return 0;
 }
