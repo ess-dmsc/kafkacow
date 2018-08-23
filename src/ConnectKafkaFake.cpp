@@ -10,9 +10,6 @@ std::string ConnectKafkaFake::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-void ConnectKafkaFake::subscribeToTopic(const std::vector<std::string> &Topic) {
-}
-
 bool ConnectKafkaFake::checkIfTopicExists(std::string Topic) {
   return Topic == "Topic that exists";
   ;
@@ -64,8 +61,7 @@ void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
                                                 std::string TopicName) {}
 
 std::pair<std::string, bool>
-ConnectKafkaFake::consumeLastNMessages(std::string Topic,
-                                       int64_t NumberOfMessages) {
+ConnectKafkaFake::consumeLastNMessages() {
 
   return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
                                       true);

@@ -10,13 +10,11 @@ public:
 
   virtual std::string getAllTopics() = 0;
 
-  virtual void subscribeToTopic(const std::vector<std::string> &Topic) = 0;
-
   virtual bool checkIfTopicExists(std::string Topic) = 0;
 
   virtual std::pair<std::string, bool> consumeFromOffset() = 0;
   virtual std::pair<std::string, bool>
-  consumeLastNMessages(std::string Topic, int64_t NumberOfMessages) = 0;
+  consumeLastNMessages() = 0;
 
   virtual std::vector<int32_t> getTopicPartitionNumbers(std::string Topic) = 0;
 

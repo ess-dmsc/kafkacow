@@ -12,14 +12,12 @@ public:
 
   std::string getAllTopics() override;
 
-  void subscribeToTopic(const std::vector<std::string> &Topic) override;
-
   bool checkIfTopicExists(std::string Topic) override;
 
   std::pair<std::string, bool> consumeFromOffset() override;
 
   std::pair<std::string, bool>
-  consumeLastNMessages(std::string Topic, int64_t NumberOfMessages) override;
+  consumeLastNMessages() override;
 
   std::vector<int32_t>
 

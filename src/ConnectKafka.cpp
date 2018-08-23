@@ -53,10 +53,6 @@ std::string ConnectKafka::getAllTopics() {
   return ListOfTopics;
 }
 
-void ConnectKafka::subscribeToTopic(const std::vector<std::string> &Topic) {
-  this->Consumer->subscribe(Topic);
-}
-
 bool ConnectKafka::checkIfTopicExists(std::string Topic) {
   std::string AllTopics = getAllTopics();
   return AllTopics.find(Topic) != std::string::npos;
@@ -188,8 +184,7 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string TopicName) {
 }
 
 std::pair<std::string, bool>
-ConnectKafka::consumeLastNMessages(std::string Topic,
-                                   int64_t NumberOfMessages) {
+ConnectKafka::consumeLastNMessages() {
   return consumeFromOffset();
 }
 
