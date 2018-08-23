@@ -207,5 +207,5 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
   Consumer->assign(TopicPartitionsWithOffsets);
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
-                [](RdKafka::TopicPartition *partition) { delete partition; });
+                [](RdKafka::TopicPartition *Partition) { delete Partition; });
 }
