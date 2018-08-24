@@ -3,6 +3,7 @@ file(GLOB SRC_FILES
         ../src/*.h)
 
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
+list(FILTER SRC_FILES EXCLUDE REGEX ".*ConnectKafka.cpp$")
 
 add_executable(UnitTests RequestHandlerTest.cpp ${SRC_FILES})
 
