@@ -1,8 +1,8 @@
 #pragma once
 
+#include "iostream"
 #include <exception>
 #include <string>
-#include "iostream"
 class ArgumentsException : public std::exception {
 private:
   std::string Message;

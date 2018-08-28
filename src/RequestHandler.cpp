@@ -35,7 +35,6 @@ void RequestHandler::checkConsumerModeArguments(
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
   else {
-    // TODO call appropriate methods
     UserArguments.OffsetToStart > -2
         ? subscribeConsumeAtOffset(UserArguments.Name,
                                    UserArguments.OffsetToStart)
@@ -104,7 +103,7 @@ void RequestHandler::showTopicPartitionOffsets(
     UserArgumentStruct UserArguments) {
   for (auto &SingleStruct :
        KafkaConnection->getHighAndLowOffsets(UserArguments.Name)) {
-    std::cout << SingleStruct.PartitionId << " " << SingleStruct.LowOffset
-              << " " << SingleStruct.HighOffset << std::endl;
+    std::cout << SingleStruct.PartitionId << " | " << SingleStruct.LowOffset
+              << " | " << SingleStruct.HighOffset << std::endl;
   }
 }
