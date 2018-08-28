@@ -104,7 +104,7 @@ TEST(RequestHandlerTest,
                ArgumentsException);
 }
 
-// consumer mode arguments test
+// consumer mode argument test
 
 TEST(RequestHandlerTest,
      consumer_mode_arguments_check_offsets_and_lastN_specified_test) {
