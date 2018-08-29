@@ -3,11 +3,12 @@
 #include "iostream"
 #include <exception>
 #include <string>
+
 class ArgumentsException : public std::exception {
 private:
   std::string Message;
 
 public:
-  ArgumentsException(std::string Message) : Message(Message) {}
-  void printException() { std::cout << Message << std::endl; }
+  explicit ArgumentsException(std::string Message) : Message(Message) {}
+  const char *what() const noexcept override { return Message.c_str(); }
 };

@@ -37,7 +37,13 @@ int main(int argc, char **argv) {
   std::string ErrStr;
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
-  NewRequestHandler.init(UserArguments);
+  try {
 
+    NewRequestHandler.checkAndRun(UserArguments);
+  } catch (ArgumentsException &E) {
+    E.what();
+  } catch (std::exception &E) {
+    std::cout << E.what() << std::endl;
+  }
   return 0;
 }

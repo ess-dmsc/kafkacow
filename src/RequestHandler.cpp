@@ -2,30 +2,19 @@
 #include "ConnectKafka.h"
 #include <thread>
 
-int RequestHandler::init(UserArgumentStruct UserArguments) {
-  checkAndRun(UserArguments);
-  return 0;
-}
-
 // check whether arguments passed match any methods
 void RequestHandler::checkAndRun(UserArgumentStruct UserArguments) {
-  try {
-    // check input if ConsumerMode chosen
-    if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
-      checkConsumerModeArguments(UserArguments);
+  // check input if ConsumerMode chosen
+  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
+    checkConsumerModeArguments(UserArguments);
 
-    // check input if MetadataMode chosen
-    else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode)
-      checkMetadataModeArguments(UserArguments);
-    // no MetadataMode or ConsumerMode chosen
-    else
-      throw ArgumentsException(
-          "Program can run in one and only one mode: --consumer or --metadata");
-  } catch (ArgumentsException E) {
-    E.printException();
-  } catch (std::exception E) {
-    std::cout << E.what() << std::endl;
-  }
+  // check input if MetadataMode chosen
+  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode)
+    checkMetadataModeArguments(UserArguments);
+  // no MetadataMode or ConsumerMode chosen
+  else
+    throw ArgumentsException(
+        "Program can run in one and only one mode: --consumer or --metadata");
 }
 
 void RequestHandler::checkConsumerModeArguments(
@@ -48,7 +37,7 @@ void RequestHandler::checkMetadataModeArguments(
   if (!UserArguments.ShowAllTopics && !UserArguments.ShowPartitionsOffsets)
     throw ArgumentsException("No action specified for \"--list\" mode");
   else if (UserArguments.ShowAllTopics)
-    std::cout << KafkaConnection->getAllTopics() << std::endl;
+    std::cout << KafkaConnection->getAllTopics() << "\n";
   if (UserArguments.ShowPartitionsOffsets)
     showTopicPartitionOffsets(UserArguments);
 }
@@ -67,11 +56,10 @@ std::string RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
     i++;
     if (MessageAndEOF.second) {
       EOFPartitionCounter++;
-      std::cout << "__________________________" << EOFPartitionCounter
-                << std::endl;
+      std::cout << "__________________________" << EOFPartitionCounter << "\n";
     }
-    std::cout << MessageAndEOF.first << std::endl;
-    std::cout << i << std::endl;
+    std::cout << MessageAndEOF.first << "\n";
+    std::cout << i << "\n";
   }
   return MessageAndEOF.first;
 }
@@ -90,11 +78,10 @@ RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
     i++;
     if (MessageAndEOF.second) {
       EOFPartitionCounter++;
-      std::cout << "__________________________" << EOFPartitionCounter
-                << std::endl;
+      std::cout << "__________________________" << EOFPartitionCounter << "\n";
     }
-    std::cout << MessageAndEOF.first << std::endl;
-    std::cout << i << std::endl;
+    std::cout << MessageAndEOF.first << "\n";
+    std::cout << i << "\n";
   }
   return MessageAndEOF.first;
 }
@@ -103,7 +90,8 @@ void RequestHandler::showTopicPartitionOffsets(
     UserArgumentStruct UserArguments) {
   for (auto &SingleStruct :
        KafkaConnection->getHighAndLowOffsets(UserArguments.Name)) {
-    std::cout << SingleStruct.PartitionId << " | " << SingleStruct.LowOffset
-              << " | " << SingleStruct.HighOffset << std::endl;
+    std::cout << "Partition ID: " << SingleStruct.PartitionId
+              << " || Low offset: " << SingleStruct.LowOffset
+              << " || High offset: " << SingleStruct.HighOffset << "\n";
   }
 }

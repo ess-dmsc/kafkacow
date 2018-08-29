@@ -16,8 +16,6 @@ public:
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection)
       : KafkaConnection(std::move(KafkaConnection)) {}
 
-  int init(UserArgumentStruct UserArguments) override;
-
   void checkAndRun(UserArgumentStruct UserArguments) override;
 
   void checkConsumerModeArguments(UserArgumentStruct UserArguments) override;
