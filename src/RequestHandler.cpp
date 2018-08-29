@@ -1,4 +1,5 @@
 #include "RequestHandler.h"
+#include "ArgumentsException.h"
 #include "ConnectKafka.h"
 #include <thread>
 
@@ -54,12 +55,9 @@ std::string RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeFromOffset();
     i++;
-    if (MessageAndEOF.second) {
+    if (MessageAndEOF.second)
       EOFPartitionCounter++;
-      std::cout << "__________________________" << EOFPartitionCounter << "\n";
-    }
     std::cout << MessageAndEOF.first << "\n";
-    std::cout << i << "\n";
   }
   return MessageAndEOF.first;
 }
@@ -76,12 +74,9 @@ RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
     i++;
-    if (MessageAndEOF.second) {
+    if (MessageAndEOF.second)
       EOFPartitionCounter++;
-      std::cout << "__________________________" << EOFPartitionCounter << "\n";
-    }
     std::cout << MessageAndEOF.first << "\n";
-    std::cout << i << "\n";
   }
   return MessageAndEOF.first;
 }

@@ -3,8 +3,6 @@
 #include "ConnectKafkaInterface.h"
 #include "OffsetsStruct.h"
 #include "TopicMetadataStruct.h"
-#include <CLI/CLI.hpp>
-#include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
 class ConnectKafka : public ConnectKafkaInterface {

@@ -1,10 +1,7 @@
 #pragma once
 
-#include "ArgumentsException.h"
 #include "ConnectKafka.h"
 #include "RequestHandlerInterface.h"
-#include <CLI/CLI.hpp>
-#include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
 class RequestHandler : public RequestHandlerInterface {

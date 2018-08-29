@@ -1,4 +1,5 @@
 #pragma once
+
 #include "OffsetsStruct.h"
 #include "TopicMetadataStruct.h"
 #include <CLI/CLI.hpp>

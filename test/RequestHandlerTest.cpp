@@ -1,3 +1,4 @@
+#include "../src/ArgumentsException.h"
 #include "../src/ConnectKafkaFake.h"
 #include "../src/ConnectKafkaInterface.h"
 #include "../src/RequestHandler.h"

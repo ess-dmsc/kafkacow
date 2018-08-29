@@ -1,5 +1,6 @@
 #include "ConnectKafka.h"
 #include "TopicMetadataStruct.h"
+#include <iostream>
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
