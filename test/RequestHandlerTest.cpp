@@ -1,3 +1,4 @@
+#include "../src/ArgumentsException.h"
 #include "../src/ConnectKafkaFake.h"
 #include "../src/ConnectKafkaInterface.h"
 #include "../src/RequestHandler.h"
@@ -36,4 +37,78 @@ TEST(RequestHandlerTest, topic_metadata_creation_test) {
 
   EXPECT_EQ(PartitionVector, TopicMetadataStructTest.Partitions);
   EXPECT_EQ("TestName", TopicMetadataStructTest.Name);
+}
+
+TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.OffsetToStart = 1234;
+  UserArguments.Name = "TestTopicName";
+
+  EXPECT_NO_THROW(NewRequestHandler.checkAndRun(UserArguments));
+}
+
+TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = false;
+  UserArguments.MetadataMode = false;
+
+  EXPECT_THROW(NewRequestHandler.checkAndRun(UserArguments),
+               ArgumentsException);
+}
+
+// metadata mode arguments test
+TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ShowPartitionsOffsets = true;
+  EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
+}
+TEST(RequestHandlerTest, show_all_topics_no_error) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ShowAllTopics = true;
+  EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
+}
+TEST(RequestHandlerTest, no_action_specified_in_metadata_mode) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ShowAllTopics = false;
+  UserArguments.ShowPartitionsOffsets = false;
+  EXPECT_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments),
+               ArgumentsException);
+}
+
+// consumer mode argument test
+
+TEST(RequestHandlerTest, both_goback_and_offsettostart_specified_error) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = 1234;
+  UserArguments.GoBack = 1234;
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
+               ArgumentsException);
+}
+
+TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = -1234;
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }

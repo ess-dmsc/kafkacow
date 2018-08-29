@@ -1,3 +1,4 @@
+#include "ArgumentsException.h"
 #include "ConnectKafka.h"
 #include "RequestHandler.h"
 #include <CLI/CLI.hpp>
@@ -7,25 +8,43 @@
 int main(int argc, char **argv) {
   CLI::App App{"From Kafka with love"};
 
-  std::string Name;
+  UserArgumentStruct UserArguments;
   std::string Broker;
-  std::string InstrumentName = "test";
-  std::int16_t GoBack = -1;
-  bool ShowAllTopics;
 
-  App.add_option(
-      "-g, --go", GoBack,
-      "How many records back to show. Otherwise retrieve entire topic.");
-  App.add_option("-t, --topic", Name, "Show records of specified topic");
-  App.add_option("-b,--Broker", Broker, "Hostname or IP of Kafka broker");
-  App.add_flag("-a, --all", ShowAllTopics, "Show a list of topics");
+  App.add_option("-g, --go", UserArguments.GoBack,
+                 "How many records back to show. Otherwise "
+                 "retrieve entire topic. Mutually "
+                 "exclusive with \"--Offset\"");
+  App.add_option("-t, --topic", UserArguments.Name,
+                 "Show records of specified topic");
+  App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker");
+  App.add_option("-o,--offset", UserArguments.OffsetToStart,
+                 "Start consuming from an offset. Otherwise retrieve entire "
+                 "topic. Mutually exclusive with \"--go\"");
+
+  App.add_flag("-a, --all", UserArguments.ShowAllTopics,
+               "Show a list of topics");
+  App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
+               "Run the program in the consumer mode");
+  App.add_flag("-l, --list", UserArguments.MetadataMode,
+               "Run the program in the metadata mode");
+  App.add_flag("-p, --partitions", UserArguments.ShowPartitionsOffsets,
+               "Show offsets for partitions of given topic \"-t\"");
+
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
+
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
-  NewRequestHandler.init();
+  try {
 
+    NewRequestHandler.checkAndRun(UserArguments);
+  } catch (ArgumentsException &E) {
+    E.what();
+  } catch (std::exception &E) {
+    std::cout << E.what() << std::endl;
+  }
   return 0;
 }
