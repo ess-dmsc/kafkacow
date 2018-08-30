@@ -11,5 +11,7 @@ add_executable(kafkaCow main.cpp
         UserArgumentsStruct.h
         OffsetsStruct.h
         TopicMetadataStruct.h
+        FlatbuffersTranslator.cpp
+        FlatbuffersTranslator.h
         )
-target_link_libraries(kafkaCow CONAN_PKG::cli11 CONAN_PKG::librdkafka)
+target_link_libraries(kafkaCow CONAN_PKG::cli11 CONAN_PKG::librdkafka CONAN_PKG::FlatBuffers)
