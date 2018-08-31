@@ -4,6 +4,8 @@
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 int main(int argc, char **argv) {
   CLI::App App{"From Kafka with love"};
@@ -33,7 +35,8 @@ int main(int argc, char **argv) {
 
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
-
+  auto console = spdlog::stdout_color_mt("console");
+  console->info("Welcome to spdlog!");
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
