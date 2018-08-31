@@ -14,4 +14,7 @@ add_executable(kafkaCow main.cpp
         FlatbuffersTranslator.cpp
         FlatbuffersTranslator.h
         )
-target_link_libraries(kafkaCow CONAN_PKG::cli11 CONAN_PKG::librdkafka CONAN_PKG::FlatBuffers)
+target_link_libraries(kafkaCow CONAN_PKG::cli11
+        CONAN_PKG::librdkafka
+        CONAN_PKG::FlatBuffers
+        CONAN_PKG::boost_filesystem)

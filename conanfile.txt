@@ -3,6 +3,8 @@ cli11/1.5.3@bincrafters/stable
 FlatBuffers/1.9.0@ess-dmsc/stable
 librdkafka/0.11.4@ess-dmsc/stable
 gtest/3121b20-dm3@ess-dmsc/stable
+cmake_findboost_modular/1.65.1@bincrafters/stable
+boost_filesystem/1.65.1@bincrafters/stable
 
 [generators]
 cmake
@@ -11,6 +13,7 @@ virtualrunenv
 [options]
 librdkafka:shared=True
 FlatBuffers:shared=True
+boost_filesystem:shared=True
 
 [imports]
 lib, *.dylib* -> ./lib

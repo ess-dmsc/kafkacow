@@ -8,12 +8,16 @@
 
 class FlatbuffersTranslator {
 private:
-  std::map<std::string, flatbuffers::Parser> CodesMap;
+  std::map<std::string, std::unique_ptr<flatbuffers::Parser>> FileIDMap;
+  std::string FullPath = "../schemas/";
 
 public:
-  FlatbuffersTranslator() {}
+  void TakeFileID(std::string Message);
 
-  void TakeCode(std::string Message);
+  std::string GetSchemaPathForID(std::string FileID);
 
-  void LoadFile();
+  std::unique_ptr<flatbuffers::Parser>
+  CreateParser(std::string FullName, std::string Message, std::string Schema);
+
+  void PrintMessage(std::string JSONMessage);
 };

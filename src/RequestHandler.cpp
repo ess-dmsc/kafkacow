@@ -57,8 +57,9 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
 
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeFromOffset();
-    if (!MessageAndEOF.first.empty()) {
-      FlatBuffers.TakeCode(MessageAndEOF.first);
+    if (!MessageAndEOF.first.empty() &&
+        MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
+      FlatBuffers.TakeFileID(MessageAndEOF.first);
       i++;
     }
     if (MessageAndEOF.second)
@@ -78,9 +79,10 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
-    if (!MessageAndEOF.first.empty()) {
+    if (!MessageAndEOF.first.empty() &&
+        MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
       // pass the message FlatbuffersTranslator
-      FlatBuffers.TakeCode(MessageAndEOF.first);
+      FlatBuffers.TakeFileID(MessageAndEOF.first);
       i++;
     }
     if (MessageAndEOF.second)
