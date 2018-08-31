@@ -199,6 +199,7 @@ def get_macos_pipeline()
                 dir("${project}/code") {
                     try {
                         checkout scm
+                        sh "git submodule update --init --recursive"
                     } catch (e) {
                         failure_function(e, 'MacOSX / Checkout failed')
                     }
@@ -233,6 +234,7 @@ def get_win10_pipeline() {
         dir("${project}") {
           stage("win10: Checkout") {
             checkout scm
+            sh "git submodule update --init --recursive"
           }  // stage
 
         	stage("win10: Setup") {
@@ -264,6 +266,7 @@ node('docker') {
         dir("${project}") {
             try {
                 scm_vars = checkout scm
+                sh "git submodule update --init --recursive"
             } catch (e) {
                 failure_function(e, 'Checkout failed')
             }
