@@ -12,4 +12,4 @@ add_executable(kafkaCow main.cpp
         OffsetsStruct.h
         TopicMetadataStruct.h
         )
-target_link_libraries(kafkaCow CONAN_PKG::cli11 CONAN_PKG::librdkafka)
+target_link_libraries(kafkaCow CONAN_PKG::cli11 CONAN_PKG::librdkafka CONAN_PKG::spdlog)
