@@ -234,7 +234,7 @@ def get_win10_pipeline() {
         dir("${project}") {
           stage("win10: Checkout") {
             checkout scm
-            sh "git submodule update --init --recursive"
+            bat "git submodule update --init --recursive"
           }  // stage
 
         	stage("win10: Setup") {
