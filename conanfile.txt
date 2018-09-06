@@ -20,3 +20,4 @@ lib, *.dylib* -> ./lib
 lib, *.so* -> ./lib
 lib64, *.so* -> ./lib
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
+bin, *.dll -> ./bin
