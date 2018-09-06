@@ -14,6 +14,8 @@ private:
   TopicMetadataStruct getTopicMetadata(std::string TopicName);
   std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
   std::vector<RdKafka::TopicPartition *> getTopicPartitions(std::string Topic);
+  std::unique_ptr<int64_t> getCurrentPartitionOffset(
+      const RdKafka::TopicMetadata::PartitionMetadataVector *);
 
 public:
   ConnectKafka(std::string Broker, std::string ErrStr);
@@ -36,9 +38,6 @@ public:
   std::pair<std::string, bool> consumeFromOffset() override;
 
   std::pair<std::string, bool> consumeLastNMessages() override;
-
-  std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *) override;
 
   std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
 

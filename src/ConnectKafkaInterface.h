@@ -12,11 +12,7 @@ public:
   virtual std::pair<std::string, bool> consumeFromOffset() = 0;
   virtual std::pair<std::string, bool> consumeLastNMessages() = 0;
 
-  virtual std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *) = 0;
-
   virtual std::vector<OffsetsStruct>
-
   getHighAndLowOffsets(std::string Topic) = 0;
 
   virtual int64_t getNumberOfTopicPartitions(std::string TopicName) = 0;

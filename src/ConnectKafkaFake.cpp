@@ -11,11 +11,6 @@ std::pair<std::string, bool> ConnectKafkaFake::consumeFromOffset() {
                                       true);
 }
 
-std::unique_ptr<int64_t> ConnectKafkaFake::getCurrentPartitionOffset(
-    const RdKafka::TopicMetadata::PartitionMetadataVector *) {
-  return std::unique_ptr<int64_t>();
-}
-
 std::vector<OffsetsStruct>
 ConnectKafkaFake::getHighAndLowOffsets(std::string Topic) {
   std::vector<OffsetsStruct> VectorOfPartitions;

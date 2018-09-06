@@ -15,9 +15,6 @@ public:
 
   std::pair<std::string, bool> consumeLastNMessages() override;
 
-  std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *) override;
-
   std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
 
   int64_t getNumberOfTopicPartitions(std::string TopicName) override;
