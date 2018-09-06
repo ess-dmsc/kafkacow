@@ -21,3 +21,6 @@ lib, *.so* -> ./lib
 lib64, *.so* -> ./lib
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
 bin, *.dll -> ./lib
+lib, *.a* -> ./lib
+lib64, *.a* -> ./lib
+bin, *.lib -> ./lib
