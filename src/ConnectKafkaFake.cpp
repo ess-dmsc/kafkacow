@@ -1,28 +1,14 @@
 #include "ConnectKafkaFake.h"
 
-std::unique_ptr<RdKafka::Metadata> ConnectKafkaFake::queryMetadata() {
-  return nullptr;
-}
-
 ConnectKafkaFake::ConnectKafkaFake() {}
 
 std::string ConnectKafkaFake::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-bool ConnectKafkaFake::checkIfTopicExists(std::string Topic) {
-  return Topic == "Topic that exists";
-  ;
-}
-
 std::pair<std::string, bool> ConnectKafkaFake::consumeFromOffset() {
   return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
                                       true);
-}
-
-TopicMetadataStruct ConnectKafkaFake::getTopicMetadata(std::string Topic) {
-  TopicMetadataStruct MetadataStruct{"topic_name", {0}};
-  return MetadataStruct;
 }
 
 std::unique_ptr<int64_t> ConnectKafkaFake::getCurrentPartitionOffset(
@@ -40,16 +26,6 @@ ConnectKafkaFake::getHighAndLowOffsets(std::string Topic) {
   return VectorOfPartitions;
 }
 
-std::vector<int32_t>
-ConnectKafkaFake::getTopicPartitionNumbers(std::string Topic) {
-  return std::vector<int32_t>();
-}
-
-std::vector<RdKafka::TopicPartition *>
-ConnectKafkaFake::getTopicPartitions(std::string Topic) {
-  return std::vector<RdKafka::TopicPartition *>();
-}
-
 int64_t ConnectKafkaFake::getNumberOfTopicPartitions(std::string TopicName) {
   return 1;
 }
@@ -61,7 +37,6 @@ void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
                                                 std::string TopicName) {}
 
 std::pair<std::string, bool> ConnectKafkaFake::consumeLastNMessages() {
-
   return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
                                       true);
 }
