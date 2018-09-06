@@ -12,7 +12,7 @@ virtualrunenv
 
 [options]
 librdkafka:shared=True
-FlatBuffers:shared=True
+FlatBuffers:shared=False
 boost_filesystem:shared=True
 
 [imports]
