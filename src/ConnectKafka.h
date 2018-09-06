@@ -13,8 +13,8 @@ private:
   bool checkIfTopicExists(std::string Topic);
   TopicMetadataStruct getTopicMetadata(std::string TopicName);
   std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
-  std::vector<RdKafka::TopicPartition *>
-  getTopicPartitions(std::string Topic);
+  std::vector<RdKafka::TopicPartition *> getTopicPartitions(std::string Topic);
+
 public:
   ConnectKafka(std::string Broker, std::string ErrStr);
   ~ConnectKafka() {
@@ -31,11 +31,7 @@ public:
     }
   }
 
-
-
   std::string getAllTopics() override;
-
-
 
   std::pair<std::string, bool> consumeFromOffset() override;
 
