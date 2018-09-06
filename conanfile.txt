@@ -20,7 +20,7 @@ lib, *.dylib* -> ./lib
 lib, *.so* -> ./lib
 lib64, *.so* -> ./lib
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
-bin, *.dll -> ./lib
+bin, *.dll -> ./bin
 lib, *.a* -> ./lib
 lib64, *.a* -> ./lib
-bin, *.lib -> ./lib
+bin, *.lib -> -> ./bin
