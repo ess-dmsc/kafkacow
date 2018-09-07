@@ -51,6 +51,17 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun(UserArguments));
 }
 
+TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.MetadataMode = true;
+  UserArguments.ShowAllTopics = true;
+
+  EXPECT_NO_THROW(NewRequestHandler.checkAndRun(UserArguments));
+}
+
 TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
