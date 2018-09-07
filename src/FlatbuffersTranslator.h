@@ -1,10 +1,6 @@
 #pragma once
 
 #include <flatbuffers/idl.h>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
 
 class FlatbuffersTranslator {
 private:
@@ -12,12 +8,13 @@ private:
   std::string FullPath = "../schemas/";
 
 public:
-  void TakeFileID(std::string Message);
+  void getFileID(std::string *Message);
 
-  std::string GetSchemaPathForID(std::string FileID);
+  std::string getSchemaPathForID(const std::string &FileID);
 
-  std::unique_ptr<flatbuffers::Parser>
-  CreateParser(std::string FullName, std::string Message, std::string Schema);
+  std::unique_ptr<flatbuffers::Parser> createParser(const std::string &FullName,
+                                                    const std::string &Message,
+                                                    const std::string &Schema);
 
-  void PrintMessage(std::string JSONMessage);
+  void printMessage(const std::string &JSONMessage);
 };

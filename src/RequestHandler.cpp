@@ -1,8 +1,5 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
-#include "ConnectKafka.h"
-#include "FlatbuffersTranslator.h"
-#include <thread>
 
 // check whether arguments passed match any methods
 void RequestHandler::checkAndRun(UserArgumentStruct UserArguments) {
@@ -46,25 +43,16 @@ void RequestHandler::checkMetadataModeArguments(
 
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
-  int64_t EOFPartitionCounter = 0,
-          NumberOfPartitions =
-              KafkaConnection->getNumberOfTopicPartitions(TopicName);
+  int EOFPartitionCounter = 0,
+      NumberOfPartitions =
+          KafkaConnection->getNumberOfTopicPartitions(TopicName);
   std::pair<std::string, bool> MessageAndEOF;
-  int i = 0;
-  // SUBSCRIBE AT AN OFFSET
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
 
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeFromOffset();
-    if (!MessageAndEOF.first.empty() &&
-        MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
-      FlatBuffers.TakeFileID(MessageAndEOF.first);
-      i++;
-    }
-    if (MessageAndEOF.second)
-      EOFPartitionCounter++;
-    // std::cout << MessageAndEOF.first << "\n";
+    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
 }
 
@@ -74,21 +62,11 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
       NumberOfPartitions =
           KafkaConnection->getNumberOfTopicPartitions(TopicName);
   std::pair<std::string, bool> MessageAndEOF;
-  int i = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
-    if (!MessageAndEOF.first.empty() &&
-        MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
-      // pass the message FlatbuffersTranslator
-      FlatBuffers.TakeFileID(MessageAndEOF.first);
-      i++;
-    }
-    if (MessageAndEOF.second)
-      EOFPartitionCounter++;
-    // print encoded message:
-    // std::cout << MessageAndEOF.first << "\n";
+    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
 }
 
@@ -100,4 +78,15 @@ void RequestHandler::showTopicPartitionOffsets(
               << " || Low offset: " << SingleStruct.LowOffset
               << " || High offset: " << SingleStruct.HighOffset << "\n";
   }
+}
+
+void RequestHandler::consumePartitions(
+    std::pair<std::string, bool> MessageAndEOF, int &EOFPartitionCounter,
+    FlatbuffersTranslator &FlatBuffers) {
+  if (!MessageAndEOF.first.empty() &&
+      MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
+    FlatBuffers.getFileID(&MessageAndEOF.first);
+  }
+  if (MessageAndEOF.second)
+    EOFPartitionCounter++;
 }

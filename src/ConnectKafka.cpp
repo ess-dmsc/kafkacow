@@ -1,6 +1,4 @@
 #include "ConnectKafka.h"
-#include "TopicMetadataStruct.h"
-#include <iostream>
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
@@ -62,7 +60,6 @@ bool ConnectKafka::checkIfTopicExists(std::string Topic) {
 std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
   using RdKafka::Message;
   std::string PayloadToReturn;
-  std::string Topic;
   bool PartitionEOF = false;
 
   auto KafkaMsg = std::unique_ptr<Message>(Consumer->consume(1000));
@@ -72,7 +69,6 @@ std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
     if (KafkaMsg->len() > 0) {
       std::string Payload(static_cast<const char *>(KafkaMsg->payload()),
                           static_cast<int>(KafkaMsg->len()));
-      Topic = KafkaMsg->topic_name();
       PayloadToReturn = Payload;
     } else {
       // If RdKafka indicates no error then we should always get a

@@ -1,14 +1,12 @@
 #pragma once
 
 #include "ConnectKafkaInterface.h"
-#include "OffsetsStruct.h"
-#include "TopicMetadataStruct.h"
-#include <librdkafka/rdkafkacpp.h>
 
 class ConnectKafka : public ConnectKafkaInterface {
 private:
   std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
+
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
   bool checkIfTopicExists(std::string Topic);
   TopicMetadataStruct getTopicMetadata(std::string TopicName);

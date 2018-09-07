@@ -1,12 +1,14 @@
 #pragma once
 
-#include "ConnectKafka.h"
+#include "FlatbuffersTranslator.h"
 #include "RequestHandlerInterface.h"
-#include <librdkafka/rdkafkacpp.h>
 
 class RequestHandler : public RequestHandlerInterface {
 private:
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
+  void consumePartitions(std::pair<std::string, bool> MessageAndEOF,
+                         int &EOFPartitionCounter,
+                         FlatbuffersTranslator &FlatBuffers);
 
 public:
   explicit RequestHandler(
