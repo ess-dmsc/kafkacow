@@ -107,7 +107,7 @@ def docker_test(image_key) {
         def custom_sh = images[image_key]['sh']
         def test_script = """
                         cd build
-                        ./bin/UnitTests ../${project}/data/
+                        ./bin/UnitTests
                     """
         sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${test_script}\""
     } catch (e) {
@@ -121,7 +121,7 @@ def docker_coverage(image_key) {
         def test_output = "TestResults.xml"
         def coverage_script = """
                         cd build
-                        ./bin/UnitTests ../${project}/data/ --gtest_output=xml:${test_output}
+                        ./bin/UnitTests --gtest_output=xml:${test_output}
                         make coverage
                         lcov --directory . --capture --output-file coverage.info
                         lcov --remove coverage.info '*_generated.h' '*/.conan/data/*' '*/usr/*' '*Test.cpp' '*gmock*' '*gtest*' --output-file coverage.info
@@ -214,7 +214,7 @@ def get_macos_pipeline()
 
                     try {
                         sh "make all UnitTests VERBOSE=1"
-                        sh ". ./activate_run.sh && ./bin/UnitTests ../code/data/ --gtest_output=xml:TestResults.xml"
+                        sh ". ./activate_run.sh && ./bin/UnitTests --gtest_output=xml:TestResults.xml"
                     } catch (e) {
                         failure_function(e, 'MacOSX / build+test failed')
                     }
@@ -250,7 +250,8 @@ def get_win10_pipeline() {
           } // stage
           stage("win10: Test") {
             bat """cd _build
-    	      .\\bin\\UnitTests.exe ..\\data\\
+              .\\activate_run.bat
+    	      .\\bin\\UnitTests.exe
     	      """
           } // stage
         }  // dir
