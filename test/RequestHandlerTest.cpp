@@ -112,3 +112,22 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   UserArguments.OffsetToStart = -1234;
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
+
+TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.MetadataMode = true;
+
+  std::string message;
+  try {
+    NewRequestHandler.checkAndRun(UserArguments);
+  } catch (ArgumentsException &exception) {
+    message = exception.what();
+  }
+  EXPECT_EQ(
+      message,
+      "Program can run in one and only one mode: --consumer or --metadata");
+}
