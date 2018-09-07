@@ -6,8 +6,16 @@
 #include <librdkafka/rdkafkacpp.h>
 
 class ConnectKafka : public ConnectKafkaInterface {
+private:
   std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
+  std::unique_ptr<RdKafka::Metadata> queryMetadata();
+  bool checkIfTopicExists(std::string Topic);
+  TopicMetadataStruct getTopicMetadata(std::string TopicName);
+  std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
+  std::vector<RdKafka::TopicPartition *> getTopicPartitions(std::string Topic);
+  std::unique_ptr<int64_t> getCurrentPartitionOffset(
+      const RdKafka::TopicMetadata::PartitionMetadataVector *);
 
 public:
   ConnectKafka(std::string Broker, std::string ErrStr);
@@ -25,29 +33,13 @@ public:
     }
   }
 
-  std::unique_ptr<RdKafka::Metadata> queryMetadata() override;
-
   std::string getAllTopics() override;
-
-  bool checkIfTopicExists(std::string Topic) override;
 
   std::pair<std::string, bool> consumeFromOffset() override;
 
   std::pair<std::string, bool> consumeLastNMessages() override;
 
-  std::vector<int32_t>
-
-  getTopicPartitionNumbers(std::string Topic) override;
-
-  TopicMetadataStruct getTopicMetadata(std::string TopicName) override;
-
-  std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *) override;
-
   std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
-
-  std::vector<RdKafka::TopicPartition *>
-  getTopicPartitions(std::string Topic) override;
 
   int64_t getNumberOfTopicPartitions(std::string TopicName) override;
 

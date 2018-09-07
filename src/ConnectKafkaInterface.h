@@ -7,28 +7,13 @@
 
 class ConnectKafkaInterface {
 public:
-  virtual std::unique_ptr<RdKafka::Metadata> queryMetadata() = 0;
-
   virtual std::string getAllTopics() = 0;
-
-  virtual bool checkIfTopicExists(std::string Topic) = 0;
 
   virtual std::pair<std::string, bool> consumeFromOffset() = 0;
   virtual std::pair<std::string, bool> consumeLastNMessages() = 0;
 
-  virtual std::vector<int32_t> getTopicPartitionNumbers(std::string Topic) = 0;
-
-  virtual TopicMetadataStruct getTopicMetadata(std::string Topic) = 0;
-
-  virtual std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *) = 0;
-
   virtual std::vector<OffsetsStruct>
-
   getHighAndLowOffsets(std::string Topic) = 0;
-
-  virtual std::vector<RdKafka::TopicPartition *>
-  getTopicPartitions(std::string Topic) = 0;
 
   virtual int64_t getNumberOfTopicPartitions(std::string TopicName) = 0;
 
