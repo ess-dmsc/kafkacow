@@ -23,12 +23,15 @@ void RequestHandler::checkConsumerModeArguments(
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
   else {
-    UserArguments.OffsetToStart > -2
-        ? subscribeConsumeAtOffset(UserArguments.Name,
-                                   UserArguments.OffsetToStart)
-        : subscribeConsumeNLastMessages(UserArguments.Name,
-                                        UserArguments.GoBack,
-                                        UserArguments.PartitionToConsume);
+    if (UserArguments.OffsetToStart > -2) {
+      subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
+    } else {
+      (UserArguments.PartitionToConsume != -1)
+          ? subscribeConsumeNLastMessages(UserArguments.Name,
+                                          UserArguments.GoBack,
+                                          UserArguments.PartitionToConsume)
+          : Logger->error("Please specify partition");
+    }
   }
 }
 
