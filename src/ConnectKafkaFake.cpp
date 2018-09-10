@@ -29,7 +29,8 @@ void ConnectKafkaFake::subscribeAtOffset(int64_t Offset,
                                          std::string TopicName) {}
 
 void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
-                                                std::string TopicName) {}
+                                                std::string TopicName,
+                                                int Partition) {}
 
 std::pair<std::string, bool> ConnectKafkaFake::consumeLastNMessages() {
   return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",

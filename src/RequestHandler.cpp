@@ -27,7 +27,8 @@ void RequestHandler::checkConsumerModeArguments(
         ? subscribeConsumeAtOffset(UserArguments.Name,
                                    UserArguments.OffsetToStart)
         : subscribeConsumeNLastMessages(UserArguments.Name,
-                                        UserArguments.GoBack);
+                                        UserArguments.GoBack,
+                                        UserArguments.PartitionToConsume);
   }
 }
 
@@ -46,25 +47,29 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   int EOFPartitionCounter = 0,
       NumberOfPartitions =
           KafkaConnection->getNumberOfTopicPartitions(TopicName);
-  std::pair<std::string, bool> MessageAndEOF;
+
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
-
   while (EOFPartitionCounter < NumberOfPartitions) {
+    std::pair<std::string, bool> MessageAndEOF;
+    MessageAndEOF.first.clear();
     MessageAndEOF = KafkaConnection->consumeFromOffset();
     consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
 }
 
 void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
-                                                   int64_t NumberOfMessages) {
+                                                   int64_t NumberOfMessages,
+                                                   int Partition) {
   int EOFPartitionCounter = 0,
       NumberOfPartitions =
           KafkaConnection->getNumberOfTopicPartitions(TopicName);
-  std::pair<std::string, bool> MessageAndEOF;
-  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName);
+  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
+                                            Partition);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
+    std::pair<std::string, bool> MessageAndEOF;
+    MessageAndEOF.first.clear();
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
     consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }

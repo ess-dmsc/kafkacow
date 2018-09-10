@@ -104,11 +104,11 @@ std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
 TopicMetadataStruct ConnectKafka::getTopicMetadata(std::string TopicName) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
-  auto iter = std::find_if(Topics->cbegin(), Topics->cend(),
-                           [TopicName](const RdKafka::TopicMetadata *tpc) {
-                             return tpc->topic() == TopicName;
-                           });
-  auto matchedTopic = *iter;
+  auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
+                               [TopicName](const RdKafka::TopicMetadata *tpc) {
+                                 return tpc->topic() == TopicName;
+                               });
+  auto matchedTopic = *Iterator;
   TopicMetadataStruct TopicMetadata;
   TopicMetadata.Name = matchedTopic->topic();
   auto PartitionMetadata = matchedTopic->partitions();
@@ -178,6 +178,7 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string TopicName) {
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
+  return;
 }
 
 std::pair<std::string, bool> ConnectKafka::consumeLastNMessages() {
@@ -185,18 +186,31 @@ std::pair<std::string, bool> ConnectKafka::consumeLastNMessages() {
 }
 
 void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
-                                            std::string TopicName) {
+                                            std::string TopicName,
+                                            int Partition) {
   std::vector<OffsetsStruct> HighAndLowOffsets =
       getHighAndLowOffsets(TopicName);
+
+  // get highest offset of all partitions
+  int64_t HighestOffest = 0;
+  for (auto it = HighAndLowOffsets.cbegin(); it != HighAndLowOffsets.cend();
+       ++it)
+    if (it->HighOffset > HighestOffest)
+      HighestOffest = it->HighOffset;
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
   for (auto i = 0; i < getNumberOfTopicPartitions(TopicName); i++) {
     auto TopicPartition = RdKafka::TopicPartition::create(TopicName, i);
 
-    TopicPartition->set_offset(HighAndLowOffsets[i].HighOffset - NMessages);
+    // subscribe to the chosen partition
+    if (i == Partition) {
+      TopicPartition->set_offset(HighAndLowOffsets[Partition].HighOffset -
+                                 NMessages);
+    }
     TopicPartitionsWithOffsets.push_back(TopicPartition);
   }
   Consumer->assign(TopicPartitionsWithOffsets);
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
+  return;
 }

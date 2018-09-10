@@ -20,5 +20,6 @@ public:
   virtual void subscribeAtOffset(int64_t Offset, std::string TopicName) = 0;
 
   virtual void subscribeToLastNMessages(int64_t NMessages,
-                                        std::string TopicName) = 0;
+                                        std::string TopicName,
+                                        int Partition) = 0;
 };

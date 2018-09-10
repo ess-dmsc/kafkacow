@@ -21,6 +21,6 @@ public:
 
   void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
 
-  void subscribeToLastNMessages(int64_t NMessages,
-                                std::string TopicName) override;
+  void subscribeToLastNMessages(int64_t NMessages, std::string TopicName,
+                                int Partition) override;
 };

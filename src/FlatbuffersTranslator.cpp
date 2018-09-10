@@ -7,12 +7,10 @@
 void FlatbuffersTranslator::getFileID(std::string *Message) {
   // get the ID from a message
   std::string FileID = Message->substr(4, 4);
-
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
     // get schema name and path for FileID
-
     std::string SchemaFile = getSchemaPathForID(FileID);
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.c_str(), false, &Schema);
@@ -27,13 +25,15 @@ void FlatbuffersTranslator::getFileID(std::string *Message) {
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       std::cerr << ("Couldn't generate new text!\n");
-    FileIDMap.emplace(FileID, std::move(Parser));
-  } else { // retrieve message using a parser that has already been put to the
-           // map
-    std::string JSONMessage;
 
-    if (!GenerateText(*FileIDMap[FileID],
-                      FileIDMap[FileID]->builder_.GetBufferPointer(),
+    // put schema path and schema into the map
+    FileIDMap.emplace(FileID, std::make_pair(SchemaFile, Schema));
+    printMessage(JSONMessage);
+  } else { // create a parser using schema loaded in the map
+    std::unique_ptr<flatbuffers::Parser> Parser = createParser(
+        FileIDMap[FileID].first, *Message, FileIDMap[FileID].second);
+    std::string JSONMessage;
+    if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       std::cerr << ("Couldn't generate text using existing parser!\n");
     printMessage(JSONMessage);

@@ -16,5 +16,6 @@ protected:
   virtual void subscribeConsumeAtOffset(std::string TopicName,
                                         int64_t Offset) = 0;
   virtual void subscribeConsumeNLastMessages(std::string TopicName,
-                                             int64_t NumberOfMessages) = 0;
+                                             int64_t NumberOfMessages,
+                                             int Partition) = 0;
 };
