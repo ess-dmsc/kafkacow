@@ -11,14 +11,11 @@ private:
   void consumePartitions(std::pair<std::string, bool> MessageAndEOF,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  std::shared_ptr<spdlog::logger> Logger;
 
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection)
-      : KafkaConnection(std::move(KafkaConnection)) {
-    Logger = spdlog::get("LOG");
-  }
+      : KafkaConnection(std::move(KafkaConnection)) {}
 
   void checkAndRun(UserArgumentStruct UserArguments) override;
 

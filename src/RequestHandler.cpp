@@ -44,15 +44,14 @@ void RequestHandler::checkMetadataModeArguments(
 
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
-  int EOFPartitionCounter = 0,
-      NumberOfPartitions =
-          KafkaConnection->getNumberOfTopicPartitions(TopicName);
+  int EOFPartitionCounter = 0;
+  int NumberOfPartitions =
+      KafkaConnection->getNumberOfTopicPartitions(TopicName);
 
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
     std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF.first.clear();
     MessageAndEOF = KafkaConnection->consumeFromOffset();
     consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
@@ -69,7 +68,6 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
     std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF.first.clear();
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
     consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }

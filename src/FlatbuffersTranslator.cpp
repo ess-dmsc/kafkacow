@@ -1,7 +1,6 @@
 #include "FlatbuffersTranslator.h"
 #include "ArgumentsException.h"
 #include <boost/filesystem.hpp>
-
 #include <iostream>
 
 void FlatbuffersTranslator::getFileID(std::string *Message) {

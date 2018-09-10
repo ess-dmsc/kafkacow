@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
                  "Start consuming from an offset. Otherwise retrieve entire "
                  "topic. Mutually exclusive with \"--go\"");
-  App.add_option("-p,--partition", UserArguments.PartitionToConsume,
+  App.add_option("-L,--partition", UserArguments.PartitionToConsume,
                  "Partition to retrieve messages from");
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
                "Run the program in the consumer mode");
   App.add_flag("-l, --list", UserArguments.MetadataMode,
                "Run the program in the metadata mode");
-  //  App.add_flag("-p, --partitions", UserArguments.ShowPartitionsOffsets,
-  //               "Show offsets for partitions of given topic \"-t\"");
+  App.add_flag("-p, --partitions", UserArguments.ShowPartitionsOffsets,
+               "Show offsets for partitions of given topic \"-t\"");
 
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);

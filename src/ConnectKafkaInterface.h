@@ -15,11 +15,11 @@ public:
   virtual std::vector<OffsetsStruct>
   getHighAndLowOffsets(std::string Topic) = 0;
 
-  virtual int64_t getNumberOfTopicPartitions(std::string TopicName) = 0;
+  virtual int getNumberOfTopicPartitions(std::string TopicName) = 0;
 
   virtual void subscribeAtOffset(int64_t Offset, std::string TopicName) = 0;
 
   virtual void subscribeToLastNMessages(int64_t NMessages,
-                                        std::string TopicName,
+                                        const std::string &TopicName,
                                         int Partition) = 0;
 };
