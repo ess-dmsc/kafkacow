@@ -15,7 +15,7 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_test) {
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
   EXPECT_NO_THROW(
-      NewRequestHandler.subscribeConsumeNLastMessages("ExampleTestTopic", 100));
+      NewRequestHandler.subscribeConsumeNLastMessages("ExampleTestTopic", 100,1));
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_test) {
