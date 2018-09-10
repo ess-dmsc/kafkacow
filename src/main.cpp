@@ -42,8 +42,11 @@ int main(int argc, char **argv) {
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
-  auto Logger = spdlog::stderr_color_mt("Error");
+
+  // setup logger
+  auto Logger = spdlog::stderr_color_mt("LOG");
   Logger->info("Welcome to spdlog!");
+
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
   try {
     NewRequestHandler.checkAndRun(UserArguments);

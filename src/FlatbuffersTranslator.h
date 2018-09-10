@@ -1,14 +1,19 @@
 #pragma once
 
 #include <flatbuffers/idl.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 class FlatbuffersTranslator {
 private:
   // for each FILEID store path to schema file and schema itself
   std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
   std::string FullPath = "../schemas/";
+  std::shared_ptr<spdlog::logger> Logger;
 
 public:
+  FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
+
   void getFileID(std::string *Message);
 
   std::string getSchemaPathForID(const std::string &FileID);

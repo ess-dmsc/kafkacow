@@ -2,6 +2,8 @@
 
 #include "FlatbuffersTranslator.h"
 #include "RequestHandlerInterface.h"
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 class RequestHandler : public RequestHandlerInterface {
 private:
@@ -9,11 +11,14 @@ private:
   void consumePartitions(std::pair<std::string, bool> MessageAndEOF,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
+  std::shared_ptr<spdlog::logger> Logger;
 
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection)
-      : KafkaConnection(std::move(KafkaConnection)) {}
+      : KafkaConnection(std::move(KafkaConnection)) {
+    Logger = spdlog::get("LOG");
+  }
 
   void checkAndRun(UserArgumentStruct UserArguments) override;
 

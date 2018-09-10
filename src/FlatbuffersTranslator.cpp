@@ -24,7 +24,7 @@ void FlatbuffersTranslator::getFileID(std::string *Message) {
 
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
-      std::cerr << ("Couldn't generate new text!\n");
+      Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile, Schema));
@@ -35,7 +35,7 @@ void FlatbuffersTranslator::getFileID(std::string *Message) {
     std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
-      std::cerr << ("Couldn't generate text using existing parser!\n");
+      Logger->error("Couldn't generate text using existing parser!\n");
     printMessage(JSONMessage);
   }
 }
@@ -64,7 +64,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   bool ok =
       Parser->Parse(Schema.c_str(), include_directories, FullName.c_str());
   if (!ok)
-    std::cerr << "Couldn't parse the schema!\n";
+    Logger->error("Couldn't parse the schema!\n");
   Parser->builder_.PushFlatBuffer(
       reinterpret_cast<const uint8_t *>(Message.c_str()), Message.length());
   return Parser;
