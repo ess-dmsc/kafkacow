@@ -9,6 +9,14 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 
+file(GLOB listOfSchemas "${PROJECT_SOURCE_DIR}/streaming-data-types/schemas/*.fbs" )
+message(${listOfSchemas})
+list(REMOVE_DUPLICATES listOfSchemas)
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/schemas/")
+foreach(schema ${listOfSchemas})
+    configure_file(${schema} "${CMAKE_CURRENT_BINARY_DIR}/schemas/" COPYONLY)
+endforeach()
+
 if(NOT CONAN_DISABLE)
     include(${CMAKE_MODULE_PATH}/conan.cmake)
     conan_cmake_run(CONANFILE conanfile.txt
@@ -24,5 +32,3 @@ if(CMAKE_COMPILER_IS_GNUCXX AND COV)
 endif()
 add_subdirectory(src)
 add_subdirectory(test)
-
-

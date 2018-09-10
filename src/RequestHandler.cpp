@@ -1,7 +1,5 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
-#include "ConnectKafka.h"
-#include <thread>
 
 // check whether arguments passed match any methods
 void RequestHandler::checkAndRun(UserArgumentStruct UserArguments) {
@@ -25,11 +23,15 @@ void RequestHandler::checkConsumerModeArguments(
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
   else {
-    UserArguments.OffsetToStart > -2
-        ? subscribeConsumeAtOffset(UserArguments.Name,
-                                   UserArguments.OffsetToStart)
-        : subscribeConsumeNLastMessages(UserArguments.Name,
-                                        UserArguments.GoBack);
+    if (UserArguments.OffsetToStart > -2) {
+      subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
+    } else {
+      (UserArguments.PartitionToConsume != -1)
+          ? subscribeConsumeNLastMessages(UserArguments.Name,
+                                          UserArguments.GoBack,
+                                          UserArguments.PartitionToConsume)
+          : Logger->error("Please specify partition");
+    }
   }
 }
 
@@ -43,42 +45,35 @@ void RequestHandler::checkMetadataModeArguments(
     showTopicPartitionOffsets(UserArguments);
 }
 
-std::string RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
-                                                     int64_t Offset) {
-  int64_t EOFPartitionCounter = 0,
-          NumberOfPartitions =
-              KafkaConnection->getNumberOfTopicPartitions(TopicName);
-  std::pair<std::string, bool> MessageAndEOF;
-  int i = 0;
-  // SUBSCRIBE AT AN OFFSET
+void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
+                                              int64_t Offset) {
+  int EOFPartitionCounter = 0;
+  int NumberOfPartitions =
+      KafkaConnection->getNumberOfTopicPartitions(TopicName);
+
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
+  FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
+    std::pair<std::string, bool> MessageAndEOF;
     MessageAndEOF = KafkaConnection->consumeFromOffset();
-    i++;
-    if (MessageAndEOF.second)
-      EOFPartitionCounter++;
-    std::cout << MessageAndEOF.first << "\n";
+    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
-  return MessageAndEOF.first;
 }
 
-std::string
-RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
-                                              int64_t NumberOfMessages) {
+void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
+                                                   int64_t NumberOfMessages,
+                                                   int Partition) {
   int EOFPartitionCounter = 0,
       NumberOfPartitions =
           KafkaConnection->getNumberOfTopicPartitions(TopicName);
-  std::pair<std::string, bool> MessageAndEOF;
-  int i = 0;
-  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName);
+  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
+                                            Partition);
+  FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
+    std::pair<std::string, bool> MessageAndEOF;
     MessageAndEOF = KafkaConnection->consumeLastNMessages();
-    i++;
-    if (MessageAndEOF.second)
-      EOFPartitionCounter++;
-    std::cout << MessageAndEOF.first << "\n";
+    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
   }
-  return MessageAndEOF.first;
 }
 
 void RequestHandler::showTopicPartitionOffsets(
@@ -89,4 +84,15 @@ void RequestHandler::showTopicPartitionOffsets(
               << " || Low offset: " << SingleStruct.LowOffset
               << " || High offset: " << SingleStruct.HighOffset << "\n";
   }
+}
+
+void RequestHandler::consumePartitions(
+    std::pair<std::string, bool> MessageAndEOF, int &EOFPartitionCounter,
+    FlatbuffersTranslator &FlatBuffers) {
+  if (!MessageAndEOF.first.empty() &&
+      MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
+    FlatBuffers.getFileID(&MessageAndEOF.first);
+  }
+  if (MessageAndEOF.second)
+    EOFPartitionCounter++;
 }

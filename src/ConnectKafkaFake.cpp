@@ -21,7 +21,7 @@ ConnectKafkaFake::getHighAndLowOffsets(std::string Topic) {
   return VectorOfPartitions;
 }
 
-int64_t ConnectKafkaFake::getNumberOfTopicPartitions(std::string TopicName) {
+int ConnectKafkaFake::getNumberOfTopicPartitions(std::string TopicName) {
   return 1;
 }
 
@@ -29,7 +29,8 @@ void ConnectKafkaFake::subscribeAtOffset(int64_t Offset,
                                          std::string TopicName) {}
 
 void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
-                                                std::string TopicName) {}
+                                                const std::string &TopicName,
+                                                int Partition) {}
 
 std::pair<std::string, bool> ConnectKafkaFake::consumeLastNMessages() {
   return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",

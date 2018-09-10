@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ConnectKafkaInterface.h"
 #include "TopicMetadataStruct.h"
 #include <CLI/CLI.hpp>
@@ -17,10 +18,10 @@ public:
 
   std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
 
-  int64_t getNumberOfTopicPartitions(std::string TopicName) override;
+  int getNumberOfTopicPartitions(std::string TopicName) override;
 
   void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
 
-  void subscribeToLastNMessages(int64_t NMessages,
-                                std::string TopicName) override;
+  void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
+                                int Partition) override;
 };

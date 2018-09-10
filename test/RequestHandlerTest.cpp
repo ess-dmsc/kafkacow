@@ -1,7 +1,10 @@
 #include "../src/ArgumentsException.h"
 #include "../src/ConnectKafkaFake.h"
 #include "../src/ConnectKafkaInterface.h"
+#include "../src/FlatbuffersTranslator.h"
 #include "../src/RequestHandler.h"
+#include <boost/filesystem.hpp>
+#include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 
 class RequestHandlerTest : public ::testing::Test {};
@@ -11,10 +14,8 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_test) {
 
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  std::string Message =
-      NewRequestHandler.subscribeConsumeNLastMessages("ExampleTestTopic", 100);
-
-  EXPECT_EQ("HiddenSecretMessageFromLovingNeutron", Message);
+  EXPECT_NO_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
+      "ExampleTestTopic", 100, 1));
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_test) {
@@ -22,10 +23,8 @@ TEST(RequestHandlerTest, subscribe_at_an_offset_test) {
 
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
 
-  std::string Message =
-      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100);
-
-  EXPECT_EQ("HiddenSecretMessageFromLovingNeutron", Message);
+  EXPECT_NO_THROW(
+      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100));
 }
 
 TEST(RequestHandlerTest, topic_metadata_creation_test) {
@@ -121,6 +120,7 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
+  UserArguments.PartitionToConsume = 1;
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 

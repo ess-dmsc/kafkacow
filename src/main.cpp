@@ -13,36 +13,41 @@ int main(int argc, char **argv) {
   UserArgumentStruct UserArguments;
   std::string Broker;
 
-  App.add_option("-g, --go", UserArguments.GoBack,
-                 "How many records back to show. Otherwise "
-                 "retrieve entire topic. Mutually "
-                 "exclusive with \"--Offset\"");
+  App.add_option(
+      "-g, --go", UserArguments.GoBack,
+      "How many records back to show from partition \"-p\". Mutually "
+      "exclusive with \"--Offset\"");
   App.add_option("-t, --topic", UserArguments.Name,
                  "Show records of specified topic");
   App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker");
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
                  "Start consuming from an offset. Otherwise retrieve entire "
                  "topic. Mutually exclusive with \"--go\"");
+  App.add_option("-p,--partition", UserArguments.PartitionToConsume,
+                 "Partition to retrieve messages from");
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics");
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode");
-  App.add_flag("-l, --list", UserArguments.MetadataMode,
+  App.add_flag("-L, --list", UserArguments.MetadataMode,
                "Run the program in the metadata mode");
-  App.add_flag("-p, --partitions", UserArguments.ShowPartitionsOffsets,
+  App.add_flag("-P, --partitions", UserArguments.ShowPartitionsOffsets,
                "Show offsets for partitions of given topic \"-t\"");
 
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
-  auto console = spdlog::stdout_color_mt("console");
-  console->info("Welcome to spdlog!");
+
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
+
+  // setup logger
+  auto Logger = spdlog::stderr_color_mt("LOG");
+  Logger->info("Welcome to spdlog!");
+
   RequestHandler NewRequestHandler(std::move(KafkaConnection));
   try {
-
     NewRequestHandler.checkAndRun(UserArguments);
   } catch (ArgumentsException &E) {
     E.what();

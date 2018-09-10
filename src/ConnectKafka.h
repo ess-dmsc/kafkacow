@@ -1,21 +1,18 @@
 #pragma once
 
 #include "ConnectKafkaInterface.h"
-#include "OffsetsStruct.h"
-#include "TopicMetadataStruct.h"
-#include <librdkafka/rdkafkacpp.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 class ConnectKafka : public ConnectKafkaInterface {
 private:
   std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
+
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
-  bool checkIfTopicExists(std::string Topic);
+
   TopicMetadataStruct getTopicMetadata(std::string TopicName);
   std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
-  std::vector<RdKafka::TopicPartition *> getTopicPartitions(std::string Topic);
-  std::unique_ptr<int64_t> getCurrentPartitionOffset(
-      const RdKafka::TopicMetadata::PartitionMetadataVector *);
 
 public:
   ConnectKafka(std::string Broker, std::string ErrStr);
@@ -41,10 +38,10 @@ public:
 
   std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
 
-  int64_t getNumberOfTopicPartitions(std::string TopicName) override;
+  int getNumberOfTopicPartitions(std::string TopicName) override;
 
   void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
 
-  void subscribeToLastNMessages(int64_t NMessages,
-                                std::string TopicName) override;
+  void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
+                                int Partition) override;
 };

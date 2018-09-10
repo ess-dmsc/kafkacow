@@ -10,6 +10,8 @@ struct UserArgumentStruct {
   std::int16_t GoBack = -2;
   std::int64_t OffsetToStart = -2;
 
+  int PartitionToConsume = -1;
+
   bool ShowAllTopics = false;
   bool ConsumerMode = false;
   bool MetadataMode = false;

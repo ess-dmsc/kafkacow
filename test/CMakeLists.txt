@@ -11,4 +11,7 @@ target_link_libraries(UnitTests
         CONAN_PKG::gtest
         CONAN_PKG::cli11
         CONAN_PKG::librdkafka
+        CONAN_PKG::boost_filesystem
+        CONAN_PKG::FlatBuffers
         CONAN_PKG::spdlog)
+

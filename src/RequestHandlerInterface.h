@@ -13,9 +13,9 @@ protected:
 
   virtual void showTopicPartitionOffsets(UserArgumentStruct UserArguments) = 0;
 
-  virtual std::string subscribeConsumeAtOffset(std::string TopicName,
-                                               int64_t Offset) = 0;
-  virtual std::string
-  subscribeConsumeNLastMessages(std::string TopicName,
-                                int64_t NumberOfMessages) = 0;
+  virtual void subscribeConsumeAtOffset(std::string TopicName,
+                                        int64_t Offset) = 0;
+  virtual void subscribeConsumeNLastMessages(std::string TopicName,
+                                             int64_t NumberOfMessages,
+                                             int Partition) = 0;
 };
