@@ -120,6 +120,7 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
+  UserArguments.PartitionToConsume = 1;
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
