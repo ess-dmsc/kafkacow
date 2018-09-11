@@ -15,14 +15,11 @@ private:
 public:
   FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
 
-  void getFileID(KafkaMessageMetadataStruct MessageData);
+  std::string getFileID(KafkaMessageMetadataStruct MessageData);
 
   std::string getSchemaPathForID(const std::string &FileID);
 
   std::unique_ptr<flatbuffers::Parser> createParser(const std::string &FullName,
                                                     const std::string &Message,
                                                     const std::string &Schema);
-
-  void printMessage(const std::string &JSONMessage,
-                    KafkaMessageMetadataStruct MessageData);
 };

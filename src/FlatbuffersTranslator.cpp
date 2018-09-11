@@ -3,7 +3,8 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
-void FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
+std::string
+FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
   std::string FileID = MessageData.PayloadToReturn.substr(4, 4);
   if (FileIDMap.find(FileID) ==
@@ -27,7 +28,7 @@ void FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile, Schema));
-    printMessage(JSONMessage, MessageData);
+    return JSONMessage;
   } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser =
         createParser(FileIDMap[FileID].first, MessageData.PayloadToReturn,
@@ -36,7 +37,7 @@ void FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       Logger->error("Couldn't generate text using existing parser!\n");
-    printMessage(JSONMessage, MessageData);
+    return JSONMessage;
   }
 }
 
@@ -68,12 +69,4 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   Parser->builder_.PushFlatBuffer(
       reinterpret_cast<const uint8_t *>(Message.c_str()), Message.length());
   return Parser;
-}
-
-void FlatbuffersTranslator::printMessage(
-    const std::string &JSONMessage, KafkaMessageMetadataStruct MessageData) {
-  std::cout << "Partition: " << MessageData.Partition
-            << " || Offset: " << MessageData.Offset
-            << " || Timestamp: " << MessageData.Timestamp << "\n";
-  std::cout << JSONMessage;
 }

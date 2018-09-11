@@ -90,8 +90,17 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.PayloadToReturn.empty() &&
       MessageData.PayloadToReturn != "HiddenSecretMessageFromLovingNeutron") {
-    FlatBuffers.getFileID(MessageData);
+    std::string JSONMessage = FlatBuffers.getFileID(MessageData);
+    printMessage(JSONMessage, MessageData);
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
+}
+
+void RequestHandler::printMessage(const std::string &JSONMessage,
+                                  KafkaMessageMetadataStruct MessageData) {
+  std::cout << "Partition: " << MessageData.Partition
+            << " || Offset: " << MessageData.Offset
+            << " || Timestamp: " << MessageData.Timestamp << "\n";
+  std::cout << JSONMessage;
 }

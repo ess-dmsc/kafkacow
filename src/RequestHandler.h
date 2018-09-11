@@ -32,4 +32,7 @@ public:
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages,
                                      int Partition) override;
+
+  void printMessage(const std::string &JSONMessage,
+                    KafkaMessageMetadataStruct MessageData);
 };
