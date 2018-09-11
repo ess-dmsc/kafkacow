@@ -8,5 +8,5 @@ struct KafkaMessageMetadataStruct {
   std::int64_t Offset;
   int32_t Partition;
   int64_t Timestamp;
-  bool PartitionEOF;
+  bool PartitionEOF = false;
 };

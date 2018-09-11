@@ -8,7 +8,7 @@
 class RequestHandler : public RequestHandlerInterface {
 private:
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
-  void consumePartitions(KafkaMessageMetadataStruct MessageData,
+  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
   std::shared_ptr<spdlog::logger> Logger;
