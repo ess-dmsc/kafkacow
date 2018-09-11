@@ -1,5 +1,6 @@
 #pragma once
 
+#include "KafkaMessageMetadataStruct.h"
 #include <flatbuffers/idl.h>
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
@@ -14,7 +15,7 @@ private:
 public:
   FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
 
-  void getFileID(std::string *Message);
+  void getFileID(KafkaMessageMetadataStruct MessageData);
 
   std::string getSchemaPathForID(const std::string &FileID);
 
@@ -22,5 +23,6 @@ public:
                                                     const std::string &Message,
                                                     const std::string &Schema);
 
-  void printMessage(const std::string &JSONMessage);
+  void printMessage(const std::string &JSONMessage,
+                    KafkaMessageMetadataStruct MessageData);
 };

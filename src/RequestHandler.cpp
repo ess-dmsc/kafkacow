@@ -54,9 +54,9 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
-    std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
+    KafkaMessageMetadataStruct MessageData;
+    MessageData = KafkaConnection->consumeFromOffset();
+    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
   }
 }
 
@@ -70,9 +70,9 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
                                             Partition);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
-    std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF = KafkaConnection->consumeLastNMessages();
-    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
+    KafkaMessageMetadataStruct MessageData;
+    MessageData = KafkaConnection->consumeLastNMessages();
+    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
   }
 }
 
@@ -86,13 +86,13 @@ void RequestHandler::showTopicPartitionOffsets(
   }
 }
 
-void RequestHandler::consumePartitions(
-    std::pair<std::string, bool> MessageAndEOF, int &EOFPartitionCounter,
-    FlatbuffersTranslator &FlatBuffers) {
-  if (!MessageAndEOF.first.empty() &&
-      MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
-    FlatBuffers.getFileID(&MessageAndEOF.first);
+void RequestHandler::consumePartitions(KafkaMessageMetadataStruct MessageData,
+                                       int &EOFPartitionCounter,
+                                       FlatbuffersTranslator &FlatBuffers) {
+  if (!MessageData.PayloadToReturn.empty() &&
+      MessageData.PayloadToReturn != "HiddenSecretMessageFromLovingNeutron") {
+    FlatBuffers.getFileID(MessageData);
   }
-  if (MessageAndEOF.second)
+  if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
 }
