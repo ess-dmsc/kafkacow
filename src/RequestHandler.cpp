@@ -1,7 +1,6 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
 #include <iomanip>
-#include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
 
 // check whether arguments passed match any methods
