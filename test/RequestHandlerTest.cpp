@@ -46,7 +46,6 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   UserArguments.ConsumerMode = true;
   UserArguments.OffsetToStart = 1234;
   UserArguments.Name = "TestTopicName";
-
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun(UserArguments));
 }
 

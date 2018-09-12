@@ -15,7 +15,7 @@ private:
 public:
   FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
 
-  std::string getFileID(KafkaMessageMetadataStruct MessageData);
+  std::string translateToJSON(KafkaMessageMetadataStruct MessageData);
 
   std::string getSchemaPathForID(const std::string &FileID);
 

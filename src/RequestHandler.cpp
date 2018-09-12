@@ -88,9 +88,9 @@ void RequestHandler::showTopicPartitionOffsets(
 void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
-  if (!MessageData.PayloadToReturn.empty() &&
-      MessageData.PayloadToReturn != "HiddenSecretMessageFromLovingNeutron") {
-    std::string JSONMessage = FlatBuffers.getFileID(MessageData);
+  if (!MessageData.Payload.empty() &&
+      !MessageData.ContainsStringMessage) {
+    std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
     printMessage(JSONMessage, MessageData);
   }
   if (MessageData.PartitionEOF)
