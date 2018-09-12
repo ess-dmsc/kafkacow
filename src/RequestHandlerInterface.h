@@ -6,7 +6,7 @@
 
 class RequestHandlerInterface {
 protected:
-  virtual void checkAndRun(UserArgumentStruct UserArguments) = 0;
+  virtual void checkAndRun() = 0;
 
   virtual void checkConsumerModeArguments(UserArgumentStruct UserArguments) = 0;
   virtual void checkMetadataModeArguments(UserArgumentStruct UserArguments) = 0;

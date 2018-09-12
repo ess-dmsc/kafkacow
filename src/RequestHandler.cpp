@@ -1,8 +1,11 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
+#include <iomanip>
+#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
 
 // check whether arguments passed match any methods
-void RequestHandler::checkAndRun(UserArgumentStruct UserArguments) {
+void RequestHandler::checkAndRun() {
   // check input if ConsumerMode chosen
   if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
     checkConsumerModeArguments(UserArguments);
@@ -91,7 +94,9 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
   if (!MessageData.PayloadToReturn.empty() &&
       MessageData.PayloadToReturn != "HiddenSecretMessageFromLovingNeutron") {
     std::string JSONMessage = FlatBuffers.getFileID(MessageData);
-    printMessage(JSONMessage, MessageData);
+    (UserArguments.ShowEntireMessage)
+        ? printMessage(JSONMessage, MessageData)
+        : printTruncatedMessage(JSONMessage, MessageData);
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
@@ -99,8 +104,69 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
 
 void RequestHandler::printMessage(const std::string &JSONMessage,
                                   KafkaMessageMetadataStruct MessageData) {
-  std::cout << "Partition: " << MessageData.Partition
-            << " || Offset: " << MessageData.Offset
-            << " || Timestamp: " << MessageData.Timestamp << "\n";
-  std::cout << JSONMessage;
+  using std::cout;
+  using std::setw;
+  std::cout << setw(50) << "- Partition: " << setw(4) << MessageData.Partition
+            << "\n"
+            << setw(47) << "- Offset: " << setw(7) << MessageData.Offset
+            << "\n- Timestamp: " << setw(21) << MessageData.Timestamp << "\n";
+  YAML::Node node = YAML::Load(JSONMessage);
+  // print message details:
+  cout << "- source_name: " << setw(19) << node["source_name"].as<std::string>()
+       << "\n- message_id: " << setw(20) << node["message_id"].as<std::string>()
+       << "\n- pulse_time: " << setw(20) << node["pulse_time"].as<std::string>()
+       << "\n"
+       << std::endl;
+
+  cout << "no." << setw(5) << "||" << setw(17) << "time_of_flight:" << setw(3)
+       << "||" << setw(15) << "detector_id:\n";
+  cout << "______||__________________||_______________\n";
+  for (unsigned int i = 0; i < node["time_of_flight"].size(); i++) {
+    cout << setw(5) << i << setw(3) << "||" << setw(15)
+         << node["time_of_flight"][i].as<std::string>() << setw(5) << "||"
+         << setw(10) << node["detector_id"][i].as<std::string>() << "\n";
+  }
+  cout << "=======================================================\n";
+}
+
+void RequestHandler::printTruncatedMessage(
+    const std::string &JSONMessage, KafkaMessageMetadataStruct MessageData) {
+  using std::cout;
+  using std::setw;
+
+  std::cout << setw(50) << "- Partition: " << setw(4) << MessageData.Partition
+            << "\n"
+            << setw(47) << "- Offset: " << setw(7) << MessageData.Offset
+            << "\n- Timestamp: " << setw(21) << MessageData.Timestamp << "\n";
+  YAML::Node node = YAML::Load(JSONMessage);
+  // print message details:
+  cout << "- source_name: " << setw(19) << node["source_name"].as<std::string>()
+       << "\n- message_id: " << setw(20) << node["message_id"].as<std::string>()
+       << "\n- pulse_time: " << setw(20) << node["pulse_time"].as<std::string>()
+       << "\n"
+       << std::endl;
+  // print truncated values
+
+  cout << "no." << setw(5) << "||" << setw(17) << "time_of_flight:" << setw(3)
+       << "||" << setw(15) << "detector_id:\n";
+  cout << "______||__________________||_______________\n";
+
+  if (node["time_of_flight"].size() < 10) {
+    for (unsigned int i = 0; i < node["time_of_flight"].size(); i++) {
+      cout << setw(5) << i << setw(3) << "||" << setw(15)
+           << node["time_of_flight"][i].as<std::string>() << setw(5) << "||"
+           << setw(10) << node["detector_id"][i].as<std::string>() << "\n";
+    }
+  } else {
+    for (auto i = 0; i < 10; i++) {
+      cout << setw(5) << i << setw(3) << "||" << setw(15)
+           << node["time_of_flight"][i].as<std::string>() << setw(5) << "||"
+           << setw(10) << node["detector_id"][i].as<std::string>() << "\n";
+    }
+    cout << "[...]" << setw(3) << "||" << setw(15) << "[...]" << setw(5) << "||"
+         << setw(11) << "[...]\n";
+    cout << "------> Omitted " << node["time_of_flight"].size() - 10
+         << " results.\n";
+    cout << "=======================================================\n";
+  }
 }

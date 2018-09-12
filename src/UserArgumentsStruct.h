@@ -16,4 +16,5 @@ struct UserArgumentStruct {
   bool ConsumerMode = false;
   bool MetadataMode = false;
   bool ShowPartitionsOffsets = false;
+  bool ShowEntireMessage = false;
 };

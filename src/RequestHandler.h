@@ -12,15 +12,18 @@ private:
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
   std::shared_ptr<spdlog::logger> Logger;
+  UserArgumentStruct UserArguments;
 
 public:
   explicit RequestHandler(
-      std::unique_ptr<ConnectKafkaInterface> KafkaConnection)
+      std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
+      UserArgumentStruct &UserArguments)
       : KafkaConnection(std::move(KafkaConnection)) {
     Logger = spdlog::get("LOG");
+    this->UserArguments = UserArguments;
   }
 
-  void checkAndRun(UserArgumentStruct UserArguments) override;
+  void checkAndRun() override;
 
   void checkConsumerModeArguments(UserArgumentStruct UserArguments) override;
 
@@ -35,4 +38,6 @@ public:
 
   void printMessage(const std::string &JSONMessage,
                     KafkaMessageMetadataStruct MessageData);
+  void printTruncatedMessage(const std::string &JSONMessage,
+                             KafkaMessageMetadataStruct MessageData);
 };
