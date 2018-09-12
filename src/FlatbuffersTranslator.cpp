@@ -34,9 +34,8 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
     return JSONMessage;
   } else {
     // create a parser using schema loaded in the map
-    std::unique_ptr<flatbuffers::Parser> Parser =
-        createParser(FileIDMap[FileID].first, MessageData.Payload,
-                     FileIDMap[FileID].second);
+    std::unique_ptr<flatbuffers::Parser> Parser = createParser(
+        FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
     // save translated message
     std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
