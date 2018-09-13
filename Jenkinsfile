@@ -143,6 +143,7 @@ def docker_formatting(image_key) {
     try {
         def custom_sh = images[image_key]['sh']
         def script = """
+                    alias clang-format="clang-format-3.9"
                     cd ${project}
                     find . \\\\( -name '*.cpp' -or -name '*.cxx' -or -name '*.h' -or -name '*.hpp' \\\\) \\
                         -exec clangformatdiff.sh {} +
