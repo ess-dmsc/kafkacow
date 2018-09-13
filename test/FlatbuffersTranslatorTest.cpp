@@ -50,7 +50,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   MessageMetadata.Payload = NewMessage;
   FlatbuffersTranslator FlatBuffersTranslator;
 
-  //Run first time to populate schema map
+  // Run first time to populate schema map
   FlatBuffersTranslator.translateToJSON(MessageMetadata);
   EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
             FlatbuffersTranslatorTest::getStringToCompare(
