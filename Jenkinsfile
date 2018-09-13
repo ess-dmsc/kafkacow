@@ -76,7 +76,7 @@ def docker_cmake(image_key) {
             coverage_on = "-DCOV=1"
         }
         def cmake_cmd = "cmake"
-        if (image_key == "centos7-gcc6") {
+        if (image_key == "centos7") {
             cmake_cmd = "cmake3"
         }
         def configure_script = """
@@ -143,7 +143,6 @@ def docker_formatting(image_key) {
     try {
         def custom_sh = images[image_key]['sh']
         def script = """
-                    clang-format -version
                     cd ${project}
                     find . \\\\( -name '*.cpp' -or -name '*.cxx' -or -name '*.h' -or -name '*.hpp' \\\\) \\
                         -exec clangformatdiff.sh {} +
