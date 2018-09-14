@@ -17,7 +17,7 @@ public:
 
   std::string getFileID(KafkaMessageMetadataStruct MessageData);
 
-  std::string getSchemaPathForID(const std::string &FileID);
+  std::pair<bool, std::string> getSchemaPathForID(const std::string &FileID);
 
   std::unique_ptr<flatbuffers::Parser> createParser(const std::string &FullName,
                                                     const std::string &Message,
