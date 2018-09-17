@@ -94,7 +94,7 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
       MessageData.PayloadToReturn != "HiddenSecretMessageFromLovingNeutron") {
     std::string JSONMessage = FlatBuffers.getFileID(MessageData);
     (UserArguments.ShowEntireMessage)
-        ? printMessage(JSONMessage, MessageData)
+        ? printMessage1(JSONMessage, MessageData)
         : printTruncatedMessage(JSONMessage, MessageData);
   }
   if (MessageData.PartitionEOF)
@@ -126,6 +126,22 @@ void RequestHandler::printMessage(const std::string &JSONMessage,
          << setw(10) << node["detector_id"][i].as<std::string>() << "\n";
   }
   cout << "=======================================================\n";
+}
+
+void RequestHandler::printMessage1(const std::string &JSONMessage,
+                                   KafkaMessageMetadataStruct MessageData) {
+  using std::cout;
+  using std::setw;
+
+  YAML::Node node = YAML::Load(JSONMessage);
+  // print message details:
+  std::vector<std::vector<std::string>> Keys;
+  if (node.IsMap()) {
+    recursivePrintJSONMap(node, Keys);
+  } else if (node.IsSequence()) {
+    recursivePrintJSONSequence(node, Keys);
+  } else
+    cout << "chuj\n";
 }
 
 void RequestHandler::printTruncatedMessage(
@@ -168,4 +184,45 @@ void RequestHandler::printTruncatedMessage(
          << " results.\n";
     cout << "=======================================================\n";
   }
+}
+
+void RequestHandler::recursivePrintJSONMap(
+    YAML::Node &Node, std::vector<std::vector<std::string>> &Keys) {
+  for (YAML::const_iterator it = Node.begin(); it != Node.end(); ++it) {
+    std::vector<std::string> Values;
+    Values.push_back(it->first.as<std::string>());
+    std::cout << it->first.as<std::string>() << "  ";
+    auto childNode = *it;
+    if (it->second.IsMap()) {
+      recursivePrintJSONMap(childNode.second, Keys);
+    } else if (it->second.IsSequence()) {
+      recursivePrintJSONSequence(childNode.second, Keys);
+    } else {
+      Values.push_back(it->second.as<std::string>());
+      Keys.push_back(Values);
+      std::cout << it->second.as<std::string>() << "\n";
+    }
+  }
+}
+
+void RequestHandler::recursivePrintJSONSequence(
+    YAML::Node &Node, std::vector<std::vector<std::string>> &Keys) {
+  std::vector<std::string> Values;
+  std::string val;
+  for (YAML::const_iterator it = Node.begin(); it != Node.end(); ++it) {
+
+    auto childNode = *it;
+    if (childNode.IsMap()) {
+      recursivePrintJSONMap(childNode, Keys);
+    } else if (childNode.IsSequence()) {
+      recursivePrintJSONSequence(childNode, Keys);
+    } else {
+      val.append(" | ");
+      val.append(childNode.as<std::string>());
+      Values.push_back(childNode.as<std::string>());
+    }
+  }
+  std::cout << val << "\n";
+  Keys.back().insert(std::end(Keys.back()), std::begin(Values),
+                     std::end(Values));
 }

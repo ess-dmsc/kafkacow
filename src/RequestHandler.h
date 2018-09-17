@@ -4,6 +4,7 @@
 #include "RequestHandlerInterface.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
+#include <yaml-cpp/node/node.h>
 
 class RequestHandler : public RequestHandlerInterface {
 private:
@@ -38,6 +39,14 @@ public:
 
   void printMessage(const std::string &JSONMessage,
                     KafkaMessageMetadataStruct MessageData);
+  void printMessage1(const std::string &JSONMessage,
+                     KafkaMessageMetadataStruct MessageData);
+
+  void recursivePrintJSONMap(YAML::Node &Node,
+                             std::vector<std::vector<std::string>> &Keys);
+  void recursivePrintJSONSequence(YAML::Node &Node,
+                                  std::vector<std::vector<std::string>> &Keys);
+
   void printTruncatedMessage(const std::string &JSONMessage,
                              KafkaMessageMetadataStruct MessageData);
 };
