@@ -54,25 +54,24 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
-    std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
+    KafkaMessageMetadataStruct MessageData;
+    MessageData = KafkaConnection->consumeFromOffset();
+    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
   }
 }
 
 void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
                                                    int64_t NumberOfMessages,
                                                    int Partition) {
-  int EOFPartitionCounter = 0,
-      NumberOfPartitions =
-          KafkaConnection->getNumberOfTopicPartitions(TopicName);
+  int EOFPartitionCounter = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
   FlatbuffersTranslator FlatBuffers;
-  while (EOFPartitionCounter < NumberOfPartitions) {
-    std::pair<std::string, bool> MessageAndEOF;
-    MessageAndEOF = KafkaConnection->consumeLastNMessages();
-    consumePartitions(MessageAndEOF, EOFPartitionCounter, FlatBuffers);
+  KafkaMessageMetadataStruct MessageData;
+  while (EOFPartitionCounter < 1) {
+
+    MessageData = KafkaConnection->consumeLastNMessages();
+    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
   }
 }
 
@@ -86,13 +85,21 @@ void RequestHandler::showTopicPartitionOffsets(
   }
 }
 
-void RequestHandler::consumePartitions(
-    std::pair<std::string, bool> MessageAndEOF, int &EOFPartitionCounter,
-    FlatbuffersTranslator &FlatBuffers) {
-  if (!MessageAndEOF.first.empty() &&
-      MessageAndEOF.first != "HiddenSecretMessageFromLovingNeutron") {
-    FlatBuffers.getFileID(&MessageAndEOF.first);
+void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
+                                       int &EOFPartitionCounter,
+                                       FlatbuffersTranslator &FlatBuffers) {
+  if (!MessageData.Payload.empty() && !MessageData.ContainsStringMessage) {
+    std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
+    printMessage(JSONMessage, MessageData);
   }
-  if (MessageAndEOF.second)
+  if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
+}
+
+void RequestHandler::printMessage(const std::string &JSONMessage,
+                                  KafkaMessageMetadataStruct MessageData) {
+  std::cout << "Partition: " << MessageData.Partition
+            << " || Offset: " << MessageData.Offset
+            << " || Timestamp: " << MessageData.Timestamp << "\n";
+  std::cout << JSONMessage;
 }

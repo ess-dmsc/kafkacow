@@ -1,4 +1,5 @@
 #include "ConnectKafka.h"
+#include "KafkaMessageMetadataStruct.h"
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
@@ -40,6 +41,7 @@ ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
   this->MetadataPointer = this->queryMetadata();
+  Logger = spdlog::get("LOG");
 }
 
 std::string ConnectKafka::getAllTopics() {
@@ -52,10 +54,9 @@ std::string ConnectKafka::getAllTopics() {
   return ListOfTopics;
 }
 
-std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
+KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
   using RdKafka::Message;
-  std::string PayloadToReturn;
-  bool PartitionEOF = false;
+  KafkaMessageMetadataStruct DataToReturn;
 
   auto KafkaMsg = std::unique_ptr<Message>(Consumer->consume(1000));
   switch (KafkaMsg->err()) {
@@ -64,7 +65,11 @@ std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
     if (KafkaMsg->len() > 0) {
       std::string Payload(static_cast<const char *>(KafkaMsg->payload()),
                           static_cast<int>(KafkaMsg->len()));
-      PayloadToReturn = Payload;
+      DataToReturn.Payload = Payload;
+      DataToReturn.Partition = KafkaMsg->partition();
+      DataToReturn.Offset = KafkaMsg->offset();
+      DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
+
     } else {
       // If RdKafka indicates no error then we should always get a
       // non-zero length message
@@ -77,7 +82,7 @@ std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
   case RdKafka::ERR__TIMED_OUT:
     break;
   case RdKafka::ERR__PARTITION_EOF:
-    PartitionEOF = true;
+    DataToReturn.PartitionEOF = true;
     // Not errors as the broker might come back or more data might be pushed
     break;
 
@@ -88,7 +93,7 @@ std::pair<std::string, bool> ConnectKafka::consumeFromOffset() {
        << RdKafka::err2str(KafkaMsg->err());
     throw std::runtime_error(os.str());
   }
-  return std::make_pair(PayloadToReturn, PartitionEOF);
+  return DataToReturn;
 }
 
 std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
@@ -112,6 +117,7 @@ TopicMetadataStruct ConnectKafka::getTopicMetadata(std::string TopicName) {
   for (auto &Partition : *PartitionMetadata) {
     TopicMetadata.Partitions.push_back(Partition->id());
   }
+  sort(TopicMetadata.Partitions.begin(), TopicMetadata.Partitions.end());
   return TopicMetadata;
 }
 
@@ -152,7 +158,7 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string TopicName) {
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
 }
 
-std::pair<std::string, bool> ConnectKafka::consumeLastNMessages() {
+KafkaMessageMetadataStruct ConnectKafka::consumeLastNMessages() {
   return consumeFromOffset();
 }
 
@@ -164,22 +170,25 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
 
   // get highest offset of all partitions
   int64_t HighestOffest = 0;
-  for (auto it : HighAndLowOffsets)
+  for (auto it : HighAndLowOffsets) {
     if (it.HighOffset > HighestOffest)
       HighestOffest = it.HighOffset;
-  std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
+  }
+  std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
   for (auto i = 0; i < getNumberOfTopicPartitions(TopicName); i++) {
     auto TopicPartition = RdKafka::TopicPartition::create(TopicName, i);
 
     // subscribe to the chosen partition
     if (i == Partition) {
       TopicPartition->set_offset(HighAndLowOffsets[Partition].HighOffset -
-                                 NMessages);
+                                 NMessages + 0);
+    } else {
+      TopicPartition->set_offset(HighestOffest + 1000);
     }
-    TopicPartitionsWithOffsets.push_back(TopicPartition);
+    TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
   }
-  Consumer->assign(TopicPartitionsWithOffsets);
-  std::for_each(TopicPartitionsWithOffsets.cbegin(),
-                TopicPartitionsWithOffsets.cend(),
+  Consumer->assign(TopicPartitionsWithOffsetsSet);
+  std::for_each(TopicPartitionsWithOffsetsSet.cbegin(),
+                TopicPartitionsWithOffsetsSet.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
 }

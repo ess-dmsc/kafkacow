@@ -6,9 +6,12 @@ std::string ConnectKafkaFake::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-std::pair<std::string, bool> ConnectKafkaFake::consumeFromOffset() {
-  return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
-                                      true);
+KafkaMessageMetadataStruct ConnectKafkaFake::consumeFromOffset() {
+  KafkaMessageMetadataStruct DataToReturn;
+  DataToReturn.Payload = "HiddenSecretMessageFromLovingNeutron";
+  DataToReturn.PartitionEOF = true;
+  DataToReturn.ContainsStringMessage = true;
+  return DataToReturn;
 }
 
 std::vector<OffsetsStruct>
@@ -32,7 +35,6 @@ void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
                                                 const std::string &TopicName,
                                                 int Partition) {}
 
-std::pair<std::string, bool> ConnectKafkaFake::consumeLastNMessages() {
-  return std::pair<std::string, bool>("HiddenSecretMessageFromLovingNeutron",
-                                      true);
+KafkaMessageMetadataStruct ConnectKafkaFake::consumeLastNMessages() {
+  return consumeFromOffset();
 }

@@ -3,39 +3,45 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
-void FlatbuffersTranslator::getFileID(std::string *Message) {
+std::string
+FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
-  std::string FileID = Message->substr(4, 4);
-  if (FileIDMap.find(FileID) ==
-      FileIDMap.end()) { // if no ID present in the map:
+  std::string FileID = MessageData.Payload.substr(4, 4);
+
+  // if no ID present in the map:
+  if (FileIDMap.find(FileID) == FileIDMap.end()) {
 
     // get schema name and path for FileID
     std::string SchemaFile = getSchemaPathForID(FileID);
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.c_str(), false, &Schema);
     if (!ok) {
-      // Logger->error("Couldn't load schema files!\n");
+      Logger->error("Couldn't load schema files!\n");
     }
 
+    // create a new parser
     std::unique_ptr<flatbuffers::Parser> Parser =
-        createParser(SchemaFile, *Message, Schema);
-    std::string JSONMessage;
+        createParser(SchemaFile, MessageData.Payload, Schema);
 
+    // save translated message
+    std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile, Schema));
-    printMessage(JSONMessage);
-  } else { // create a parser using schema loaded in the map
+    return JSONMessage;
+  } else {
+    // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
-        FileIDMap[FileID].first, *Message, FileIDMap[FileID].second);
+        FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
+    // save translated message
     std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       Logger->error("Couldn't generate text using existing parser!\n");
-    printMessage(JSONMessage);
+    return JSONMessage;
   }
 }
 
@@ -67,8 +73,4 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   Parser->builder_.PushFlatBuffer(
       reinterpret_cast<const uint8_t *>(Message.c_str()), Message.length());
   return Parser;
-}
-
-void FlatbuffersTranslator::printMessage(const std::string &JSONMessage) {
-  std::cout << JSONMessage;
 }

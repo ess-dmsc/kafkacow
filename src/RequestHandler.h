@@ -8,7 +8,7 @@
 class RequestHandler : public RequestHandlerInterface {
 private:
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
-  void consumePartitions(std::pair<std::string, bool> MessageAndEOF,
+  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
   std::shared_ptr<spdlog::logger> Logger;
@@ -32,4 +32,7 @@ public:
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages,
                                      int Partition) override;
+
+  void printMessage(const std::string &JSONMessage,
+                    KafkaMessageMetadataStruct MessageData);
 };

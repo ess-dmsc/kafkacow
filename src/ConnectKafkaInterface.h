@@ -1,5 +1,6 @@
 #pragma once
 
+#include "KafkaMessageMetadataStruct.h"
 #include "OffsetsStruct.h"
 #include "TopicMetadataStruct.h"
 #include <CLI/CLI.hpp>
@@ -9,8 +10,8 @@ class ConnectKafkaInterface {
 public:
   virtual std::string getAllTopics() = 0;
 
-  virtual std::pair<std::string, bool> consumeFromOffset() = 0;
-  virtual std::pair<std::string, bool> consumeLastNMessages() = 0;
+  virtual KafkaMessageMetadataStruct consumeFromOffset() = 0;
+  virtual KafkaMessageMetadataStruct consumeLastNMessages() = 0;
 
   virtual std::vector<OffsetsStruct>
   getHighAndLowOffsets(std::string Topic) = 0;
