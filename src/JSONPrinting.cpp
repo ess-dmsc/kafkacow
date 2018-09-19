@@ -24,8 +24,8 @@ void JSONPrinting::printEntireMessage(const std::string &JSONMessage) {
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
       MessageWithNoQuotes.end());
-  cout << MessageWithNoQuotes;
-  cout << "\n__________________________________________________\n";
+  std::cout << MessageWithNoQuotes;
+  std::cout << "\n__________________________________________________\n";
 }
 
 /// Receives deserialized flatbuffers message, truncated large arrays, formats
@@ -52,8 +52,8 @@ void JSONPrinting::printTruncatedMessage(const std::string &JSONMessage) {
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
       MessageWithNoQuotes.end());
-  cout << MessageWithNoQuotes;
-  cout << "\n__________________________________________________\n";
+  std::cout << MessageWithNoQuotes;
+  std::cout << "\n__________________________________________________\n";
 }
 
 /// First of a pair of recursive methods that receive YAML node and truncate
@@ -77,6 +77,7 @@ void JSONPrinting::recursiveTruncateJSONMap(YAML::Node &Node) {
 /// \param Node
 void JSONPrinting::recursiveTruncateJSONSequence(YAML::Node &Node) {
   int Counter = 0;
+  int OriginalSize = Node.size();
   auto Begin = Node.begin();
   auto End = Node.end();
   for (YAML::const_iterator it = Begin; it != End; ++it) {
@@ -94,7 +95,7 @@ void JSONPrinting::recursiveTruncateJSONSequence(YAML::Node &Node) {
       if (NodeSize - Counter > 10) {
         Node.remove(NodeSize - Counter);
 
-      } else if (NodeSize - Counter == 0) {
+      } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
         Node.remove(NodeSize - Counter);
         std::stringstream ss;
         Node.push_back("[...]");
