@@ -4,7 +4,7 @@
 #include <iostream>
 
 std::string
-FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
+FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
   std::string FileID = MessageData.Payload.substr(4, 4);
   if (FileIDMap.find(FileID) ==
@@ -23,10 +23,12 @@ FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
       Logger->error("Couldn't load schema files!\n");
     }
 
+    // create a new parser
     std::unique_ptr<flatbuffers::Parser> Parser =
         createParser(SchemaFile.second, MessageData.Payload, Schema);
-    std::string JSONMessage;
 
+    // save translated message
+    std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
       Logger->error("Couldn't generate new text!\n");

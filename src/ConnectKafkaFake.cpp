@@ -10,7 +10,7 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consumeFromOffset() {
   KafkaMessageMetadataStruct DataToReturn;
   DataToReturn.Payload = "HiddenSecretMessageFromLovingNeutron";
   DataToReturn.PartitionEOF = true;
-
+  DataToReturn.ContainsStringMessage = true;
   return DataToReturn;
 }
 

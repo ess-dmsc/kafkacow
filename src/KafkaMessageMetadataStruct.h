@@ -4,9 +4,10 @@
 #include <string>
 
 struct KafkaMessageMetadataStruct {
-  std::string Payload;
   std::int64_t Offset;
-  int32_t Partition;
   int64_t Timestamp;
+  int32_t Partition;
+  std::string Payload;
   bool PartitionEOF = false;
+  bool ContainsStringMessage = false;
 };
