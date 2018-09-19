@@ -90,7 +90,7 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty() && !MessageData.ContainsStringMessage) {
-    std::string JSONMessage = FlatBuffers.getFileID(MessageData);
+    std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
     JSONPrinting JSONPrinter;
     (UserArguments.ShowEntireMessage)
         ? JSONPrinter.printEntireMessage(JSONMessage)
