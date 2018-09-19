@@ -6,17 +6,16 @@
 std::string
 FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
-  std::string FileID = MessageData.PayloadToReturn.substr(4, 4);
-  //  std::string FileID = "lol";
+  std::string FileID = MessageData.Payload.substr(4, 4);
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
     // get schema name and path for FileID
     std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
-    // if FileID invalidate, assume message is in JSON and return
+    // if FileID invalidate, assume message is in JSON and return it
     if (!SchemaFile.first)
-      return MessageData.PayloadToReturn;
+      return MessageData.Payload;
 
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.second.c_str(), false, &Schema);
@@ -25,7 +24,7 @@ FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
     }
 
     std::unique_ptr<flatbuffers::Parser> Parser =
-        createParser(SchemaFile.second, MessageData.PayloadToReturn, Schema);
+        createParser(SchemaFile.second, MessageData.Payload, Schema);
     std::string JSONMessage;
 
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
@@ -36,9 +35,8 @@ FlatbuffersTranslator::getFileID(KafkaMessageMetadataStruct MessageData) {
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
     return JSONMessage;
   } else { // create a parser using schema loaded in the map
-    std::unique_ptr<flatbuffers::Parser> Parser =
-        createParser(FileIDMap[FileID].first, MessageData.PayloadToReturn,
-                     FileIDMap[FileID].second);
+    std::unique_ptr<flatbuffers::Parser> Parser = createParser(
+        FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
     std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))

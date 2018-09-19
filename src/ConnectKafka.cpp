@@ -65,7 +65,7 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
     if (KafkaMsg->len() > 0) {
       std::string Payload(static_cast<const char *>(KafkaMsg->payload()),
                           static_cast<int>(KafkaMsg->len()));
-      DataToReturn.PayloadToReturn = Payload;
+      DataToReturn.Payload = Payload;
       DataToReturn.Partition = KafkaMsg->partition();
       DataToReturn.Offset = KafkaMsg->offset();
       DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
