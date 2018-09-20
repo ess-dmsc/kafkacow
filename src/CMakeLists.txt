@@ -1,4 +1,4 @@
-add_executable(kafkaCow main.cpp
+add_executable(kafkacow main.cpp
         RequestHandler.cpp
         RequestHandler.h
         RequestHandlerInterface.h
@@ -15,7 +15,7 @@ add_executable(kafkaCow main.cpp
         FlatbuffersTranslator.h
         JSONPrinting.cpp
         JSONPrinting.h)
-target_link_libraries(kafkaCow CONAN_PKG::cli11
+target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka
         CONAN_PKG::FlatBuffers
         CONAN_PKG::boost_filesystem
