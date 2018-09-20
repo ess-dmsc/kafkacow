@@ -8,7 +8,7 @@
 /// screen.
 ///
 /// \param JSONMessage
-void printEntireMessage(const std::string &JSONMessage) {
+std::string getEntireMessage(const std::string &JSONMessage) {
   using std::cout;
   using nlohmann::json;
 
@@ -24,15 +24,14 @@ void printEntireMessage(const std::string &JSONMessage) {
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
       MessageWithNoQuotes.end());
-  std::cout << MessageWithNoQuotes;
-  std::cout << "\n__________________________________________________\n";
+  return MessageWithNoQuotes;
 }
 
 /// Receives deserialized flatbuffers message, truncated large arrays, formats
 /// it and prints it to the screen.
 ///
 /// \param JSONMessage
-void printTruncatedMessage(const std::string &JSONMessage) {
+std::string getTruncatedMessage(const std::string &JSONMessage) {
   using std::cout;
   using nlohmann::json;
 
@@ -47,8 +46,7 @@ void printTruncatedMessage(const std::string &JSONMessage) {
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
       MessageWithNoQuotes.end());
-  std::cout << MessageWithNoQuotes;
-  std::cout << "\n__________________________________________________\n";
+  return MessageWithNoQuotes;
 }
 
 YAML::Node truncateMessage(const std::string &JSONMessage) {
@@ -108,4 +106,9 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
       }
     }
   }
+}
+
+void printToScreen(const std::string &Message) {
+  std::cout << Message;
+  std::cout << "\n__________________________________________________\n";
 }
