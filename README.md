@@ -8,7 +8,7 @@ Similarly to kafkacat application runs in either __metadata__ or __consumer__ mo
 Client runs once and presents data as requested:
 
 ```
-kafkacow -h
+bin/kafkacow -h
 
 Options:  
   -h,--help                   Print this help message and exit
@@ -26,7 +26,7 @@ Options:
   #### Usage example
   Show last 10 messages of MULTIPART_EVENTS topic from broker hinata.isis.cclrc.ac.uk:9092:
   ```
-kafkaCow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
+bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   ```
   
   ## Install

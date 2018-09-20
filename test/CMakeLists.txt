@@ -6,7 +6,7 @@ list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
 list(FILTER SRC_FILES EXCLUDE REGEX ".*ConnectKafka.cpp$")
 
 add_executable(UnitTests RequestHandlerTest.cpp ${SRC_FILES}
-        FlatbuffersTranslatorTest.cpp ${SRC_FILES})
+        FlatbuffersTranslatorTest.cpp ${SRC_FILES} JSONPrintingTest.cpp)
 
 target_link_libraries(UnitTests
         CONAN_PKG::gtest
@@ -14,4 +14,6 @@ target_link_libraries(UnitTests
         CONAN_PKG::librdkafka
         CONAN_PKG::boost_filesystem
         CONAN_PKG::FlatBuffers
-        CONAN_PKG::spdlog)
+        CONAN_PKG::spdlog
+        CONAN_PKG::yaml-cpp
+        CONAN_PKG::jsonformoderncpp)

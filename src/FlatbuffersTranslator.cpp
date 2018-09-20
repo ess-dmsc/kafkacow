@@ -7,21 +7,23 @@ std::string
 FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
   std::string FileID = MessageData.Payload.substr(4, 4);
+  if (FileIDMap.find(FileID) ==
+      FileIDMap.end()) { // if no ID present in the map:
 
-  // if no ID present in the map:
-  if (FileIDMap.find(FileID) == FileIDMap.end()) {
+    std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
-    // get schema name and path for FileID
-    std::string SchemaFile = getSchemaPathForID(FileID);
+    // if FileID is invalid, assume message is in JSON and return it
+    if (!SchemaFile.first)
+      return MessageData.Payload;
+
     std::string Schema;
-    bool ok = flatbuffers::LoadFile(SchemaFile.c_str(), false, &Schema);
+    bool ok = flatbuffers::LoadFile(SchemaFile.second.c_str(), false, &Schema);
     if (!ok) {
       Logger->error("Couldn't load schema files!\n");
     }
 
-    // create a new parser
     std::unique_ptr<flatbuffers::Parser> Parser =
-        createParser(SchemaFile, MessageData.Payload, Schema);
+        createParser(SchemaFile.second, MessageData.Payload, Schema);
 
     // save translated message
     std::string JSONMessage;
@@ -30,13 +32,11 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
       Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
-    FileIDMap.emplace(FileID, std::make_pair(SchemaFile, Schema));
+    FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
     return JSONMessage;
-  } else {
-    // create a parser using schema loaded in the map
+  } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
         FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
-    // save translated message
     std::string JSONMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
                       &JSONMessage))
@@ -46,16 +46,18 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
 }
 
 // find a schema file name relevant to the ID and return it
-std::string
+std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
     if (DirectoryEntry.string().find(FileID) != std::string::npos) {
-      return DirectoryEntry.string();
+      // if schema found, return TRUE and path
+      return std::make_pair(true, DirectoryEntry.string());
     }
   }
-  throw ArgumentsException("No relevant schema!");
+  // if no valid schema for identifier, return FALSE
+  return std::make_pair(false, "");
 }
 
 std::unique_ptr<flatbuffers::Parser>

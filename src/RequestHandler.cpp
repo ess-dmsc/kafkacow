@@ -1,8 +1,9 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
+#include "JSONPrinting.h"
 
 // check whether arguments passed match any methods
-void RequestHandler::checkAndRun(UserArgumentStruct UserArguments) {
+void RequestHandler::checkAndRun() {
   // check input if ConsumerMode chosen
   if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
     checkConsumerModeArguments(UserArguments);
@@ -88,18 +89,12 @@ void RequestHandler::showTopicPartitionOffsets(
 void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
-  if (!MessageData.Payload.empty() && !MessageData.ContainsStringMessage) {
+  if (!MessageData.Payload.empty()) {
     std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
-    printMessage(JSONMessage, MessageData);
+    (UserArguments.ShowEntireMessage)
+        ? printToScreen(getEntireMessage(JSONMessage))
+        : printToScreen(getTruncatedMessage(JSONMessage));
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
-}
-
-void RequestHandler::printMessage(const std::string &JSONMessage,
-                                  KafkaMessageMetadataStruct MessageData) {
-  std::cout << "Partition: " << MessageData.Partition
-            << " || Offset: " << MessageData.Offset
-            << " || Timestamp: " << MessageData.Timestamp << "\n";
-  std::cout << JSONMessage;
 }

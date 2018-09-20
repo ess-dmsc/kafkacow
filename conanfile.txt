@@ -6,6 +6,8 @@ gtest/3121b20-dm3@ess-dmsc/stable
 cmake_findboost_modular/1.65.1@bincrafters/stable
 boost_filesystem/1.65.1@bincrafters/stable
 spdlog/1.1.0@bincrafters/stable
+yaml-cpp/ee99c41@ess-dmsc/stable
+jsonformoderncpp/3.2.0@vthiery/stable
 
 [generators]
 cmake

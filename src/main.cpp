@@ -34,6 +34,8 @@ int main(int argc, char **argv) {
                "Run the program in the metadata mode");
   App.add_flag("-P, --partitions", UserArguments.ShowPartitionsOffsets,
                "Show offsets for partitions of given topic \"-t\"");
+  App.add_flag("-E, --entire", UserArguments.ShowEntireMessage,
+               "Show all records of a message(truncated by default)");
 
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
@@ -46,9 +48,9 @@ int main(int argc, char **argv) {
   auto Logger = spdlog::stderr_color_mt("LOG");
   Logger->info("Welcome to spdlog!");
 
-  RequestHandler NewRequestHandler(std::move(KafkaConnection));
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   try {
-    NewRequestHandler.checkAndRun(UserArguments);
+    NewRequestHandler.checkAndRun();
   } catch (ArgumentsException &E) {
     E.what();
   } catch (std::exception &E) {

@@ -56,3 +56,11 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
 }
+
+TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
+  KafkaMessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
+  FlatbuffersTranslator FlatBuffersTranslator;
+  EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
+            MessageMetadata.Payload);
+}

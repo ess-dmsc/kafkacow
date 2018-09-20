@@ -1,15 +1,15 @@
 project = "kafkacow"
-clangformat_os = "fedora25"
-test_and_coverage_os = "centos7-gcc6"
-archive_os = "centos7-gcc6"
+clangformat_os = "debian9"
+test_and_coverage_os = "centos7"
+archive_os = "centos7"
 
 images = [
-        'centos7-gcc6': [
-                'name': 'essdmscdm/centos7-gcc6-build-node:2.1.0',
+        'centos7': [
+                'name': 'essdmscdm/centos7-build-node:3.1.0',
                 'sh'  : '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash -e'
         ],
-        'fedora25'    : [
-                'name': 'essdmscdm/fedora25-build-node:1.0.0',
+        'debian9'    : [
+                'name': 'essdmscdm/debian9-build-node:2.1.0',
                 'sh'  : 'bash -e'
         ],
         'ubuntu1804'  : [
@@ -76,7 +76,7 @@ def docker_cmake(image_key) {
             coverage_on = "-DCOV=1"
         }
         def cmake_cmd = "cmake"
-        if (image_key == "centos7-gcc6") {
+        if (image_key == "centos7") {
             cmake_cmd = "cmake3"
         }
         def configure_script = """
@@ -143,7 +143,7 @@ def docker_formatting(image_key) {
     try {
         def custom_sh = images[image_key]['sh']
         def script = """
-                    clang-format -version
+                    alias clang-format="clang-format-3.9"
                     cd ${project}
                     find . \\\\( -name '*.cpp' -or -name '*.cxx' -or -name '*.h' -or -name '*.hpp' \\\\) \\
                         -exec clangformatdiff.sh {} +
