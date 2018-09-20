@@ -31,9 +31,8 @@ int main(int argc, char **argv) {
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode");
   App.add_flag("-L, --list", UserArguments.MetadataMode,
-               "Run the program in the metadata mode");
-  App.add_flag("-P, --partitions", UserArguments.ShowPartitionsOffsets,
-               "Show offsets for partitions of given topic \"-t\"");
+               "Metadata mode. Show all topics and partitions. If \"-t\" "
+               "specified, shows partition offsets.");
   App.add_flag("-E, --entire", UserArguments.ShowEntireMessage,
                "Show all records of a message(truncated by default)");
 

@@ -38,12 +38,12 @@ void RequestHandler::checkConsumerModeArguments(
 
 void RequestHandler::checkMetadataModeArguments(
     UserArgumentStruct UserArguments) {
-  if (!UserArguments.ShowAllTopics && !UserArguments.ShowPartitionsOffsets)
-    std::cout << KafkaConnection->showAllMetadata();
-  else if (UserArguments.ShowAllTopics)
+  if (UserArguments.ShowAllTopics)
     std::cout << KafkaConnection->getAllTopics() << "\n";
-  else if (UserArguments.ShowPartitionsOffsets)
+  else if (!UserArguments.Name.empty())
     showTopicPartitionOffsets(UserArguments);
+  else if (!UserArguments.ShowAllTopics)
+    std::cout << KafkaConnection->showAllMetadata();
 }
 
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
@@ -78,6 +78,7 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
 
 void RequestHandler::showTopicPartitionOffsets(
     UserArgumentStruct UserArguments) {
+  std::cout << UserArguments.Name << "\n";
   for (auto &SingleStruct :
        KafkaConnection->getHighAndLowOffsets(UserArguments.Name)) {
     std::cout << "Partition ID: " << SingleStruct.PartitionId
