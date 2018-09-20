@@ -8,7 +8,7 @@
 /// screen.
 ///
 /// \param JSONMessage
-void JSONPrinting::printEntireMessage(const std::string &JSONMessage) {
+void printEntireMessage(const std::string &JSONMessage) {
   using std::cout;
   using nlohmann::json;
 
@@ -32,18 +32,13 @@ void JSONPrinting::printEntireMessage(const std::string &JSONMessage) {
 /// it and prints it to the screen.
 ///
 /// \param JSONMessage
-void JSONPrinting::printTruncatedMessage(const std::string &JSONMessage) {
+void printTruncatedMessage(const std::string &JSONMessage) {
   using std::cout;
   using nlohmann::json;
 
-  YAML::Node node = YAML::Load(JSONMessage);
-  if (node.IsMap())
-    recursiveTruncateJSONMap(node);
-  else if (node.IsSequence())
-    recursiveTruncateJSONSequence(node);
-
+  YAML::Node Node = truncateMessage(JSONMessage);
   YAML::Emitter Emitter;
-  Emitter << YAML::DoubleQuoted << YAML::Flow << node;
+  Emitter << YAML::DoubleQuoted << YAML::Flow << Node;
   auto JSONModernMessage = json::parse(Emitter.c_str());
   std::string MessageWithNoQuotes = JSONModernMessage.dump(4);
   MessageWithNoQuotes.erase(
@@ -56,11 +51,20 @@ void JSONPrinting::printTruncatedMessage(const std::string &JSONMessage) {
   std::cout << "\n__________________________________________________\n";
 }
 
-/// First of a pair of recursive methods that receive YAML node and truncate
+YAML::Node truncateMessage(const std::string &JSONMessage) {
+  YAML::Node Node = YAML::Load(JSONMessage);
+  if (Node.IsMap())
+    recursiveTruncateJSONMap(Node);
+  else if (Node.IsSequence())
+    recursiveTruncateJSONSequence(Node);
+  return Node;
+}
+
+/// Recursive method that receives YAML node and truncates
 /// long arrays that it contains.
 ///
 /// \param Node
-void JSONPrinting::recursiveTruncateJSONMap(YAML::Node &Node) {
+void recursiveTruncateJSONMap(YAML::Node &Node) {
   for (YAML::const_iterator it = Node.begin(); it != Node.end(); ++it) {
     auto childNode = *it;
     if (it->second.IsMap()) {
@@ -71,13 +75,13 @@ void JSONPrinting::recursiveTruncateJSONMap(YAML::Node &Node) {
   }
 }
 
-/// First of a pair of recursive methods that receive YAML node and truncate
+/// Recursive method that receives YAML node and truncates
 /// long arrays that it contains.
 ///
 /// \param Node
-void JSONPrinting::recursiveTruncateJSONSequence(YAML::Node &Node) {
+void recursiveTruncateJSONSequence(YAML::Node &Node) {
   int Counter = 0;
-  int OriginalSize = Node.size();
+  size_t OriginalSize = Node.size();
   auto Begin = Node.begin();
   auto End = Node.end();
   for (YAML::const_iterator it = Begin; it != End; ++it) {
@@ -91,7 +95,7 @@ void JSONPrinting::recursiveTruncateJSONSequence(YAML::Node &Node) {
       recursiveTruncateJSONSequence(childNode);
     } else {
       Counter++;
-      int NodeSize = Node.size();
+      size_t NodeSize = Node.size();
       if (NodeSize - Counter > 10) {
         Node.remove(NodeSize - Counter);
 
@@ -99,7 +103,7 @@ void JSONPrinting::recursiveTruncateJSONSequence(YAML::Node &Node) {
         Node.remove(NodeSize - Counter);
         std::stringstream ss;
         Node.push_back("[...]");
-        ss << "Ommitted " << NodeSize - 10 << " results.";
+        ss << "Omitted " << NodeSize - 10 << " results.";
         Node.push_back(ss.str());
       }
     }

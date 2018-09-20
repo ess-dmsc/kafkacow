@@ -91,13 +91,9 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty() && !MessageData.ContainsStringMessage) {
     std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
-    JSONPrinting JSONPrinter;
-    (UserArguments.ShowEntireMessage)
-        ? JSONPrinter.printEntireMessage(JSONMessage)
-        : JSONPrinter.printTruncatedMessage(JSONMessage);
-
+    (UserArguments.ShowEntireMessage) ? printEntireMessage(JSONMessage)
+                                      : printTruncatedMessage(JSONMessage);
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
 }
-

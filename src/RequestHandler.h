@@ -4,17 +4,8 @@
 #include "RequestHandlerInterface.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
-#include <yaml-cpp/node/node.h>
 
 class RequestHandler : public RequestHandlerInterface {
-private:
-  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
-  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
-                         int &EOFPartitionCounter,
-                         FlatbuffersTranslator &FlatBuffers);
-  std::shared_ptr<spdlog::logger> Logger;
-  UserArgumentStruct UserArguments;
-
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
@@ -36,4 +27,12 @@ public:
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages,
                                      int Partition) override;
+
+private:
+  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
+  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
+                         int &EOFPartitionCounter,
+                         FlatbuffersTranslator &FlatBuffers);
+  std::shared_ptr<spdlog::logger> Logger;
+  UserArgumentStruct UserArguments;
 };

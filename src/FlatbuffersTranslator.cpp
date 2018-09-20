@@ -10,10 +10,9 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
-    // get schema name and path for FileID
     std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
-    // if FileID invalidate, assume message is in JSON and return it
+    // if FileID is invalid, assume message is in JSON and return it
     if (!SchemaFile.first)
       return MessageData.Payload;
 
@@ -23,7 +22,6 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
       Logger->error("Couldn't load schema files!\n");
     }
 
-    // create a new parser
     std::unique_ptr<flatbuffers::Parser> Parser =
         createParser(SchemaFile.second, MessageData.Payload, Schema);
 
