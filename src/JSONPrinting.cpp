@@ -94,11 +94,10 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
     } else {
       Counter++;
       size_t NodeSize = Node.size();
-      if (NodeSize - Counter > 10) {
+      if (NodeSize - Counter > 9) {
         Node.remove(NodeSize - Counter);
 
       } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
-        Node.remove(NodeSize - Counter);
         std::stringstream ss;
         Node.push_back("[...]");
         ss << "Omitted " << NodeSize - 10 << " results.";
