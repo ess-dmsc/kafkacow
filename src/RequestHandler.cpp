@@ -39,7 +39,7 @@ void RequestHandler::checkConsumerModeArguments(
 void RequestHandler::checkMetadataModeArguments(
     UserArgumentStruct UserArguments) {
   if (!UserArguments.ShowAllTopics && !UserArguments.ShowPartitionsOffsets)
-    throw ArgumentsException("No action specified for \"--list\" mode");
+    std::cout << KafkaConnection->showAllMetadata();
   else if (UserArguments.ShowAllTopics)
     std::cout << KafkaConnection->getAllTopics() << "\n";
   if (UserArguments.ShowPartitionsOffsets)

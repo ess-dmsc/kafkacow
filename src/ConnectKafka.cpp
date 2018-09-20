@@ -1,5 +1,6 @@
 #include "ConnectKafka.h"
 #include "KafkaMessageMetadataStruct.h"
+#include <iomanip>
 
 namespace {
 std::unique_ptr<RdKafka::Conf>
@@ -191,4 +192,34 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
   std::for_each(TopicPartitionsWithOffsetsSet.cbegin(),
                 TopicPartitionsWithOffsetsSet.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
+}
+
+std::string ConnectKafka::showAllMetadata() {
+  using std::setw;
+  std::stringstream SS;
+  SS << MetadataPointer->brokers()->size() << " brokers:\n";
+  for (auto Broker : *MetadataPointer->brokers())
+    SS << "   broker " << Broker->id() << " at " << Broker->host()
+       << Broker->port() << "\n";
+  SS << "\n";
+  SS << MetadataPointer->topics()->size() << " topics:\n";
+  for (auto Topic : *MetadataPointer->topics()) {
+    SS << "   \"" << Topic->topic() << "\" with " << Topic->partitions()->size()
+       << " partitions:\n";
+    for (auto Partition : *Topic->partitions()) {
+      std::stringstream Replicas;
+      std::copy(Partition->replicas()->begin(), Partition->replicas()->end(),
+                std::ostream_iterator<int32_t>(Replicas, ", "));
+      std::stringstream ISRSs;
+      std::copy(Partition->isrs()->begin(), Partition->isrs()->end(),
+                std::ostream_iterator<int32_t>(ISRSs, ", "));
+      SS << "        partition " << setw(3) << Partition->id() << "  |  leader "
+         << setw(3) << Partition->leader()
+         << "  |  replicas: " << Replicas.str() << "|  isrs: " << ISRSs.str()
+         << "\n";
+    }
+    SS << "\n";
+  }
+  std::string Metadata = SS.str();
+  return Metadata;
 }

@@ -37,3 +37,7 @@ void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
 KafkaMessageMetadataStruct ConnectKafkaFake::consumeLastNMessages() {
   return consumeFromOffset();
 }
+
+std::string ConnectKafkaFake::showAllMetadata() {
+  return std::__cxx11::string();
+}

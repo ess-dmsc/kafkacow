@@ -94,8 +94,7 @@ TEST(RequestHandlerTest, no_action_specified_in_metadata_mode) {
   UserArguments.ShowAllTopics = false;
   UserArguments.ShowPartitionsOffsets = false;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
-  EXPECT_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments),
-               ArgumentsException);
+  EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
 
 // consumer mode argument test

@@ -23,4 +23,6 @@ public:
   virtual void subscribeToLastNMessages(int64_t NMessages,
                                         const std::string &TopicName,
                                         int Partition) = 0;
+
+  virtual std::string showAllMetadata() = 0;
 };

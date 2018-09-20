@@ -24,4 +24,5 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;
+  std::string showAllMetadata() override;
 };
