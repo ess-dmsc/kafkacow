@@ -35,3 +35,11 @@ TEST(JSONPrintingTest, print_message_test) {
       OutputMessage,
       "TestMessage\n__________________________________________________\n");
 }
+
+TEST(JSONPrintingTest, print_nested_maps_and_sequences_test) {
+  std::string InputMessage = "[ 15579, 91072, {\n"
+                             "  32972: {\n"
+                             "    32972:\n"
+                             "    32972}},[15579, 91072] ]";
+  EXPECT_NO_THROW(getEntireMessage(InputMessage));
+}
