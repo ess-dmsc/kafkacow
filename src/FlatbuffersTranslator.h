@@ -9,7 +9,7 @@ class FlatbuffersTranslator {
 private:
   // for each FILEID store path to schema file and schema itself
   std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
-  std::string FullPath = "../schemas/";
+  std::string FullPath = "schemas/";
   std::shared_ptr<spdlog::logger> Logger;
 
 public:
