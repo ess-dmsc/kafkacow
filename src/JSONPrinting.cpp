@@ -99,8 +99,8 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
 
       } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
         std::stringstream ss;
-        Node.push_back("[...]");
-        ss << "Omitted " << NodeSize - 10 << " results.";
+        Node.push_back("...");
+        ss << "Truncated " << NodeSize - 10 << " elements.";
         Node.push_back(ss.str());
       }
     }
