@@ -38,6 +38,4 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consumeLastNMessages() {
   return consumeFromOffset();
 }
 
-std::string ConnectKafkaFake::showAllMetadata() {
-  return std::__cxx11::string();
-}
+std::string ConnectKafkaFake::showAllMetadata() { return "Test return"; }
