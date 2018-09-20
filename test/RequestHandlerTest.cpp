@@ -87,7 +87,7 @@ TEST(RequestHandlerTest, show_all_topics_no_error) {
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
-TEST(RequestHandlerTest, no_action_specified_in_metadata_mode) {
+TEST(RequestHandlerTest, display_all_metadata) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;

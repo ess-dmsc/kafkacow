@@ -42,7 +42,7 @@ void RequestHandler::checkMetadataModeArguments(
     std::cout << KafkaConnection->showAllMetadata();
   else if (UserArguments.ShowAllTopics)
     std::cout << KafkaConnection->getAllTopics() << "\n";
-  if (UserArguments.ShowPartitionsOffsets)
+  else if (UserArguments.ShowPartitionsOffsets)
     showTopicPartitionOffsets(UserArguments);
 }
 
