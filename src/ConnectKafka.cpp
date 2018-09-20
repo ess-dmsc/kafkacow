@@ -199,7 +199,7 @@ std::string ConnectKafka::showAllMetadata() {
   std::stringstream SS;
   SS << MetadataPointer->brokers()->size() << " brokers:\n";
   for (auto Broker : *MetadataPointer->brokers())
-    SS << "   broker " << Broker->id() << " at " << Broker->host()<<":"
+    SS << "   broker " << Broker->id() << " at " << Broker->host() << ":"
        << Broker->port() << "\n";
   SS << "\n";
   SS << MetadataPointer->topics()->size() << " topics:\n";
