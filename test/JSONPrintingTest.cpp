@@ -18,7 +18,6 @@ TEST(JSONPrintingTest, print_truncated_message_test) {
       "32972,\n    79344,\n    22827,\n    32972,\n    79344,\n    22827,\n    "
       "32972,\n    79344,\n    22827,\n    32972,\n    79344,\n    22827,\n    "
       "37233,\n]}";
-  printToScreen(getTruncatedMessage(InputMessage));
   EXPECT_EQ(getTruncatedMessage(InputMessage),
             "{\n    time_of_flight: [\n        15579\n        91072\n        "
             "32972\n        79344\n        22827\n        32972\n        "
