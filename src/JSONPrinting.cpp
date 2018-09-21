@@ -49,6 +49,10 @@ std::string getTruncatedMessage(const std::string &JSONMessage) {
   return MessageWithNoQuotes;
 }
 
+/// Initializes truncating and returns edited YAML node.
+///
+/// \param JSONMessage
+/// \return
 YAML::Node truncateMessage(const std::string &JSONMessage) {
   YAML::Node Node = YAML::Load(JSONMessage);
   if (Node.IsMap())
@@ -107,6 +111,9 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
   }
 }
 
+/// Prints the argument message and a separating line of underscores.
+///
+/// \param Message
 void printToScreen(const std::string &Message) {
   std::cout << Message;
   std::cout << "\n__________________________________________________\n";
