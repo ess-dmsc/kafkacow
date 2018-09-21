@@ -14,12 +14,14 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consumeFromOffset() {
 }
 
 std::vector<OffsetsStruct>
-ConnectKafkaFake::getHighAndLowOffsets(std::string Topic) {
+ConnectKafkaFake::getTopicsHighAndLowOffsets(std::string Topic) {
   std::vector<OffsetsStruct> VectorOfPartitions;
   OffsetsStruct FirstPartition = {1234, 12345, 0};
   OffsetsStruct SecondPartition{2234, 22345, 1};
+  OffsetsStruct ThirdPartition = getPartitionHighAndLowOffsets(Topic, 3);
   VectorOfPartitions.push_back(FirstPartition);
   VectorOfPartitions.push_back(SecondPartition);
+  VectorOfPartitions.push_back(ThirdPartition);
   return VectorOfPartitions;
 }
 
@@ -36,4 +38,16 @@ void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
 
 KafkaMessageMetadataStruct ConnectKafkaFake::consumeLastNMessages() {
   return consumeFromOffset();
+}
+
+std::string ConnectKafkaFake::showAllMetadata() { return "Test return"; }
+
+OffsetsStruct
+ConnectKafkaFake::getPartitionHighAndLowOffsets(const std::string &Topic,
+                                                int32_t PartitionID) {
+  OffsetsStruct OffsetsToReturn;
+  OffsetsToReturn.HighOffset = 5;
+  OffsetsToReturn.LowOffset = 1;
+  OffsetsToReturn.PartitionId = PartitionID;
+  return OffsetsToReturn;
 }

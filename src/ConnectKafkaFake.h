@@ -16,7 +16,11 @@ public:
 
   KafkaMessageMetadataStruct consumeLastNMessages() override;
 
-  std::vector<OffsetsStruct> getHighAndLowOffsets(std::string Topic) override;
+  std::vector<OffsetsStruct>
+  getTopicsHighAndLowOffsets(std::string Topic) override;
+
+  OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
+                                              int32_t PartitionID) override;
 
   int getNumberOfTopicPartitions(std::string TopicName) override;
 
@@ -24,4 +28,5 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;
+  std::string showAllMetadata() override;
 };

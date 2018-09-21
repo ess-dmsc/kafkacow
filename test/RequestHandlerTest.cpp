@@ -75,7 +75,8 @@ TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
-  UserArguments.ShowPartitionsOffsets = true;
+  UserArguments.Name = "MULTIPART_events";
+  UserArguments.ConsumerMode = true;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
@@ -87,15 +88,17 @@ TEST(RequestHandlerTest, show_all_topics_no_error) {
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
-TEST(RequestHandlerTest, no_action_specified_in_metadata_mode) {
+
+TEST(RequestHandlerTest, display_all_metadata) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = false;
-  UserArguments.ShowPartitionsOffsets = false;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
-  EXPECT_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments),
-               ArgumentsException);
+  testing::internal::CaptureStdout();
+  NewRequestHandler.checkMetadataModeArguments(UserArguments);
+  std::string OutputMessage = testing::internal::GetCapturedStdout();
+  EXPECT_EQ("Test return", OutputMessage);
 }
 
 // consumer mode argument test
