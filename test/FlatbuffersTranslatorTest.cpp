@@ -51,8 +51,8 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   FlatbuffersTranslator FlatBuffersTranslator;
 
   // Run first time to populate schema map
-  FlatBuffersTranslator.translateToJSON(MessageMetadata);
-  EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
+  FlatBuffersTranslator.deserializeToYAML(MessageMetadata);
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
 }
@@ -61,6 +61,6 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
   FlatbuffersTranslator FlatBuffersTranslator;
-  EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
             MessageMetadata.Payload);
 }

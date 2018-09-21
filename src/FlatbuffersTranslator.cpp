@@ -3,8 +3,8 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
-std::string
-FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
+std::string FlatbuffersTranslator::deserializeToYAML(
+    KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
   std::string FileID = MessageData.Payload.substr(4, 4);
   if (FileIDMap.find(FileID) ==
@@ -26,22 +26,22 @@ FlatbuffersTranslator::translateToJSON(KafkaMessageMetadataStruct MessageData) {
         createParser(SchemaFile.second, MessageData.Payload, Schema);
 
     // save translated message
-    std::string JSONMessage;
+    std::string YAMLMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &JSONMessage))
+                      &YAMLMessage))
       Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
-    return JSONMessage;
+    return YAMLMessage;
   } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
         FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
-    std::string JSONMessage;
+    std::string YAMLMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &JSONMessage))
+                      &YAMLMessage))
       Logger->error("Couldn't generate text using existing parser!\n");
-    return JSONMessage;
+    return YAMLMessage;
   }
 }
 
