@@ -123,22 +123,27 @@ TopicMetadataStruct ConnectKafka::getTopicMetadata(std::string TopicName) {
 }
 
 std::vector<OffsetsStruct>
-ConnectKafka::getHighAndLowOffsets(std::string Topic) {
+ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
   auto TopicPartitions = getTopicPartitionNumbers(Topic);
-
-  int64_t Low, High;
-  int Timeout = 100;
   std::vector<OffsetsStruct> HighAndLowOffsets;
-
   for (auto &PartitionID : TopicPartitions) {
-    Consumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, Timeout);
-    OffsetsStruct OffsetsToSave;
-    OffsetsToSave.HighOffset = High;
-    OffsetsToSave.LowOffset = Low;
-    OffsetsToSave.PartitionId = PartitionID;
+    OffsetsStruct OffsetsToSave =
+        getPartitionHighAndLowOffsets(Topic, PartitionID);
     HighAndLowOffsets.push_back(OffsetsToSave);
   }
   return HighAndLowOffsets;
+}
+
+OffsetsStruct
+ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
+                                            int32_t PartitionID) {
+  int64_t Low, High;
+  Consumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
+  OffsetsStruct OffsetsToSave;
+  OffsetsToSave.HighOffset = High;
+  OffsetsToSave.LowOffset = Low;
+  OffsetsToSave.PartitionId = PartitionID;
+  return OffsetsToSave;
 }
 
 int ConnectKafka::getNumberOfTopicPartitions(std::string TopicName) {
@@ -167,7 +172,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
                                             const std::string &TopicName,
                                             int Partition) {
   std::vector<OffsetsStruct> HighAndLowOffsets =
-      getHighAndLowOffsets(TopicName);
+      getTopicsHighAndLowOffsets(TopicName);
 
   // get highest offset of all partitions
   int64_t HighestOffest = 0;
@@ -207,14 +212,18 @@ std::string ConnectKafka::showAllMetadata() {
     SS << "   \"" << Topic->topic() << "\" with " << Topic->partitions()->size()
        << " partitions:\n";
     for (auto Partition : *Topic->partitions()) {
+      OffsetsStruct PartitionOffsets =
+          getPartitionHighAndLowOffsets(Topic->topic(), Partition->id());
       std::stringstream Replicas;
       std::copy(Partition->replicas()->begin(), Partition->replicas()->end(),
                 std::ostream_iterator<int32_t>(Replicas, ", "));
       std::stringstream ISRSs;
       std::copy(Partition->isrs()->begin(), Partition->isrs()->end(),
                 std::ostream_iterator<int32_t>(ISRSs, ", "));
-      SS << "        partition " << setw(3) << Partition->id() << "  |  leader "
-         << setw(3) << Partition->leader()
+      SS << "        partition " << setw(3) << Partition->id()
+         << "  |  Low offset: " << setw(6) << PartitionOffsets.LowOffset
+         << "  |  High Offset: " << setw(6) << PartitionOffsets.HighOffset
+         << "  |  leader: " << setw(3) << Partition->leader()
          << "  |  replicas: " << Replicas.str() << "|  isrs: " << ISRSs.str()
          << "\n";
     }

@@ -14,7 +14,10 @@ public:
   virtual KafkaMessageMetadataStruct consumeLastNMessages() = 0;
 
   virtual std::vector<OffsetsStruct>
-  getHighAndLowOffsets(std::string Topic) = 0;
+  getTopicsHighAndLowOffsets(std::string Topic) = 0;
+
+  virtual OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
+                                                      int32_t PartitionID) = 0;
 
   virtual int getNumberOfTopicPartitions(std::string TopicName) = 0;
 

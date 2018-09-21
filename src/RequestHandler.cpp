@@ -80,7 +80,7 @@ void RequestHandler::showTopicPartitionOffsets(
     UserArgumentStruct UserArguments) {
   std::cout << UserArguments.Name << "\n";
   for (auto &SingleStruct :
-       KafkaConnection->getHighAndLowOffsets(UserArguments.Name)) {
+       KafkaConnection->getTopicsHighAndLowOffsets(UserArguments.Name)) {
     std::cout << "Partition ID: " << SingleStruct.PartitionId
               << " || Low offset: " << SingleStruct.LowOffset
               << " || High offset: " << SingleStruct.HighOffset << "\n";
