@@ -3,6 +3,10 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
+/// Deserializes Kafka message or simply returns it if it's already in JSON.
+/// Returns string with YAML.
+///
+/// \param Message
 std::string FlatbuffersTranslator::deserializeToYAML(
     KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
@@ -45,7 +49,12 @@ std::string FlatbuffersTranslator::deserializeToYAML(
   }
 }
 
-// find a schema file name relevant to the ID and return it
+/// Scans the directory FullPath for a schema containing FileID in its name and
+/// returns path to it as a string and flag set to TRUE. If no schema found,
+/// returns an empty string and flag FALSE.
+///
+/// \param FileID
+/// \return
 std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
@@ -60,6 +69,12 @@ FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   return std::make_pair(false, "");
 }
 
+/// Creates a Flatbuffers::Parser for a specified schema and returns it.
+///
+/// \param FullName
+/// \param Message
+/// \param Schema
+/// \return
 std::unique_ptr<flatbuffers::Parser>
 FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
