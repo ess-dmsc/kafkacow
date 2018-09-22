@@ -53,7 +53,7 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
       KafkaConnection->getNumberOfTopicPartitions(TopicName);
 
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
   while (EOFPartitionCounter < NumberOfPartitions) {
     KafkaMessageMetadataStruct MessageData;
     MessageData = KafkaConnection->consumeFromOffset();
@@ -67,7 +67,7 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   int EOFPartitionCounter = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
-  FlatbuffersTranslator FlatBuffers;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
   KafkaMessageMetadataStruct MessageData;
   while (EOFPartitionCounter < 1) {
 

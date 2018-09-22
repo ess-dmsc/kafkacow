@@ -47,7 +47,8 @@ int main(int argc, char **argv) {
   auto Logger = spdlog::stderr_color_mt("LOG");
   Logger->info("Welcome to spdlog!");
 
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  const std::string SchemaPath = "schemas/";
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments, SchemaPath);
   try {
     NewRequestHandler.checkAndRun();
   } catch (ArgumentsException &E) {

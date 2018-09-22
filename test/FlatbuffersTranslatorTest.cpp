@@ -6,8 +6,9 @@
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
 public:
-  static std::string getStringToCompare(std::string Source, std::string Value,
-                                        std::string TimeStamp) {
+  static std::string getStringToCompare(const std::string &Source,
+                                        const std::string &Value,
+                                        const std::string &TimeStamp) {
     std::string ToCompare = R"({
   source_name: ")";
     ToCompare.append(Source);
@@ -48,7 +49,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;
-  FlatbuffersTranslator FlatBuffersTranslator;
+  FlatbuffersTranslator FlatBuffersTranslator("schemas/");
 
   // Run first time to populate schema map
   FlatBuffersTranslator.translateToJSON(MessageMetadata);
@@ -60,7 +61,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
-  FlatbuffersTranslator FlatBuffersTranslator;
+  FlatbuffersTranslator FlatBuffersTranslator("schemas/");
   EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
             MessageMetadata.Payload);
 }

@@ -6,14 +6,9 @@
 #include <spdlog/spdlog.h>
 
 class FlatbuffersTranslator {
-private:
-  // for each FILEID store path to schema file and schema itself
-  std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
-  std::string FullPath = "schemas/";
-  std::shared_ptr<spdlog::logger> Logger;
-
 public:
-  FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
+  explicit FlatbuffersTranslator(std::string SchemaPath)
+      : PathToSchemas(std::move(SchemaPath)), Logger(spdlog::get("LOG")) {}
 
   std::string translateToJSON(KafkaMessageMetadataStruct MessageData);
 
@@ -22,4 +17,10 @@ public:
   std::unique_ptr<flatbuffers::Parser> createParser(const std::string &FullName,
                                                     const std::string &Message,
                                                     const std::string &Schema);
+
+private:
+  // for each FILEID store path to schema file and schema itself
+  std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
+  const std::string PathToSchemas;
+  std::shared_ptr<spdlog::logger> Logger;
 };
