@@ -8,6 +8,7 @@ boost_filesystem/1.65.1@bincrafters/stable
 spdlog/1.1.0@bincrafters/stable
 yaml-cpp/ee99c41@ess-dmsc/stable
 jsonformoderncpp/3.2.0@vthiery/stable
+libgit2/0.27.4@matthew-d-jones/stable
 
 [generators]
 cmake

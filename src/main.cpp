@@ -1,6 +1,7 @@
 #include "ArgumentsException.h"
 #include "ConnectKafka.h"
 #include "RequestHandler.h"
+#include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
@@ -40,15 +41,18 @@ int main(int argc, char **argv) {
                  false);
 
   CLI11_PARSE(App, argc, argv);
-  std::string ErrStr;
-  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
 
   // setup logger
   auto Logger = spdlog::stderr_color_mt("LOG");
-  Logger->info("Welcome to spdlog!");
+  Logger->info("Welcome to kafkacow!");
 
-  const std::string SchemaPath = "schemas/";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments, SchemaPath);
+  std::string SchemaPath = updateSchemas();
+
+  std::string ErrStr;
+  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
+
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   SchemaPath);
   try {
     NewRequestHandler.checkAndRun();
   } catch (ArgumentsException &E) {
