@@ -12,7 +12,6 @@ private:
 
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
 
-  TopicMetadataStruct getTopicMetadata(std::string TopicName);
   std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
 
 public:
@@ -43,11 +42,11 @@ public:
   OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                               int32_t PartitionID) override;
 
-  int getNumberOfTopicPartitions(std::string TopicName) override;
+  int getNumberOfTopicPartitions(std::string Topic) override;
 
-  void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
+  void subscribeAtOffset(int64_t Offset, std::string Topic) override;
 
-  void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
+  void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
   std::string showAllMetadata() override;
 };

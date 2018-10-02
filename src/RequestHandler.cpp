@@ -2,7 +2,10 @@
 #include "ArgumentsException.h"
 #include "JSONPrinting.h"
 
-// check whether arguments passed match any methods
+/// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
+/// calls method responsible for handling one of the modes or throws
+/// ArgumentsException if arguments invalid.
+/// \param UserArguments
 void RequestHandler::checkAndRun() {
   // check input if ConsumerMode chosen
   if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
@@ -17,6 +20,10 @@ void RequestHandler::checkAndRun() {
         "Program can run in one and only one mode: --consumer or --metadata");
 }
 
+/// Analyzes user arguments to determine which consumer mode functionality to
+/// run.
+///
+/// \param UserArguments
 void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
   if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) ||
@@ -36,6 +43,10 @@ void RequestHandler::checkConsumerModeArguments(
   }
 }
 
+/// Analyzes user arguments to determine which metadata mode functionality to
+/// run.
+///
+/// \param UserArguments
 void RequestHandler::checkMetadataModeArguments(
     UserArgumentStruct UserArguments) {
   if (UserArguments.ShowAllTopics)
@@ -46,6 +57,10 @@ void RequestHandler::checkMetadataModeArguments(
     std::cout << KafkaConnection->showAllMetadata();
 }
 
+/// Subscribes at an offset to a specified TopicName and consumes the data.
+///
+/// \param TopicName
+/// \param Offset
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
   int EOFPartitionCounter = 0;
@@ -61,6 +76,12 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   }
 }
 
+/// Subscribes to NumberOfMessages from Partition of specified TopicName and
+/// consumes the data.
+///
+/// \param TopicName
+/// \param NumberOfMessages
+/// \param Partition
 void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
                                                    int64_t NumberOfMessages,
                                                    int Partition) {
@@ -76,6 +97,9 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   }
 }
 
+/// Prints to screen a list of partitions' IDs and their low/high offsets.
+///
+/// \param UserArguments
 void RequestHandler::showTopicPartitionOffsets(
     UserArgumentStruct UserArguments) {
   std::cout << UserArguments.Name << "\n";
@@ -87,11 +111,17 @@ void RequestHandler::showTopicPartitionOffsets(
   }
 }
 
+/// Receives a serialized message and if it is not empty, passes it to
+/// FlatbuffersTranslator to deserialize.
+///
+/// \param MessageAndEOF
+/// \param EOFPartitionCounter
+/// \param FlatBuffers
 void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
-    std::string JSONMessage = FlatBuffers.translateToJSON(MessageData);
+    std::string JSONMessage = FlatBuffers.deserializeToYAML(MessageData);
     (UserArguments.ShowEntireMessage)
         ? printToScreen(getEntireMessage(JSONMessage))
         : printToScreen(getTruncatedMessage(JSONMessage));
