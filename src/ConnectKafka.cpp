@@ -23,9 +23,9 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
 }
 }
 
-/// Gets Metadata object from Kafka and returns unique_ptr to it
+/// Gets Metadata object from Kafka.
 ///
-/// \return
+/// \return unique_ptr to RdKafka::Metadata
 std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
@@ -46,7 +46,7 @@ ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
 
 /// Returns a list of topics stored by the broker.
 ///
-/// \return
+/// \return single string containing all topics.
 std::string ConnectKafka::getAllTopics() {
   auto Topics = MetadataPointer->topics();
   std::string ListOfTopics;
@@ -58,9 +58,8 @@ std::string ConnectKafka::getAllTopics() {
 }
 
 /// Consumes Kafka messages starting from specified offset.
-/// Returns a struct containg serialized message and its metadata.
 ///
-/// \return
+/// \return struct containg serialized message and its metadata.
 KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
   using RdKafka::Message;
   KafkaMessageMetadataStruct DataToReturn;
@@ -103,10 +102,10 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
   return DataToReturn;
 }
 
-/// Queries Kafka for Topic's metadata and returns a vector of partition IDs.
+/// Queries Kafka for Topic's metadata and returns partition numbers.
 ///
 /// \param Topic
-/// \return
+/// \return vector<int32_t> of partition IDs
 std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
@@ -142,12 +141,11 @@ ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
   return HighAndLowOffsets;
 }
 
-/// Returns a struct containg offsets of a single PartitionID for a
-/// specified Topic
+/// Queries Kafka for offsets of a single PartitionID for a specified Topic
 ///
 /// \param Topic
 /// \param PartitionID
-/// \return
+/// \return OffsetsStruct containing PartitionID and High- and LowOffset.
 OffsetsStruct
 ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
                                             int32_t PartitionID) {
@@ -160,7 +158,7 @@ ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
   return OffsetsToSave;
 }
 
-/// Returns a total of partitions that specified Topic has.
+/// Returns a number of partitions that specified Topic has.
 ///
 /// \param Topic
 /// \return
@@ -228,7 +226,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
 
 /// Displays brokers, topics, partitions and their details.
 ///
-/// \return
+/// \return single string containing metadata.
 std::string ConnectKafka::showAllMetadata() {
   using std::setw;
   std::stringstream SS;
