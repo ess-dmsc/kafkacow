@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
                  "Partition to get messages from");
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
-               "Show a list of topics");
+               "Show a list of topics. To be used in \"-L\" mode.");
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode");
   App.add_flag("-L, --list", UserArguments.MetadataMode,
