@@ -32,7 +32,7 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   
   Show list of all topics from broker hinata.isis.cclrc.ac.uk:9092:
   ```
-  -b hinata.isis.cclrc.ac.uk:9092 -L -a
+ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -L -a
   ```
   
   ## Install
