@@ -3,8 +3,7 @@
 #include "JSONPrinting.h"
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
-/// calls
-/// method responsible for handling one of the modes or throws
+/// calls method responsible for handling one of the modes or throws
 /// ArgumentsException if arguments invalid.
 /// \param UserArguments
 void RequestHandler::checkAndRun() {
@@ -77,7 +76,7 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   }
 }
 
-/// Subscribes to NLastMessages from Partition of specified TopicName and
+/// Subscribes to NumberOfMessages from Partition of specified TopicName and
 /// consumes the data.
 ///
 /// \param TopicName

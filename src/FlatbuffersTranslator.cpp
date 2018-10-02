@@ -3,9 +3,9 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 
-/// Deserializes Kafka message or, if no schema found, assumes message is in
-/// JSON and simply returns it.
-/// Returns string with YAML.
+/// Deserializes Kafka message and returns YAML or, if no schema found, assumes
+/// message is in
+/// JSON/YAML and simply returns it.
 ///
 /// \param Message
 std::string FlatbuffersTranslator::deserializeToYAML(
