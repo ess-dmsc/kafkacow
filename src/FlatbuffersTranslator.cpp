@@ -4,10 +4,10 @@
 #include <iostream>
 
 /// Deserializes Kafka message and returns YAML or, if no schema found, assumes
-/// message is in
-/// JSON/YAML and simply returns it.
+/// message is in JSON/YAML and simply returns it.
 ///
 /// \param Message
+/// \return single string with YAML/JSON message.
 std::string FlatbuffersTranslator::deserializeToYAML(
     KafkaMessageMetadataStruct MessageData) {
   // get the ID from a message
@@ -50,12 +50,11 @@ std::string FlatbuffersTranslator::deserializeToYAML(
   }
 }
 
-/// Scans the directory FullPath for a schema containing FileID in its name and
-/// returns path to it as a string and flag set to TRUE. If no schema found,
-/// returns an empty string and flag FALSE.
+/// Scans the directory FullPath for a schema containing FileID in its name.
 ///
 /// \param FileID
-/// \return
+/// \return std::pair<bool, std::string> with path as string and bool TRUE if
+/// path was found, or FALSE and empty string if otherwise.
 std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
@@ -70,12 +69,12 @@ FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   return std::make_pair(false, "");
 }
 
-/// Creates a Flatbuffers::Parser for a specified schema and returns it.
+/// Creates a Flatbuffers::Parser for a specified schema.
 ///
-/// \param FullName
-/// \param Message
-/// \param Schema
-/// \return
+/// \param FullName name of schema file
+/// \param Message  Message to deserialize
+/// \param Schema   schema file
+/// \return std::unique_ptr<flatbuffers::Parser> to created parser.
 std::unique_ptr<flatbuffers::Parser>
 FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
