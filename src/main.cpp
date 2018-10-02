@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
                  "Show records of specified topic");
   App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker");
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
-                 "Start consuming from an offset. Otherwise retrieve entire "
+                 "Start consuming from an offset. Otherwise print entire "
                  "topic. Mutually exclusive with \"--go\"");
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
-                 "Partition to retrieve messages from");
+                 "Partition to get messages from");
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics");

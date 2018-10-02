@@ -190,7 +190,7 @@ KafkaMessageMetadataStruct ConnectKafka::consumeLastNMessages() {
   return consumeFromOffset();
 }
 
-/// Subscribes to a specified Partition of a Topic to retrieve last NMessages.
+/// Subscribes to a specified Partition of a Topic to get last NMessages.
 ///
 /// \param NMessages
 /// \param Topic
