@@ -44,7 +44,7 @@ public:
 
   int getNumberOfTopicPartitions(std::string Topic) override;
 
-  void subscribeAtOffset(int32_t Offset, std::string Topic) override;
+  void subscribeAtOffset(int64_t Offset, std::string Topic) override;
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;

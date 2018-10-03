@@ -24,7 +24,7 @@ public:
 
   void showTopicPartitionOffsets(UserArgumentStruct UserArguments) override;
 
-  void subscribeConsumeAtOffset(std::string TopicName, int32_t Offset) override;
+  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset) override;
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages,
                                      int Partition) override;

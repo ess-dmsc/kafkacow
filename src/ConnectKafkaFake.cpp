@@ -29,7 +29,7 @@ int ConnectKafkaFake::getNumberOfTopicPartitions(std::string TopicName) {
   return 1;
 }
 
-void ConnectKafkaFake::subscribeAtOffset(int32_t Offset,
+void ConnectKafkaFake::subscribeAtOffset(int64_t Offset,
                                          std::string TopicName) {}
 
 void ConnectKafkaFake::subscribeToLastNMessages(int32_t NMessages,

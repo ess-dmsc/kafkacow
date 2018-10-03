@@ -18,14 +18,16 @@ int main(int argc, char **argv) {
          "-g, --go", UserArguments.GoBack,
          "How many records back to show from partition \"-p\". Mutually "
          "exclusive with \"--Offset\"")
-      ->check(CLI::Range(0, std::numeric_limits<int32_t>::max()));
+      ->check(CLI::Range(std::numeric_limits<int64_t>::min(),
+                         std::numeric_limits<int64_t>::max()));
   App.add_option("-t, --topic", UserArguments.Name,
                  "Show records of specified topic");
   App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker");
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
                  "Start consuming from an offset. Otherwise print entire "
                  "topic. Mutually exclusive with \"--go\"")
-      ->check(CLI::Range(0, std::numeric_limits<int32_t>::max()));
+      ->check(CLI::Range(std::numeric_limits<int64_t>::min(),
+                         std::numeric_limits<int64_t>::max()));
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
                  "Partition to get messages from");
 

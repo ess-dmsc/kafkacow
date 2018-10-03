@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 struct OffsetsStruct {
-  int32_t LowOffset;
-  int32_t HighOffset;
+  int64_t LowOffset;
+  int64_t HighOffset;
   int32_t PartitionId;
 };

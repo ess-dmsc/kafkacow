@@ -62,7 +62,7 @@ void RequestHandler::checkMetadataModeArguments(
 /// \param TopicName
 /// \param Offset
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
-                                              int32_t Offset) {
+                                              int64_t Offset) {
   verifyOffset(Offset, TopicName);
 
   int EOFPartitionCounter = 0;
