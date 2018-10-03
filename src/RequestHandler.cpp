@@ -62,7 +62,7 @@ void RequestHandler::checkMetadataModeArguments(
 /// \param TopicName
 /// \param Offset
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
-                                              int64_t Offset) {
+                                              int32_t Offset) {
   verifyOffset(Offset, TopicName);
 
   int EOFPartitionCounter = 0;
@@ -83,7 +83,7 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
 ///
 /// \param Offset
 /// \param TopicName
-void RequestHandler::verifyOffset(int64_t Offset, std::string TopicName) {
+void RequestHandler::verifyOffset(int32_t Offset, std::string TopicName) {
   std::vector<OffsetsStruct> Offsets =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;

@@ -149,7 +149,7 @@ ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
 OffsetsStruct
 ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
                                             int32_t PartitionID) {
-  int64_t Low, High;
+  int32_t Low, High;
   Consumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
   OffsetsStruct OffsetsToSave;
   OffsetsToSave.HighOffset = High;
@@ -170,7 +170,7 @@ int ConnectKafka::getNumberOfTopicPartitions(std::string Topic) {
 ///
 /// \param Offset
 /// \param Topic
-void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
+void ConnectKafka::subscribeAtOffset(int32_t Offset, std::string Topic) {
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
   for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
     auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
@@ -200,7 +200,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
       getTopicsHighAndLowOffsets(Topic);
 
   // get highest offset of all partitions
-  int64_t HighestOffest = 0;
+  int32_t HighestOffest = 0;
   for (auto it : HighAndLowOffsets) {
     if (it.HighOffset > HighestOffest)
       HighestOffest = it.HighOffset;

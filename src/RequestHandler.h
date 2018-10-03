@@ -24,7 +24,7 @@ public:
 
   void showTopicPartitionOffsets(UserArgumentStruct UserArguments) override;
 
-  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset) override;
+  void subscribeConsumeAtOffset(std::string TopicName, int32_t Offset) override;
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages,
                                      int Partition) override;
@@ -34,7 +34,7 @@ private:
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  void verifyOffset(int64_t Offset, std::string TopicName);
+  void verifyOffset(int32_t Offset, std::string TopicName);
   void verifyNLast(int64_t NLast, std::string TopicName, int16_t Partition);
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;

@@ -21,7 +21,7 @@ public:
 
   virtual int getNumberOfTopicPartitions(std::string TopicName) = 0;
 
-  virtual void subscribeAtOffset(int64_t Offset, std::string TopicName) = 0;
+  virtual void subscribeAtOffset(int32_t Offset, std::string TopicName) = 0;
 
   virtual void subscribeToLastNMessages(int64_t NMessages,
                                         const std::string &TopicName,

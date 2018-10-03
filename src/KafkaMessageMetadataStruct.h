@@ -4,7 +4,7 @@
 #include <string>
 
 struct KafkaMessageMetadataStruct {
-  std::int64_t Offset;
+  std::int32_t Offset;
   int64_t Timestamp;
   int32_t Partition;
   std::string Payload;
