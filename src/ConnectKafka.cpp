@@ -94,10 +94,9 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
 
   default:
     /* All other errors */
-    std::ostringstream os;
-    os << "KafkaTopicSubscriber::consumeMessage() - "
-       << RdKafka::err2str(KafkaMsg->err());
-    throw std::runtime_error(os.str());
+    throw std::runtime_error(
+        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
+                    RdKafka::err2str(KafkaMsg->err())));
   }
   return DataToReturn;
 }
