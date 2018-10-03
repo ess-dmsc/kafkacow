@@ -113,6 +113,6 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
 ///
 /// \param Message
 void printToScreen(const std::string &Message) {
-  std::cout << Message;
-  std::cout << "\n__________________________________________________\n";
+  fmt::print("{}\n__________________________________________________\n",
+             Message);
 }

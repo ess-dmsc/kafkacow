@@ -257,6 +257,5 @@ std::string ConnectKafka::showAllMetadata() {
     }
     SS << "\n";
   }
-  std::string Metadata = SS.str();
-  return Metadata;
+  return SS.str();
 }
