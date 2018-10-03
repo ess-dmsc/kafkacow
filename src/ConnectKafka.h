@@ -5,15 +5,6 @@
 #include <spdlog/spdlog.h>
 
 class ConnectKafka : public ConnectKafkaInterface {
-private:
-  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
-  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
-  std::shared_ptr<spdlog::logger> Logger;
-
-  std::unique_ptr<RdKafka::Metadata> queryMetadata();
-
-  std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
-
 public:
   ConnectKafka(std::string Broker, std::string ErrStr);
   ~ConnectKafka() {
@@ -49,4 +40,13 @@ public:
   void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
   std::string showAllMetadata() override;
+
+private:
+  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
+  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
+  std::shared_ptr<spdlog::logger> Logger;
+
+  std::unique_ptr<RdKafka::Metadata> queryMetadata();
+
+  std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
 };

@@ -29,10 +29,10 @@ public:
                                      int Partition) override;
 
 private:
+  std::shared_ptr<spdlog::logger> Logger;
+  UserArgumentStruct UserArguments;
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  std::shared_ptr<spdlog::logger> Logger;
-  UserArgumentStruct UserArguments;
 };
