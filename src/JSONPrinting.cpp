@@ -3,7 +3,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
-
+#include <fmt/format.h>
 /// Receives deserialized flatbuffers message, formats it and prints it to the
 /// screen.
 ///
@@ -102,10 +102,8 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
         Node.remove(NodeSize - Counter);
 
       } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
-        std::stringstream ss;
         Node.push_back("...");
-        ss << "Truncated " << NodeSize - 10 << " elements.";
-        Node.push_back(ss.str());
+        Node.push_back(fmt::format("Truncated {} elements.",NodeSize-10));
       }
     }
   }
