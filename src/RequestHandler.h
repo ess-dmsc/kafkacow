@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ArgumentsException.h"
 #include "FlatbuffersTranslator.h"
 #include "RequestHandlerInterface.h"
 #include <spdlog/logger.h>
@@ -33,6 +34,8 @@ private:
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
+  void verifyOffset(int64_t Offset, std::string TopicName);
+  void verifyNLast(int64_t NLast, std::string TopicName, int16_t Partition);
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
 };
