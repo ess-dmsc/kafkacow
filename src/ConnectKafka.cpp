@@ -201,8 +201,9 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
   // get highest offset of all partitions
   int64_t HighestOffest = 0;
   for (auto it : HighAndLowOffsets) {
-    if (it.HighOffset > HighestOffest)
+    if (it.HighOffset > HighestOffest) {
       HighestOffest = it.HighOffset;
+    }
   }
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
   for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
@@ -230,9 +231,10 @@ std::string ConnectKafka::showAllMetadata() {
   using std::setw;
   std::stringstream SS;
   SS << MetadataPointer->brokers()->size() << " brokers:\n";
-  for (auto Broker : *MetadataPointer->brokers())
+  for (auto Broker : *MetadataPointer->brokers()) {
     SS << fmt::format("   broker {} at {}:{}\n", Broker->id(), Broker->host(),
                       Broker->port());
+  }
   SS << fmt::format("\n{} topics:\n", MetadataPointer->topics()->size());
   for (auto Topic : *MetadataPointer->topics()) {
     SS << fmt::format("   \"{}\" with {} partitions:\n", Topic->topic(),
