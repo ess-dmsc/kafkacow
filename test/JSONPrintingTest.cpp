@@ -26,6 +26,7 @@ TEST(JSONPrintingTest, print_truncated_message_test) {
             "]\n}");
 }
 
+
 TEST(JSONPrintingTest, print_message_test) {
 
   testing::internal::CaptureStdout();
