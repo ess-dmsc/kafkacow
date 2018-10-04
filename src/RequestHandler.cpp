@@ -83,7 +83,8 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
 ///
 /// \param Offset
 /// \param TopicName
-void RequestHandler::verifyOffset(int32_t Offset, std::string TopicName) {
+void RequestHandler::verifyOffset(const int64_t Offset,
+                                  const std::string TopicName) {
   std::vector<OffsetsStruct> Offsets =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
@@ -125,8 +126,9 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
 /// \param NLast
 /// \param TopicName
 /// \param Partition
-void RequestHandler::verifyNLast(int64_t NLast, std::string TopicName,
-                                 int16_t Partition) {
+void RequestHandler::verifyNLast(const int64_t NLast,
+                                 const std::string TopicName,
+                                 const int16_t Partition) {
   OffsetsStruct Struct =
       KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
   if (Struct.HighOffset - Struct.LowOffset < NLast)

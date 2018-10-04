@@ -200,10 +200,10 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
       getTopicsHighAndLowOffsets(Topic);
 
   // get highest offset of all partitions
-  int32_t HighestOffest = 0;
+  int64_t HighestOffset = 0;
   for (auto it : HighAndLowOffsets) {
-    if (it.HighOffset > HighestOffest)
-      HighestOffest = it.HighOffset;
+    if (it.HighOffset > HighestOffset)
+      HighestOffset = it.HighOffset;
   }
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
   for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
@@ -214,7 +214,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
       TopicPartition->set_offset(HighAndLowOffsets[Partition].HighOffset -
                                  NMessages + 0);
     } else {
-      TopicPartition->set_offset(HighestOffest + 1000);
+      TopicPartition->set_offset(HighestOffset + 1000);
     }
     TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
   }

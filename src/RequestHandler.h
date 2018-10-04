@@ -34,8 +34,9 @@ private:
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  void verifyOffset(int32_t Offset, std::string TopicName);
-  void verifyNLast(int64_t NLast, std::string TopicName, int16_t Partition);
+  void verifyOffset(const int64_t Offset, const std::string TopicName);
+  void verifyNLast(const int64_t NLast, const std::string TopicName,
+                   const int16_t Partition);
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
 };
