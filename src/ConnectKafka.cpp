@@ -36,12 +36,12 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
+ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr)
+    : Logger(spdlog::get("LOG")) {
   this->Consumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
   this->MetadataPointer = this->queryMetadata();
-  Logger = spdlog::get("LOG");
 }
 
 /// Returns a list of topics stored by the broker.
