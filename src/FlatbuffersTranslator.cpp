@@ -80,7 +80,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
                                     const std::string &Schema) {
   flatbuffers::IDLOptions opts;
-  std::unique_ptr<flatbuffers::Parser> Parser(new flatbuffers::Parser(opts));
+  auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
   const char *include_directories[] = {FullPath.c_str(), nullptr};
   bool ok =
