@@ -231,13 +231,12 @@ std::string ConnectKafka::showAllMetadata() {
   std::stringstream SS;
   SS << MetadataPointer->brokers()->size() << " brokers:\n";
   for (auto Broker : *MetadataPointer->brokers())
-    SS << "   broker " << Broker->id() << " at " << Broker->host() << ":"
-       << Broker->port() << "\n";
-  SS << "\n";
-  SS << MetadataPointer->topics()->size() << " topics:\n";
+    SS << fmt::format("   broker {} at {}:{}\n", Broker->id(), Broker->host(),
+                      Broker->port());
+  SS << fmt::format("\n{} topics:\n", MetadataPointer->topics()->size());
   for (auto Topic : *MetadataPointer->topics()) {
-    SS << "   \"" << Topic->topic() << "\" with " << Topic->partitions()->size()
-       << " partitions:\n";
+    SS << fmt::format("   \"{}\" with {} partitions:\n", Topic->topic(),
+                      Topic->partitions()->size());
     for (auto Partition : *Topic->partitions()) {
       OffsetsStruct PartitionOffsets =
           getPartitionHighAndLowOffsets(Topic->topic(), Partition->id());
@@ -247,12 +246,12 @@ std::string ConnectKafka::showAllMetadata() {
       std::stringstream ISRSs;
       std::copy(Partition->isrs()->begin(), Partition->isrs()->end(),
                 std::ostream_iterator<int32_t>(ISRSs, ", "));
-      SS << "        partition " << setw(3) << Partition->id()
-         << "  |  Low offset: " << setw(6) << PartitionOffsets.LowOffset
-         << "  |  High Offset: " << setw(6) << PartitionOffsets.HighOffset
-         << "  |  leader: " << setw(3) << Partition->leader()
-         << "  |  replicas: " << Replicas.str() << "|  isrs: " << ISRSs.str()
-         << "\n";
+      SS << fmt::format("        partition {:>3}  |  Low offset: {:>6}  |  "
+                        "High offset: {:>6} |  leader: {:>2} |  replicas: {} | "
+                        " isrs: {}\n",
+                        Partition->id(), PartitionOffsets.LowOffset,
+                        PartitionOffsets.HighOffset, Partition->leader(),
+                        Replicas.str(), ISRSs.str());
     }
     SS << "\n";
   }
