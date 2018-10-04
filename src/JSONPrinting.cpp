@@ -8,7 +8,8 @@
 /// screen.
 ///
 /// \param JSONMessage
-std::string getEntireMessage(const std::string &JSONMessage) {
+std::string getEntireMessage(const std::string &JSONMessage,
+                             const int &Indent) {
   using std::cout;
   using nlohmann::json;
 
@@ -17,7 +18,7 @@ std::string getEntireMessage(const std::string &JSONMessage) {
   YAML::Emitter Emitter;
   Emitter << YAML::DoubleQuoted << YAML::Flow << node;
   auto JSONModernMessage = json::parse(Emitter.c_str());
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(4);
+  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
       MessageWithNoQuotes.end());
@@ -31,7 +32,8 @@ std::string getEntireMessage(const std::string &JSONMessage) {
 /// it and prints it to the screen.
 ///
 /// \param JSONMessage
-std::string getTruncatedMessage(const std::string &JSONMessage) {
+std::string getTruncatedMessage(const std::string &JSONMessage,
+                                const int &Indent) {
   using std::cout;
   using nlohmann::json;
 
@@ -39,7 +41,7 @@ std::string getTruncatedMessage(const std::string &JSONMessage) {
   YAML::Emitter Emitter;
   Emitter << YAML::DoubleQuoted << YAML::Flow << Node;
   auto JSONModernMessage = json::parse(Emitter.c_str());
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(4);
+  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
       MessageWithNoQuotes.end());

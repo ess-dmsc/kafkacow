@@ -162,8 +162,10 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
   if (!MessageData.Payload.empty()) {
     std::string JSONMessage = FlatBuffers.deserializeToYAML(MessageData);
     (UserArguments.ShowEntireMessage)
-        ? printToScreen(getEntireMessage(JSONMessage))
-        : printToScreen(getTruncatedMessage(JSONMessage));
+        ? printToScreen(
+              getEntireMessage(JSONMessage, UserArguments.Indentation))
+        : printToScreen(
+              getTruncatedMessage(JSONMessage, UserArguments.Indentation));
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
