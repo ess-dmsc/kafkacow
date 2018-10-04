@@ -63,6 +63,8 @@ void RequestHandler::checkMetadataModeArguments(
 /// \param Offset
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
+  verifyOffset(Offset, TopicName);
+
   int EOFPartitionCounter = 0;
   int NumberOfPartitions =
       KafkaConnection->getNumberOfTopicPartitions(TopicName);
@@ -76,6 +78,26 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   }
 }
 
+/// Ensures there are messages to read at offset provided by the user, otherwise
+/// throws an ArgumentsException.
+///
+/// \param Offset
+/// \param TopicName
+void RequestHandler::verifyOffset(const int64_t Offset,
+                                  const std::string TopicName) {
+  std::vector<OffsetsStruct> Offsets =
+      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+  bool InvalidOffset = true;
+  for (OffsetsStruct Struct : Offsets) {
+    if (Offset < Struct.HighOffset && Offset > Struct.LowOffset) {
+      InvalidOffset = false;
+      break;
+    }
+  }
+  if (InvalidOffset)
+    throw ArgumentsException("Offset not valid!");
+}
+
 /// Subscribes to NumberOfMessages from Partition of specified TopicName and
 /// consumes the data.
 ///
@@ -85,6 +107,7 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
 void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
                                                    int64_t NumberOfMessages,
                                                    int Partition) {
+  verifyNLast(NumberOfMessages, TopicName, Partition);
   int EOFPartitionCounter = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
@@ -95,6 +118,21 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
     MessageData = KafkaConnection->consumeLastNMessages();
     consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
   }
+}
+
+/// Checks if there is enough messages to read on a specified partition.
+/// Otherwise throws an ArgumentsException.
+///
+/// \param NLast
+/// \param TopicName
+/// \param Partition
+void RequestHandler::verifyNLast(const int64_t NLast,
+                                 const std::string TopicName,
+                                 const int16_t Partition) {
+  OffsetsStruct Struct =
+      KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
+  if (Struct.HighOffset - Struct.LowOffset < NLast)
+    throw ArgumentsException("Cannot display that many messages!");
 }
 
 /// Prints to screen a list of partitions' IDs and their low/high offsets.
