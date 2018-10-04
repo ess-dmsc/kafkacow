@@ -1,7 +1,6 @@
 add_executable(kafkacow main.cpp
         RequestHandler.cpp
         RequestHandler.h
-        RequestHandlerInterface.h
         ConnectKafka.cpp
         ConnectKafka.h
         ConnectKafkaInterface.h
