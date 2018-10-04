@@ -4,6 +4,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
+
 /// Receives deserialized flatbuffers message, formats it and prints it to the
 /// screen.
 ///
