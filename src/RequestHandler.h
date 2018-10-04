@@ -39,4 +39,5 @@ private:
   void verifyOffset(const int64_t Offset, const std::string TopicName);
   void verifyNLast(const int64_t NLast, const std::string TopicName,
                    const int16_t Partition);
+  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
 };
