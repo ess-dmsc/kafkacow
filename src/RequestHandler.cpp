@@ -1,6 +1,7 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
 #include "JSONPrinting.h"
+#include <fmt/format.h>
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
 /// calls method responsible for handling one of the modes or throws
@@ -143,9 +144,9 @@ void RequestHandler::showTopicPartitionOffsets(
   std::cout << UserArguments.Name << "\n";
   for (auto &SingleStruct :
        KafkaConnection->getTopicsHighAndLowOffsets(UserArguments.Name)) {
-    std::cout << "Partition ID: " << SingleStruct.PartitionId
-              << " || Low offset: " << SingleStruct.LowOffset
-              << " || High offset: " << SingleStruct.HighOffset << "\n";
+    fmt::print("Partition ID: {} || Low offset: {} || High offset: {}",
+               SingleStruct.PartitionId, SingleStruct.LowOffset,
+               SingleStruct.HighOffset);
   }
 }
 
