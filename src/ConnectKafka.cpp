@@ -3,22 +3,39 @@
 #include <iomanip>
 
 namespace {
+
+void logError(const std::string &ErrStr,
+              std::shared_ptr<spdlog::logger> Logger) {
+  if (!ErrStr.empty())
+    Logger->error(ErrStr);
+}
+
 std::unique_ptr<RdKafka::Conf>
 createGlobalConfiguration(const std::string &BrokerAddr) {
   auto conf = std::unique_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
   std::string ErrStr;
+  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
   conf->set("metadata.broker.list", BrokerAddr, ErrStr);
+  logError(ErrStr, Logger);
   conf->set("session.timeout.ms", "10000", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("group.id", "mantid", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("message.max.bytes", "10000000", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("fetch.message.max.bytes", "10000000", ErrStr);
-  conf->set("replica.fetch.max.bytes", "10000000", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("enable.auto.commit", "false", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("enable.auto.offset.store", "false", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("offset.store.method", "none", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("api.version.request", "true", ErrStr);
+  logError(ErrStr, Logger);
   conf->set("auto.offset.reset", "largest", ErrStr);
+  logError(ErrStr, Logger);
   return conf;
 }
 }
@@ -36,11 +53,13 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr)
-    : Logger(spdlog::get("LOG")) {
+ConnectKafka::ConnectKafka(std::string Broker) : Logger(spdlog::get("LOG")) {
+  std::string ErrStr;
   this->Consumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
+  if (!ErrStr.empty())
+    Logger->error(ErrStr);
   this->MetadataPointer = this->queryMetadata();
 }
 

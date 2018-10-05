@@ -50,8 +50,7 @@ int main(int argc, char **argv) {
   Logger->info("Welcome to spdlog!");
 
   CLI11_PARSE(App, argc, argv);
-  std::string ErrStr;
-  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
+  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
 
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   try {
