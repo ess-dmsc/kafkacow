@@ -1,5 +1,6 @@
 #pragma once
 
+#include "UserArgumentsStruct.h"
 #include <string>
 #include <yaml-cpp/yaml.h>
 
