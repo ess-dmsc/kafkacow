@@ -57,6 +57,8 @@ int main(int argc, char **argv) {
     NewRequestHandler.checkAndRun();
   } catch (ArgumentsException &E) {
     std::cout << E.what() << std::endl;
+  } catch (std::runtime_error &E) {
+    std::cout << E.what() << std::endl;
   } catch (std::exception &E) {
     std::cout << E.what() << std::endl;
   }
