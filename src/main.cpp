@@ -53,10 +53,6 @@ int main(int argc, char **argv) {
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   try {
     NewRequestHandler.checkAndRun();
-  } catch (ArgumentsException &E) {
-    Logger->error(E.what());
-  } catch (std::runtime_error &E) {
-    Logger->error(E.what());
   } catch (std::exception &E) {
     Logger->error(E.what());
   }
