@@ -56,11 +56,11 @@ int main(int argc, char **argv) {
   try {
     NewRequestHandler.checkAndRun();
   } catch (ArgumentsException &E) {
-    std::cout << E.what() << std::endl;
+    Logger->error(E.what());
   } catch (std::runtime_error &E) {
-    std::cout << E.what() << std::endl;
+    Logger->error(E.what());
   } catch (std::exception &E) {
-    std::cout << E.what() << std::endl;
+    Logger->error(E.what());
   }
   return 0;
 }
