@@ -4,33 +4,36 @@
 
 namespace {
 
-void logError(std::array<std::string, 10> ErrStr,
-              std::shared_ptr<spdlog::logger> Logger) {
-  for (std::string Err : ErrStr) {
-    if (!Err.empty()) {
-      Err.append(" in createGlobalConfiguration([...])");
-      Logger->error(Err);
-    }
+std::unique_ptr<RdKafka::Conf>
+configAndLogError(std::unique_ptr<RdKafka::Conf> conf, std::string Arg1,
+                  std::string Arg2) {
+  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
+  std::string ErrStr;
+  conf->set(Arg1, Arg2, ErrStr);
+  if (!ErrStr.empty()) {
+    ErrStr.append(" in createGlobalConfiguration([...])");
+    Logger->error(ErrStr);
   }
+  return conf;
 }
 
 std::unique_ptr<RdKafka::Conf>
 createGlobalConfiguration(const std::string &BrokerAddr) {
   auto conf = std::unique_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  std::array<std::string, 10> ErrStr;
-  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
-  conf->set("metadata.broker.list", BrokerAddr, ErrStr[0]);
-  conf->set("session.timeout.ms", "10000", ErrStr[1]);
-  conf->set("group.id", "mantid", ErrStr[2]);
-  conf->set("message.max.bytes", "10000000", ErrStr[3]);
-  conf->set("fetch.message.max.bytes", "10000000", ErrStr[4]);
-  conf->set("enable.auto.commit", "false", ErrStr[5]);
-  conf->set("enable.auto.offset.store", "false", ErrStr[6]);
-  conf->set("offset.store.method", "none", ErrStr[7]);
-  conf->set("api.version.request", "true", ErrStr[8]);
-  conf->set("auto.offset.reset", "largest", ErrStr[9]);
-  logError(ErrStr, Logger);
+
+  conf = configAndLogError(std::move(conf), "metadata.broker.list", BrokerAddr);
+  conf = configAndLogError(std::move(conf), "session.timeout.ms", "10000");
+  conf = configAndLogError(std::move(conf), "group.id", "mantid");
+  conf = configAndLogError(std::move(conf), "message.max.bytes", "10000000");
+  conf =
+      configAndLogError(std::move(conf), "fetch.message.max.bytes", "10000000");
+  conf = configAndLogError(std::move(conf), "enable.auto.commit", "false");
+  conf =
+      configAndLogError(std::move(conf), "enable.auto.offset.store", "false");
+  conf = configAndLogError(std::move(conf), "offset.store.method", "none");
+  conf = configAndLogError(std::move(conf), "api.version.request", "true");
+  conf = configAndLogError(std::move(conf), "auto.offset.reset", "largest");
   return conf;
 }
 }
