@@ -11,6 +11,7 @@ struct UserArgumentStruct {
   std::int64_t OffsetToStart = -2;
 
   int PartitionToConsume = -1;
+  int Indentation = 4;
 
   bool ShowAllTopics = false;
   bool ConsumerMode = false;
