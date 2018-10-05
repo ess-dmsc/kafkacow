@@ -27,6 +27,10 @@ int main(int argc, char **argv) {
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
                  "Partition to get messages from");
+  App.add_option(
+         "-i,--indentation", UserArguments.Indentation,
+         "Number of spaces used as indentation. Range 0 - 20. 4 by default.")
+      ->check(CLI::Range(0, 20));
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics. To be used in \"-L\" mode.");
