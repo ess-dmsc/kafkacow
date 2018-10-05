@@ -4,37 +4,32 @@
 
 namespace {
 
-void logError(const std::string &ErrStr,
+void logError(std::array<std::string, 10> ErrStr,
               std::shared_ptr<spdlog::logger> Logger) {
-  if (!ErrStr.empty())
-    Logger->error(ErrStr);
+  for (std::string Err : ErrStr) {
+    if (!Err.empty()) {
+      Err.append(" in createGlobalConfiguration([...])");
+      Logger->error(Err);
+    }
+  }
 }
 
 std::unique_ptr<RdKafka::Conf>
 createGlobalConfiguration(const std::string &BrokerAddr) {
   auto conf = std::unique_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  std::string ErrStr;
+  std::array<std::string, 10> ErrStr;
   std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
-  conf->set("metadata.broker.list", BrokerAddr, ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("session.timeout.ms", "10000", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("group.id", "mantid", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("message.max.bytes", "10000000", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("fetch.message.max.bytes", "10000000", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("enable.auto.commit", "false", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("enable.auto.offset.store", "false", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("offset.store.method", "none", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("api.version.request", "true", ErrStr);
-  logError(ErrStr, Logger);
-  conf->set("auto.offset.reset", "largest", ErrStr);
+  conf->set("metadata.broker.list", BrokerAddr, ErrStr[0]);
+  conf->set("session.timeout.ms", "10000", ErrStr[1]);
+  conf->set("group.id", "mantid", ErrStr[2]);
+  conf->set("message.max.bytes", "10000000", ErrStr[3]);
+  conf->set("fetch.message.max.bytes", "10000000", ErrStr[4]);
+  conf->set("enable.auto.commit", "false", ErrStr[5]);
+  conf->set("enable.auto.offset.store", "false", ErrStr[6]);
+  conf->set("offset.store.method", "none", ErrStr[7]);
+  conf->set("api.version.request", "true", ErrStr[8]);
+  conf->set("auto.offset.reset", "largest", ErrStr[9]);
   logError(ErrStr, Logger);
   return conf;
 }
