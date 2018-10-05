@@ -84,38 +84,45 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
   KafkaMessageMetadataStruct DataToReturn;
 
   auto KafkaMsg = std::unique_ptr<Message>(Consumer->consume(1000));
-  switch (KafkaMsg->err()) {
-  case RdKafka::ERR_NO_ERROR:
-    // Real message
-    if (KafkaMsg->len() > 0) {
-      std::string Payload(static_cast<const char *>(KafkaMsg->payload()),
-                          static_cast<int>(KafkaMsg->len()));
-      DataToReturn.Payload = Payload;
-      DataToReturn.Partition = KafkaMsg->partition();
-      DataToReturn.Offset = KafkaMsg->offset();
-      DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
+  try {
+    switch (KafkaMsg->err()) {
+    case RdKafka::ERR_NO_ERROR:
+      // Real message
+      if (KafkaMsg->len() > 0) {
+        std::string Payload(static_cast<const char *>(KafkaMsg->payload()),
+                            static_cast<int>(KafkaMsg->len()));
+        DataToReturn.Payload = Payload;
+        DataToReturn.Partition = KafkaMsg->partition();
+        DataToReturn.Offset = KafkaMsg->offset();
+        DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
 
-    } else {
-      // If RdKafka indicates no error then we should always get a
-      // non-zero length message
-      throw std::runtime_error("KafkaTopicSubscriber::consumeMessage() - Kafka "
-                               "indicated no error but a zero-length payload "
-                               "was received");
+      } else {
+        // If RdKafka indicates no error then we should always get a
+        // non-zero length message
+        throw std::runtime_error(
+            "KafkaTopicSubscriber::consumeMessage() - Kafka "
+            "indicated no error but a zero-length payload "
+            "was received");
+      }
+      break;
+
+    case RdKafka::ERR__TIMED_OUT:
+      break;
+    case RdKafka::ERR__PARTITION_EOF:
+      DataToReturn.PartitionEOF = true;
+      // Not errors as the broker might come back or more data might be pushed
+      break;
+
+    default:
+      /* All other errors */
+      throw std::runtime_error(
+          fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
+                      RdKafka::err2str(KafkaMsg->err())));
     }
-    break;
-
-  case RdKafka::ERR__TIMED_OUT:
-    break;
-  case RdKafka::ERR__PARTITION_EOF:
-    DataToReturn.PartitionEOF = true;
-    // Not errors as the broker might come back or more data might be pushed
-    break;
-
-  default:
-    /* All other errors */
-    throw std::runtime_error(
-        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
-                    RdKafka::err2str(KafkaMsg->err())));
+  } catch (std::runtime_error &E) {
+    Logger->error(E.what());
+  } catch (std::exception &E) {
+    Logger->error(E.what());
   }
   return DataToReturn;
 }
