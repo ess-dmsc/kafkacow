@@ -47,8 +47,14 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
-  if (!metadata) {
-    throw std::runtime_error("Failed to query metadata from broker");
+  try {
+    if (!metadata) {
+      throw std::runtime_error("Failed to query metadata from broker");
+    }
+  } catch (std::runtime_error &E) {
+    Logger->error(E.what());
+  } catch (std::exception &E) {
+    Logger->error(E.what());
   }
   return metadata;
 }
