@@ -1,12 +1,13 @@
 #pragma once
 
 #include "ArgumentsException.h"
+#include "ConnectKafkaInterface.h"
 #include "FlatbuffersTranslator.h"
-#include "RequestHandlerInterface.h"
+#include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
-class RequestHandler : public RequestHandlerInterface {
+class RequestHandler {
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
@@ -16,18 +17,17 @@ public:
     this->UserArguments = UserArguments;
   }
 
-  void checkAndRun() override;
+  void checkAndRun();
 
-  void checkConsumerModeArguments(UserArgumentStruct UserArguments) override;
+  void checkConsumerModeArguments(UserArgumentStruct UserArguments);
 
-  void checkMetadataModeArguments(UserArgumentStruct UserArguments) override;
+  void checkMetadataModeArguments(UserArgumentStruct UserArguments);
 
-  void showTopicPartitionOffsets(UserArgumentStruct UserArguments) override;
+  void showTopicPartitionOffsets(UserArgumentStruct UserArguments);
 
-  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset) override;
+  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset);
   void subscribeConsumeNLastMessages(std::string TopicName,
-                                     int64_t NumberOfMessages,
-                                     int Partition) override;
+                                     int64_t NumberOfMessages, int Partition);
 
 private:
   std::shared_ptr<spdlog::logger> Logger;
@@ -39,4 +39,5 @@ private:
   void verifyOffset(const int64_t Offset, const std::string TopicName);
   void verifyNLast(const int64_t NLast, const std::string TopicName,
                    const int16_t Partition);
+  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
 };

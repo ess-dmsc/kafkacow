@@ -4,6 +4,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
+
 /// Receives deserialized flatbuffers message, formats it and prints it to the
 /// screen.
 ///
@@ -109,12 +110,4 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
       }
     }
   }
-}
-
-/// Prints the argument message and a separating line of underscores.
-///
-/// \param Message
-void printToScreen(const std::string &Message) {
-  fmt::print("{}\n__________________________________________________\n",
-             Message);
 }

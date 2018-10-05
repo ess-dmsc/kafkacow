@@ -161,12 +161,22 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
     std::string JSONMessage = FlatBuffers.deserializeToYAML(MessageData);
+    printMessageMetadata(MessageData);
     (UserArguments.ShowEntireMessage)
-        ? printToScreen(
-              getEntireMessage(JSONMessage, UserArguments.Indentation))
-        : printToScreen(
+        ? std::cout << fmt::format(
+              "{}", getEntireMessage(JSONMessage, UserArguments.Indentation))
+        : std::cout << fmt::format(
+              "{}",
               getTruncatedMessage(JSONMessage, UserArguments.Indentation));
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
+}
+
+void RequestHandler::printMessageMetadata(
+    KafkaMessageMetadataStruct &MessageData) {
+  std::cout << fmt::format("\n{:_>67}{:>67}\nTimestamp: {:>11} || PartitionID: "
+                           "{:>5} || Offset: {:>7}\n",
+                           "\n", "|", MessageData.Timestamp,
+                           MessageData.Partition, MessageData.Offset);
 }
