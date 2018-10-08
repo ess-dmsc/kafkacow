@@ -27,11 +27,12 @@ void RequestHandler::checkAndRun() {
 /// \param UserArguments
 void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
-  if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) ||
-      (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2))
+  if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2))
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
-  else {
+  else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+    printEntireTopic(UserArguments.Name);
+  } else {
     if (UserArguments.OffsetToStart > -2) {
       subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
     } else {
@@ -90,11 +91,14 @@ void RequestHandler::verifyOffset(const int64_t Offset,
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
   for (OffsetsStruct Struct : Offsets) {
-    if (Offset < Struct.HighOffset && Offset > Struct.LowOffset) {
+    if (Offset <= Struct.HighOffset && Offset >= Struct.LowOffset) {
       InvalidOffset = false;
       break;
     }
   }
+  // default value
+  if (Offset == -2)
+    InvalidOffset = false;
   if (InvalidOffset)
     throw ArgumentsException("Offset not valid!");
 }
@@ -179,4 +183,15 @@ void RequestHandler::printMessageMetadata(
                            "{:>5} || Offset: {:>7}\n",
                            "\n", "|", MessageData.Timestamp,
                            MessageData.Partition, MessageData.Offset);
+}
+
+void RequestHandler::printEntireTopic(const std::string &TopicName) {
+  std::vector<OffsetsStruct> OffsetsStruct =
+      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+  int64_t MinOffset = OffsetsStruct[0].LowOffset;
+  for (auto Struct : OffsetsStruct) {
+    if (Struct.LowOffset < MinOffset)
+      MinOffset = Struct.LowOffset;
+  }
+  subscribeConsumeAtOffset(TopicName, MinOffset);
 }

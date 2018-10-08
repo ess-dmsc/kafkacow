@@ -105,7 +105,8 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
 ///
 /// \param Topic
 /// \return vector<int32_t> of partition IDs
-std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
+std::vector<int32_t>
+ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
   auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
@@ -129,7 +130,7 @@ std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
 /// \param Topic
 /// \return
 std::vector<OffsetsStruct>
-ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
+ConnectKafka::getTopicsHighAndLowOffsets(const std::string &Topic) {
   auto TopicPartitions = getTopicPartitionNumbers(Topic);
   std::vector<OffsetsStruct> HighAndLowOffsets;
   for (auto &PartitionID : TopicPartitions) {
