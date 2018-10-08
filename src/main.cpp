@@ -45,21 +45,16 @@ int main(int argc, char **argv) {
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
 
-  // setup logger
   auto Logger = spdlog::stderr_color_mt("LOG");
-  Logger->info("Welcome to spdlog!");
 
   CLI11_PARSE(App, argc, argv);
-  std::string ErrStr;
-  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker, ErrStr);
 
+  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   try {
     NewRequestHandler.checkAndRun();
-  } catch (ArgumentsException &E) {
-    std::cout << E.what() << std::endl;
   } catch (std::exception &E) {
-    std::cout << E.what() << std::endl;
+    Logger->error(E.what());
   }
   return 0;
 }

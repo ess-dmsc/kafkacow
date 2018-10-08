@@ -3,22 +3,36 @@
 #include <iomanip>
 
 namespace {
+
+void setConfig(RdKafka::Conf &conf, const std::string &ConfigName,
+               const std::string &ConfigValue) {
+  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
+  std::string ErrStr;
+  conf.set(ConfigName, ConfigValue, ErrStr);
+  if (!ErrStr.empty()) {
+    ErrStr.append(" in createGlobalConfiguration([...])");
+    Logger->error(ErrStr);
+  }
+}
+
 std::unique_ptr<RdKafka::Conf>
 createGlobalConfiguration(const std::string &BrokerAddr) {
   auto conf = std::unique_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  std::string ErrStr;
-  conf->set("metadata.broker.list", BrokerAddr, ErrStr);
-  conf->set("session.timeout.ms", "10000", ErrStr);
-  conf->set("group.id", "mantid", ErrStr);
-  conf->set("message.max.bytes", "10000000", ErrStr);
-  conf->set("fetch.message.max.bytes", "10000000", ErrStr);
-  conf->set("replica.fetch.max.bytes", "10000000", ErrStr);
-  conf->set("enable.auto.commit", "false", ErrStr);
-  conf->set("enable.auto.offset.store", "false", ErrStr);
-  conf->set("offset.store.method", "none", ErrStr);
-  conf->set("api.version.request", "true", ErrStr);
-  conf->set("auto.offset.reset", "largest", ErrStr);
+
+  setConfig(*conf, "metadata.broker.list", BrokerAddr);
+  setConfig(*conf, "session.timeout.ms", "10000");
+  setConfig(*conf, "message.max.bytes", "10000000");
+  setConfig(*conf, "fetch.message.max.bytes", "10000000");
+  setConfig(*conf, "enable.auto.commit", "false");
+  setConfig(*conf, "enable.auto.offset.store", "false");
+  setConfig(*conf, "offset.store.method", "none");
+  setConfig(*conf, "api.version.request", "true");
+  setConfig(*conf, "auto.offset.reset", "largest");
+  // kafkacow uses assign not subscribe, so group id is not used for consumer
+  // balancing.
+  setConfig(*conf, "group.id", "kafkacow");
+
   return conf;
 }
 }
@@ -30,17 +44,26 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
-  if (!metadata) {
-    throw std::runtime_error("Failed to query metadata from broker");
+  try {
+    if (!metadata) {
+      throw std::runtime_error("Failed to query metadata from broker");
+    }
+  } catch (std::exception &E) {
+    Logger->error(E.what());
   }
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr)
-    : Logger(spdlog::get("LOG")) {
+ConnectKafka::ConnectKafka(std::string Broker) : Logger(spdlog::get("LOG")) {
+  std::string ErrStr;
   this->Consumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
+  if (!ErrStr.empty()) {
+    ErrStr.append(
+        "Error creating KafkaConsumer in ConnectKafka::ConnectKafka.");
+    Logger->error(ErrStr);
+  }
   this->MetadataPointer = this->queryMetadata();
 }
 
