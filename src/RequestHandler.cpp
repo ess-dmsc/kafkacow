@@ -96,9 +96,6 @@ void RequestHandler::verifyOffset(const int64_t Offset,
       break;
     }
   }
-  // default value
-  if (Offset == -2)
-    InvalidOffset = false;
   if (InvalidOffset)
     throw ArgumentsException("Offset not valid!");
 }
