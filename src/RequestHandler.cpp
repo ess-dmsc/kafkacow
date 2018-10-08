@@ -174,6 +174,9 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
     EOFPartitionCounter++;
 }
 
+/// Prints and formats message Metadata.
+///
+/// \param MessageData
 void RequestHandler::printMessageMetadata(
     KafkaMessageMetadataStruct &MessageData) {
   std::cout << fmt::format("\n{:_>67}{:>67}\nTimestamp: {:>11} || PartitionID: "
@@ -182,6 +185,10 @@ void RequestHandler::printMessageMetadata(
                            MessageData.Partition, MessageData.Offset);
 }
 
+/// Calculates topic's lowest offset and subscribes to it to print the entire
+/// topic.
+///
+/// \param TopicName
 void RequestHandler::printEntireTopic(const std::string &TopicName) {
   std::vector<OffsetsStruct> OffsetsStruct =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
