@@ -164,3 +164,14 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
       message,
       "Program can run in one and only one mode: --consumer or --metadata");
 }
+
+TEST(RequestHandlerTest,
+     default_consumer_behaviour_or_print_entire_topic_test) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.Name = "ExampleTestTopic";
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
+}
