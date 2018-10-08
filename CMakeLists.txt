@@ -10,7 +10,6 @@ endif()
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 
 file(GLOB listOfSchemas "${PROJECT_SOURCE_DIR}/streaming-data-types/schemas/*.fbs" )
-message(${listOfSchemas})
 list(REMOVE_DUPLICATES listOfSchemas)
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/schemas/")
 foreach(schema ${listOfSchemas})
