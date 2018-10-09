@@ -10,12 +10,14 @@ endif()
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 
 file(GLOB listOfSchemas "${PROJECT_SOURCE_DIR}/streaming-data-types/schemas/*.fbs" )
-message(${listOfSchemas})
 list(REMOVE_DUPLICATES listOfSchemas)
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/schemas/")
 foreach(schema ${listOfSchemas})
     configure_file(${schema} "${CMAKE_CURRENT_BINARY_DIR}/schemas/" COPYONLY)
 endforeach()
+
+configure_file("${PROJECT_SOURCE_DIR}/AppImageResources/icon.png" "${CMAKE_CURRENT_BINARY_DIR}/icon.png" COPYONLY)
+configure_file("${PROJECT_SOURCE_DIR}/AppImageResources/kafkacow.desktop" "${CMAKE_CURRENT_BINARY_DIR}/kafkacow.desktop" COPYONLY)
 
 if(NOT CONAN_DISABLE)
     include(${CMAKE_MODULE_PATH}/conan.cmake)
