@@ -5,18 +5,8 @@
 #include <spdlog/spdlog.h>
 
 class ConnectKafka : public ConnectKafkaInterface {
-private:
-  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
-  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
-  std::shared_ptr<spdlog::logger> Logger;
-
-  std::unique_ptr<RdKafka::Metadata> queryMetadata();
-
-  TopicMetadataStruct getTopicMetadata(std::string TopicName);
-  std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
-
 public:
-  ConnectKafka(std::string Broker, std::string ErrStr);
+  ConnectKafka(std::string Broker);
   ~ConnectKafka() {
     if (Consumer) {
       Consumer->close();
@@ -43,11 +33,20 @@ public:
   OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                               int32_t PartitionID) override;
 
-  int getNumberOfTopicPartitions(std::string TopicName) override;
+  int getNumberOfTopicPartitions(std::string Topic) override;
 
-  void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
+  void subscribeAtOffset(int64_t Offset, std::string Topic) override;
 
-  void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
+  void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
   std::string showAllMetadata() override;
+
+private:
+  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
+  std::unique_ptr<RdKafka::Metadata> MetadataPointer;
+  std::shared_ptr<spdlog::logger> Logger;
+
+  std::unique_ptr<RdKafka::Metadata> queryMetadata();
+
+  std::vector<int32_t> getTopicPartitionNumbers(std::string Topic);
 };

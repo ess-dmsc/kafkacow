@@ -11,22 +11,29 @@ Client runs once and presents data as requested:
 bin/kafkacow -h
 
 Options:  
-  -h,--help                   Print this help message and exit
-  -g,--go INT                 How many records back to show. Otherwise retrieve entire topic. Mutually exclusive with "--Offset"
-  -t,--topic TEXT             Show records of specified topic
-  -b,--broker TEXT            Hostname or IP of Kafka broker
-  -o,--offset INT             Start consuming from an offset. Otherwise retrieve entire topic. Mutually exclusive with "--go"
-  -a,--all                    Show a list of topics
-  -C,--consumer               Run the program in the consumer mode
-  -l,--list                   Run the program in the metadata mode
-  -p,--partitions             Show offsets for partitions of given topic "-t"
-  -c,--config_file TEXT       Read configuration from an ini file
+     -h,--help                   Print this help message and exit
+     -g,--go INT                 How many records back to show from partition "-p". Mutually exclusive with "--Offset"
+     -t,--topic TEXT             Show records of specified topic
+     -b,--broker TEXT            Hostname or IP of Kafka broker
+     -o,--offset INT             Start consuming from an offset. Otherwise print entire topic. Mutually exclusive with "--go"
+     -p,--partition INT          Partition to get messages from
+     -i,--indentation INT        Number of spaces used as indentation. Range 0 - 20. 4 by default.
+     -a,--all                    Show a list of topics. To be used in "-L" mode.
+     -C,--consumer               Run the program in the consumer mode
+     -L,--list                   Metadata mode. Show all topics and partitions. If "-t" specified, shows partition offsets.
+     -E,--entire                 Show all records of a message(truncated by default)
+     -c,--config_file TEXT       Read configuration from an ini file
   ```
   
   #### Usage example
   Show last 10 messages of MULTIPART_EVENTS topic from broker hinata.isis.cclrc.ac.uk:9092:
   ```
 bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
+  ```
+  
+  Show list of all topics from broker hinata.isis.cclrc.ac.uk:9092:
+  ```
+ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -L -a
   ```
   
   ## Install

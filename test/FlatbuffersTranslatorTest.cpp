@@ -52,8 +52,8 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   FlatbuffersTranslator FlatBuffersTranslator("schemas/");
 
   // Run first time to populate schema map
-  FlatBuffersTranslator.translateToJSON(MessageMetadata);
-  EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
+  FlatBuffersTranslator.deserializeToYAML(MessageMetadata);
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
 }

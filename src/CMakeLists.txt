@@ -1,7 +1,6 @@
 add_executable(kafkacow main.cpp
         RequestHandler.cpp
         RequestHandler.h
-        RequestHandlerInterface.h
         ConnectKafka.cpp
         ConnectKafka.h
         ConnectKafkaInterface.h
@@ -26,4 +25,5 @@ target_link_libraries(kafkacow
         CONAN_PKG::spdlog
         CONAN_PKG::yaml-cpp
         CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::libgit2)
+        CONAN_PKG::libgit2
+        CONAN_PKG::fmt)

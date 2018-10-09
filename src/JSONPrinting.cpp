@@ -1,5 +1,6 @@
 #include "JSONPrinting.h"
 #include <algorithm>
+#include <fmt/format.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
@@ -8,7 +9,8 @@
 /// screen.
 ///
 /// \param JSONMessage
-std::string getEntireMessage(const std::string &JSONMessage) {
+std::string getEntireMessage(const std::string &JSONMessage,
+                             const int &Indent) {
   using std::cout;
   using nlohmann::json;
 
@@ -17,7 +19,7 @@ std::string getEntireMessage(const std::string &JSONMessage) {
   YAML::Emitter Emitter;
   Emitter << YAML::DoubleQuoted << YAML::Flow << node;
   auto JSONModernMessage = json::parse(Emitter.c_str());
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(4);
+  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
       MessageWithNoQuotes.end());
@@ -31,7 +33,8 @@ std::string getEntireMessage(const std::string &JSONMessage) {
 /// it and prints it to the screen.
 ///
 /// \param JSONMessage
-std::string getTruncatedMessage(const std::string &JSONMessage) {
+std::string getTruncatedMessage(const std::string &JSONMessage,
+                                const int &Indent) {
   using std::cout;
   using nlohmann::json;
 
@@ -39,7 +42,7 @@ std::string getTruncatedMessage(const std::string &JSONMessage) {
   YAML::Emitter Emitter;
   Emitter << YAML::DoubleQuoted << YAML::Flow << Node;
   auto JSONModernMessage = json::parse(Emitter.c_str());
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(4);
+  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
       MessageWithNoQuotes.end());
@@ -49,6 +52,10 @@ std::string getTruncatedMessage(const std::string &JSONMessage) {
   return MessageWithNoQuotes;
 }
 
+/// Initializes truncating and returns edited YAML node.
+///
+/// \param JSONMessage
+/// \return
 YAML::Node truncateMessage(const std::string &JSONMessage) {
   YAML::Node Node = YAML::Load(JSONMessage);
   if (Node.IsMap())
@@ -98,16 +105,9 @@ void recursiveTruncateJSONSequence(YAML::Node &Node) {
         Node.remove(NodeSize - Counter);
 
       } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
-        std::stringstream ss;
         Node.push_back("...");
-        ss << "Truncated " << NodeSize - 10 << " elements.";
-        Node.push_back(ss.str());
+        Node.push_back(fmt::format("Truncated {} elements.", NodeSize - 10));
       }
     }
   }
-}
-
-void printToScreen(const std::string &Message) {
-  std::cout << Message;
-  std::cout << "\n__________________________________________________\n";
 }

@@ -3,48 +3,73 @@
 #include <iomanip>
 
 namespace {
+
+void setConfig(RdKafka::Conf &conf, const std::string &ConfigName,
+               const std::string &ConfigValue) {
+  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
+  std::string ErrStr;
+  conf.set(ConfigName, ConfigValue, ErrStr);
+  if (!ErrStr.empty()) {
+    ErrStr.append(" in createGlobalConfiguration([...])");
+    Logger->error(ErrStr);
+  }
+}
+
 std::unique_ptr<RdKafka::Conf>
 createGlobalConfiguration(const std::string &BrokerAddr) {
   auto conf = std::unique_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-  std::string ErrStr;
-  conf->set("metadata.broker.list", BrokerAddr, ErrStr);
-  conf->set("session.timeout.ms", "10000", ErrStr);
-  conf->set("group.id", "mantid", ErrStr);
-  conf->set("message.max.bytes", "10000000", ErrStr);
-  conf->set("fetch.message.max.bytes", "10000000", ErrStr);
-  conf->set("replica.fetch.max.bytes", "10000000", ErrStr);
-  conf->set("enable.auto.commit", "false", ErrStr);
-  conf->set("enable.auto.offset.store", "false", ErrStr);
-  conf->set("offset.store.method", "none", ErrStr);
-  conf->set("api.version.request", "true", ErrStr);
-  conf->set("auto.offset.reset", "largest", ErrStr);
+
+  setConfig(*conf, "metadata.broker.list", BrokerAddr);
+  setConfig(*conf, "session.timeout.ms", "10000");
+  setConfig(*conf, "message.max.bytes", "10000000");
+  setConfig(*conf, "fetch.message.max.bytes", "10000000");
+  setConfig(*conf, "enable.auto.commit", "false");
+  setConfig(*conf, "enable.auto.offset.store", "false");
+  setConfig(*conf, "offset.store.method", "none");
+  setConfig(*conf, "api.version.request", "true");
+  setConfig(*conf, "auto.offset.reset", "largest");
+  // kafkacow uses assign not subscribe, so group id is not used for consumer
+  // balancing.
+  setConfig(*conf, "group.id", "kafkacow");
+
   return conf;
 }
 }
 
+/// Gets Metadata object from Kafka.
+///
+/// \return unique_ptr to RdKafka::Metadata
 std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
-  // API requires address of a pointer to the struct but compiler won't allow
-  // &metadata.get() as it is an rvalue
-
   Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
-  // Capture the pointer in an owning struct to take care of deletion
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
-  if (!metadata) {
-    throw std::runtime_error("Failed to query metadata from broker");
+  try {
+    if (!metadata) {
+      throw std::runtime_error("Failed to query metadata from broker");
+    }
+  } catch (std::exception &E) {
+    Logger->error(E.what());
   }
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker, std::string ErrStr) {
+ConnectKafka::ConnectKafka(std::string Broker) : Logger(spdlog::get("LOG")) {
+  std::string ErrStr;
   this->Consumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
+  if (!ErrStr.empty()) {
+    ErrStr.append(
+        "Error creating KafkaConsumer in ConnectKafka::ConnectKafka.");
+    Logger->error(ErrStr);
+  }
   this->MetadataPointer = this->queryMetadata();
-  Logger = spdlog::get("LOG");
 }
 
+/// Returns a list of topics stored by the broker.
+///
+/// \return single string containing all topics.
 std::string ConnectKafka::getAllTopics() {
   auto Topics = MetadataPointer->topics();
   std::string ListOfTopics;
@@ -55,6 +80,9 @@ std::string ConnectKafka::getAllTopics() {
   return ListOfTopics;
 }
 
+/// Consumes Kafka messages starting from specified offset.
+///
+/// \return struct containg serialized message and its metadata.
 KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
   using RdKafka::Message;
   KafkaMessageMetadataStruct DataToReturn;
@@ -89,39 +117,40 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
 
   default:
     /* All other errors */
-    std::ostringstream os;
-    os << "KafkaTopicSubscriber::consumeMessage() - "
-       << RdKafka::err2str(KafkaMsg->err());
-    throw std::runtime_error(os.str());
+    throw std::runtime_error(
+        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
+                    RdKafka::err2str(KafkaMsg->err())));
   }
   return DataToReturn;
 }
 
+/// Queries Kafka for Topic's metadata and returns partition numbers.
+///
+/// \param Topic
+/// \return vector<int32_t> of partition IDs
 std::vector<int32_t> ConnectKafka::getTopicPartitionNumbers(std::string Topic) {
-  auto TopicMetadata = getTopicMetadata(Topic);
-  return TopicMetadata.Partitions;
-}
-
-TopicMetadataStruct ConnectKafka::getTopicMetadata(std::string TopicName) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
   auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
-                               [TopicName](const RdKafka::TopicMetadata *tpc) {
-                                 return tpc->topic() == TopicName;
+                               [Topic](const RdKafka::TopicMetadata *tpc) {
+                                 return tpc->topic() == Topic;
                                });
   auto matchedTopic = *Iterator;
-  TopicMetadataStruct TopicMetadata;
-  TopicMetadata.Name = matchedTopic->topic();
+  std::vector<int32_t> TopicPartitionNumbers;
   auto PartitionMetadata = matchedTopic->partitions();
-
   // save needed partition metadata here
   for (auto &Partition : *PartitionMetadata) {
-    TopicMetadata.Partitions.push_back(Partition->id());
+    TopicPartitionNumbers.push_back(Partition->id());
   }
-  sort(TopicMetadata.Partitions.begin(), TopicMetadata.Partitions.end());
-  return TopicMetadata;
+  sort(TopicPartitionNumbers.begin(), TopicPartitionNumbers.end());
+  return TopicPartitionNumbers;
 }
 
+/// Returns a vector of structs containing offsets of partitions for specified
+/// Topic.
+///
+/// \param Topic
+/// \return
 std::vector<OffsetsStruct>
 ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
   auto TopicPartitions = getTopicPartitionNumbers(Topic);
@@ -134,6 +163,11 @@ ConnectKafka::getTopicsHighAndLowOffsets(std::string Topic) {
   return HighAndLowOffsets;
 }
 
+/// Queries Kafka for offsets of a single PartitionID for a specified Topic
+///
+/// \param Topic
+/// \param PartitionID
+/// \return OffsetsStruct containing PartitionID and High- and LowOffset.
 OffsetsStruct
 ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
                                             int32_t PartitionID) {
@@ -146,14 +180,22 @@ ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
   return OffsetsToSave;
 }
 
-int ConnectKafka::getNumberOfTopicPartitions(std::string TopicName) {
-  return getTopicPartitionNumbers(TopicName).size();
+/// Returns a number of partitions that specified Topic has.
+///
+/// \param Topic
+/// \return
+int ConnectKafka::getNumberOfTopicPartitions(std::string Topic) {
+  return getTopicPartitionNumbers(Topic).size();
 }
 
-void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string TopicName) {
+/// Subscribes to partitions of a specified Topic at given Offset.
+///
+/// \param Offset
+/// \param Topic
+void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
-  for (auto i = 0; i < getNumberOfTopicPartitions(TopicName); i++) {
-    auto TopicPartition = RdKafka::TopicPartition::create(TopicName, i);
+  for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
+    auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
 
     TopicPartition->set_offset(Offset);
     TopicPartitionsWithOffsets.push_back(TopicPartition);
@@ -168,28 +210,34 @@ KafkaMessageMetadataStruct ConnectKafka::consumeLastNMessages() {
   return consumeFromOffset();
 }
 
+/// Subscribes to a specified Partition of a Topic to get last NMessages.
+///
+/// \param NMessages
+/// \param Topic
+/// \param Partition
 void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
-                                            const std::string &TopicName,
+                                            const std::string &Topic,
                                             int Partition) {
   std::vector<OffsetsStruct> HighAndLowOffsets =
-      getTopicsHighAndLowOffsets(TopicName);
+      getTopicsHighAndLowOffsets(Topic);
 
   // get highest offset of all partitions
-  int64_t HighestOffest = 0;
+  int64_t HighestOffset = 0;
   for (auto it : HighAndLowOffsets) {
-    if (it.HighOffset > HighestOffest)
-      HighestOffest = it.HighOffset;
+    if (it.HighOffset > HighestOffset) {
+      HighestOffset = it.HighOffset;
+    }
   }
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
-  for (auto i = 0; i < getNumberOfTopicPartitions(TopicName); i++) {
-    auto TopicPartition = RdKafka::TopicPartition::create(TopicName, i);
+  for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
+    auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
 
     // subscribe to the chosen partition
     if (i == Partition) {
       TopicPartition->set_offset(HighAndLowOffsets[Partition].HighOffset -
                                  NMessages + 0);
     } else {
-      TopicPartition->set_offset(HighestOffest + 1000);
+      TopicPartition->set_offset(HighestOffset + 1000);
     }
     TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
   }
@@ -199,18 +247,21 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
 }
 
+/// Displays brokers, topics, partitions and their details.
+///
+/// \return single string containing metadata.
 std::string ConnectKafka::showAllMetadata() {
   using std::setw;
   std::stringstream SS;
   SS << MetadataPointer->brokers()->size() << " brokers:\n";
-  for (auto Broker : *MetadataPointer->brokers())
-    SS << "   broker " << Broker->id() << " at " << Broker->host() << ":"
-       << Broker->port() << "\n";
-  SS << "\n";
-  SS << MetadataPointer->topics()->size() << " topics:\n";
+  for (auto Broker : *MetadataPointer->brokers()) {
+    SS << fmt::format("   broker {} at {}:{}\n", Broker->id(), Broker->host(),
+                      Broker->port());
+  }
+  SS << fmt::format("\n{} topics:\n", MetadataPointer->topics()->size());
   for (auto Topic : *MetadataPointer->topics()) {
-    SS << "   \"" << Topic->topic() << "\" with " << Topic->partitions()->size()
-       << " partitions:\n";
+    SS << fmt::format("   \"{}\" with {} partitions:\n", Topic->topic(),
+                      Topic->partitions()->size());
     for (auto Partition : *Topic->partitions()) {
       OffsetsStruct PartitionOffsets =
           getPartitionHighAndLowOffsets(Topic->topic(), Partition->id());
@@ -220,15 +271,14 @@ std::string ConnectKafka::showAllMetadata() {
       std::stringstream ISRSs;
       std::copy(Partition->isrs()->begin(), Partition->isrs()->end(),
                 std::ostream_iterator<int32_t>(ISRSs, ", "));
-      SS << "        partition " << setw(3) << Partition->id()
-         << "  |  Low offset: " << setw(6) << PartitionOffsets.LowOffset
-         << "  |  High Offset: " << setw(6) << PartitionOffsets.HighOffset
-         << "  |  leader: " << setw(3) << Partition->leader()
-         << "  |  replicas: " << Replicas.str() << "|  isrs: " << ISRSs.str()
-         << "\n";
+      SS << fmt::format("        partition {:>3}  |  Low offset: {:>6}  |  "
+                        "High offset: {:>6} |  leader: {:>2} |  replicas: {} | "
+                        " isrs: {}\n",
+                        Partition->id(), PartitionOffsets.LowOffset,
+                        PartitionOffsets.HighOffset, Partition->leader(),
+                        Replicas.str(), ISRSs.str());
     }
     SS << "\n";
   }
-  std::string Metadata = SS.str();
-  return Metadata;
+  return SS.str();
 }

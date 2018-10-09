@@ -10,7 +10,7 @@ public:
   explicit FlatbuffersTranslator(std::string SchemaPath)
       : PathToSchemas(std::move(SchemaPath)), Logger(spdlog::get("LOG")) {}
 
-  std::string translateToJSON(KafkaMessageMetadataStruct MessageData);
+  std::string deserializeToYAML(KafkaMessageMetadataStruct MessageData);
 
   std::pair<bool, std::string> getSchemaPathForID(const std::string &FileID);
 

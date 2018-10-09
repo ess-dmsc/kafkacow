@@ -13,24 +13,46 @@ const std::string SchemaPath = "schemas/";
 
 class RequestHandlerTest : public ::testing::Test {};
 
-TEST(RequestHandlerTest, subscribe_consume_n_last_messages_test) {
+TEST(RequestHandlerTest,
+     subscribe_consume_n_last_messages_throws_if_incorrect_arguments_test) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  UserArgumentStruct UserArguments;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+
+  EXPECT_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
+                   "ExampleTestTopic", 100, 1),
+               ArgumentsException);
+}
+
+TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    SchemaPath);
 
   EXPECT_NO_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
-      "ExampleTestTopic", 100, 1));
+      "ExampleTestTopic", 1, 1));
 }
 
-TEST(RequestHandlerTest, subscribe_at_an_offset_test) {
+TEST(RequestHandlerTest,
+     subscribe_at_an_offset_throws_if_incorrect_arguments_test) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  UserArgumentStruct UserArguments;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+
+  EXPECT_THROW(
+      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100),
+      ArgumentsException);
+}
+
+TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    SchemaPath);
 
   EXPECT_NO_THROW(
-      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100));
+      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 12344));
 }
 
 TEST(RequestHandlerTest, topic_metadata_creation_test) {
@@ -49,7 +71,7 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
 
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
-  UserArguments.OffsetToStart = 1234;
+  UserArguments.OffsetToStart = 1235;
   UserArguments.Name = "TestTopicName";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    SchemaPath);
