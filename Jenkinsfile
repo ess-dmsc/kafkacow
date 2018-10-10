@@ -9,6 +9,10 @@ images = [
                 'name': 'essdmscdm/centos7-build-node:3.1.0',
                 'sh'  : '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash -e'
         ],
+        'centos7-release': [
+                        'name': 'essdmscdm/centos7-build-node:3.1.0',
+                        'sh'  : '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash -e'
+                ],
         'debian9'    : [
                 'name': 'essdmscdm/debian9-build-node:2.2.0',
                 'sh'  : 'bash -e'
