@@ -192,6 +192,7 @@ def get_pipeline(image_key) {
                 }
                 if (image_key == release_os) {
                     docker_release(image_key)
+                    """echo 'in a good if branch'"""
                 }
 
             } catch (e) {
