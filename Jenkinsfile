@@ -155,7 +155,7 @@ def docker_formatting(image_key) {
     }
 }
 
-docker_release(image_key)
+docker_release(image_key){
     try {
         MicCheck.sh"""
 
