@@ -85,6 +85,8 @@ def docker_cmake(image_key) {
             cmake_cmd = "cmake3"
         }
         def configure_script = """
+                        echo 'THIS IS **debug docker_cmake'
+                        echo "$image_key"
                         cd build
                         ${cmake_cmd} ../${project} ${coverage_on}
                     """
@@ -125,7 +127,6 @@ def docker_coverage(image_key) {
         def custom_sh = images[image_key]['sh']
         def test_output = "TestResults.xml"
         def coverage_script = """
-                        echo '*******************************mic check one two mich check three four'
                         cd build
                         ./bin/UnitTests --gtest_output=xml:${test_output}
                         make coverage
@@ -162,11 +163,13 @@ def docker_formatting(image_key) {
 
 def docker_release(image_key){
     try {
-        MicCheck.sh"""
+       def MYSCRIPT = """
 
-        echo '*******************************mic check one two mich check one two'
+        echo 'THIS IS ** docker_release'
+         echo "$image_key"
 
         """
+         sh "${MYSCRIPT}"
     } catch (e) {
         failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
     }
@@ -183,22 +186,19 @@ def get_pipeline(image_key) {
                 docker_dependencies(image_key)
                 docker_cmake(image_key)
                 docker_build(image_key)
-
                 if (image_key == test_and_coverage_os) {
                     docker_coverage(image_key)
                 }
                 else {
                     docker_test(image_key)
                 }
+                if (image_key == release_os) {
+                    docker_release(image_key)
+                }
 
                 if (image_key == clangformat_os) {
                     docker_formatting(image_key)
                 }
-                if (image_key == release_os) {
-                    docker_release(image_key)
-                    """echo 'in a good if branch'"""
-                }
-
             } catch (e) {
                 failure_function(e, "Unknown build failure for ${image_key}")
             } finally {
