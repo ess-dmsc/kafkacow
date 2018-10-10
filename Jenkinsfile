@@ -121,6 +121,7 @@ def docker_coverage(image_key) {
         def custom_sh = images[image_key]['sh']
         def test_output = "TestResults.xml"
         def coverage_script = """
+                        echo '*******************************mic check one two mich check three four'
                         cd build
                         ./bin/UnitTests --gtest_output=xml:${test_output}
                         make coverage
