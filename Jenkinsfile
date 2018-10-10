@@ -81,7 +81,7 @@ def docker_cmake(image_key) {
             coverage_on = "-DCOV=1"
         }
         def cmake_cmd = "cmake"
-        if (image_key == "centos7") {
+        if (image_key == "centos7||image_key=="centos7-release") {
             cmake_cmd = "cmake3"
         }
         def configure_script = """
