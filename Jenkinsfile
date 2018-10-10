@@ -2,6 +2,7 @@ project = "kafkacow"
 clangformat_os = "debian9"
 test_and_coverage_os = "centos7"
 archive_os = "centos7"
+release_os = "centos7-release"
 
 images = [
         'centos7': [
@@ -154,6 +155,17 @@ def docker_formatting(image_key) {
     }
 }
 
+docker_release(image_key)
+    try {
+        MicCheck.sh"""
+
+        echo '*******************************mic check one two mich check one two'
+
+        """
+    } catch (e) {
+        failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
+    }
+}
 
 def get_pipeline(image_key) {
     return {
@@ -176,6 +188,9 @@ def get_pipeline(image_key) {
 
                 if (image_key == clangformat_os) {
                     docker_formatting(image_key)
+                }
+                if (image_key == release_os) {
+                    docker_release(image_key)
                 }
 
             } catch (e) {
@@ -286,3 +301,4 @@ node('docker') {
     // Delete workspace when build is done
     cleanWs()
 }
+
