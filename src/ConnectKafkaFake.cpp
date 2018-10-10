@@ -51,4 +51,3 @@ ConnectKafkaFake::getPartitionHighAndLowOffsets(const std::string &Topic,
   OffsetsToReturn.PartitionId = PartitionID;
   return OffsetsToReturn;
 }
-
