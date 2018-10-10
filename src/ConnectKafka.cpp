@@ -260,3 +260,4 @@ std::string ConnectKafka::showAllMetadata() {
   }
   return SS.str();
 }
+

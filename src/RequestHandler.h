@@ -41,4 +41,5 @@ private:
                    const int16_t Partition);
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
   void printEntireTopic(const std::string &TopicName);
+  void checkIfTopicEmpty(const std::string &TopicName);
 };

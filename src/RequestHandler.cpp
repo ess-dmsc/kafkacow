@@ -31,10 +31,13 @@ void RequestHandler::checkConsumerModeArguments(
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
   else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-           !UserArguments.Name.empty()) {
-    printEntireTopic(UserArguments.Name);
-  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+           UserArguments.Name.empty()) {
     throw ArgumentsException("Please specify topic!");
+  }
+  // check if topic is not empty
+  checkIfTopicEmpty(UserArguments.Name);
+  if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+    printEntireTopic(UserArguments.Name);
   } else {
     if (UserArguments.OffsetToStart > -2) {
       subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
@@ -46,6 +49,18 @@ void RequestHandler::checkConsumerModeArguments(
           : Logger->error("Please specify partition");
     }
   }
+}
+
+void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
+  std::vector<OffsetsStruct> HighAndLowOffsets =
+      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+  bool EmptyTopic = true;
+  for (auto Offsets : HighAndLowOffsets) {
+    if (Offsets.LowOffset != Offsets.HighOffset)
+      EmptyTopic = false;
+  }
+  if (EmptyTopic)
+    throw ArgumentsException("Topic is empty!");
 }
 
 /// Analyzes user arguments to determine which metadata mode functionality to
