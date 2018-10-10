@@ -46,9 +46,7 @@ int main(int argc, char **argv) {
   App.set_config("-c,--config_file", "", "Read configuration from an ini file",
                  false);
 
-  // setup logger
   auto Logger = spdlog::stderr_color_mt("LOG");
-  Logger->info("Welcome to spdlog!");
 
   CLI11_PARSE(App, argc, argv);
   std::string ErrStr;

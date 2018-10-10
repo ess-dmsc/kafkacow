@@ -30,8 +30,11 @@ void RequestHandler::checkConsumerModeArguments(
   if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2))
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
-  else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+  else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
+           !UserArguments.Name.empty()) {
     printEntireTopic(UserArguments.Name);
+  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+    throw ArgumentsException("Please specify topic!");
   } else {
     if (UserArguments.OffsetToStart > -2) {
       subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
