@@ -22,7 +22,7 @@ Options:
   -i,--indentation INT        Number of spaces used as indentation. Range 0 - 20. 4 by default.
   -a,--all                    Show a list of topics. To be used in "-L" mode.
   -e,--entire                 Show all records of a message(truncated by default).
-  -c,--config TEXT            Read configuration from an ini file.
+  -c,--config-file TEXT            Read configuration from an ini file.
   ```
   
   #### Usage example
