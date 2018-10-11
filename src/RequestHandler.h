@@ -40,4 +40,6 @@ private:
   void verifyNLast(const int64_t NLast, const std::string TopicName,
                    const int16_t Partition);
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
+  void printEntireTopic(const std::string &TopicName);
+  void checkIfTopicEmpty(const std::string &TopicName);
 };

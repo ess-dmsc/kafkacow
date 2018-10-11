@@ -28,12 +28,10 @@ int main(int argc, char **argv) {
          "How many records back to show from partition \"-p\". Mutually "
          "exclusive with \"--Offset\".")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
-
-  App.add_option("-o,--offset", UserArguments.OffsetToStart,
-                 "Start consuming from an offset. Otherwise print entire "
-                 "topic. Mutually exclusive with \"--go\".")
+  App.add_option(
+         "-o,--offset", UserArguments.OffsetToStart,
+         "Start consuming from an offset. Mutually exclusive with \"--go\"")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
-
   App.add_option(
          "-i,--indentation", UserArguments.Indentation,
          "Number of spaces used as indentation. Range 0 - 20. 4 by default.")
@@ -41,10 +39,8 @@ int main(int argc, char **argv) {
 
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics. To be used in \"-L\" mode.");
-
   App.add_flag("-e, --entire", UserArguments.ShowEntireMessage,
                "Show all records of a message(truncated by default).");
-
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 

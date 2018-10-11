@@ -27,11 +27,18 @@ void RequestHandler::checkAndRun() {
 /// \param UserArguments
 void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
-  if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) ||
-      (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2))
+  if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2)
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
-  else {
+  else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
+           UserArguments.Name.empty()) {
+    throw ArgumentsException("Please specify topic!");
+  }
+  // check if topic is not empty
+  checkIfTopicEmpty(UserArguments.Name);
+  if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+    printEntireTopic(UserArguments.Name);
+  } else {
     if (UserArguments.OffsetToStart > -2) {
       subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
     } else {
@@ -42,6 +49,18 @@ void RequestHandler::checkConsumerModeArguments(
           : Logger->error("Please specify partition");
     }
   }
+}
+
+void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
+  std::vector<OffsetsStruct> HighAndLowOffsets =
+      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+  bool EmptyTopic = true;
+  for (auto Offsets : HighAndLowOffsets) {
+    if (Offsets.LowOffset != Offsets.HighOffset)
+      EmptyTopic = false;
+  }
+  if (EmptyTopic)
+    throw ArgumentsException("Topic is empty!");
 }
 
 /// Analyzes user arguments to determine which metadata mode functionality to
@@ -90,7 +109,7 @@ void RequestHandler::verifyOffset(const int64_t Offset,
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
   for (OffsetsStruct Struct : Offsets) {
-    if (Offset < Struct.HighOffset && Offset > Struct.LowOffset) {
+    if (Offset <= Struct.HighOffset && Offset >= Struct.LowOffset) {
       InvalidOffset = false;
       break;
     }
@@ -173,10 +192,28 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
     EOFPartitionCounter++;
 }
 
+/// Prints and formats message Metadata.
+///
+/// \param MessageData
 void RequestHandler::printMessageMetadata(
     KafkaMessageMetadataStruct &MessageData) {
   std::cout << fmt::format("\n{:_>67}{:>67}\nTimestamp: {:>11} || PartitionID: "
                            "{:>5} || Offset: {:>7}\n",
                            "\n", "|", MessageData.Timestamp,
                            MessageData.Partition, MessageData.Offset);
+}
+
+/// Calculates topic's lowest offset and subscribes to it to print the entire
+/// topic.
+///
+/// \param TopicName
+void RequestHandler::printEntireTopic(const std::string &TopicName) {
+  std::vector<OffsetsStruct> OffsetsStruct =
+      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+  int64_t MinOffset = OffsetsStruct[0].LowOffset;
+  for (auto OffsetStruct : OffsetsStruct) {
+    if (OffsetStruct.LowOffset < MinOffset)
+      MinOffset = OffsetStruct.LowOffset;
+  }
+  subscribeConsumeAtOffset(TopicName, MinOffset);
 }

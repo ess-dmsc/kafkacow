@@ -14,7 +14,7 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consumeFromOffset() {
 }
 
 std::vector<OffsetsStruct>
-ConnectKafkaFake::getTopicsHighAndLowOffsets(std::string Topic) {
+ConnectKafkaFake::getTopicsHighAndLowOffsets(const std::string &Topic) {
   std::vector<OffsetsStruct> VectorOfPartitions;
   OffsetsStruct FirstPartition = {1234, 12345, 0};
   OffsetsStruct SecondPartition{2234, 22345, 1};
