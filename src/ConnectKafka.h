@@ -6,7 +6,7 @@
 
 class ConnectKafka : public ConnectKafkaInterface {
 public:
-  ConnectKafka(std::string Broker, std::string ErrStr);
+  ConnectKafka(std::string Broker);
   ~ConnectKafka() {
     if (Consumer) {
       Consumer->close();
