@@ -11,7 +11,7 @@ then
     rm -rf $DIR
 fi
 mkdir -p "$DIR";
-cp -r "$BASELONGNAME/build" "$DIR"
+cp -r "$BASELONGNAME/build/." "$DIR"
 cd kafkacow.AppDir
 curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppRun --output AppRun
 chmod a+x AppRun
@@ -28,9 +28,12 @@ then
     rm -rf "$BASELONGNAME/kafkacow-image.AppImage"
 fi
 
+
 echo 'current path:'
 echo "$PWD"
 cd kafkacow.AppDir/usr
 echo 'current path:'
 echo "$PWD"
 ls
+
+./AppImageAssistant kafkacow.AppDir ./kafkacow-image.AppImage
