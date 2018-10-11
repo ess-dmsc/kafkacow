@@ -1,5 +1,6 @@
  #!/bin/bash
 echo "THIS IS an AppImage creator"
+cd ..
 BASELONGNAME=$(pwd)
 echo 'THIS IS **base long name'
 echo "$BASELONGNAME"
