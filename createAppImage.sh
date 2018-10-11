@@ -27,4 +27,4 @@ then
     printf '%s\n' "Overwriting image..."
     rm -rf "$BASELONGNAME/kafkacow-image.AppImage"
 fi
-./AppImageAssistant kafkacow.AppDir ./kafkacow-image.AppImage
+

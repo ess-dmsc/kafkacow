@@ -172,7 +172,7 @@ def docker_release(image_key){
          ls
          cd kafkacow
          echo 'current path:'
-                  echo "$PWD"
+         echo "$PWD"
          ls
         ./createAppImage.sh
         """
