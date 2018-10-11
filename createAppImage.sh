@@ -42,4 +42,9 @@ echo "$PWD"
 ls
 cd ..
 cd ..
-./AppImageAssistant kafkacow.AppDir ./kafkacow-image.AppImage
+
+apt install fuse
+modprobe fuse
+groupadd fuse
+
+./AppImageAssistant kafkacow.AppDir "./$1.AppImage"
