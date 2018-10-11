@@ -27,7 +27,7 @@ void RequestHandler::checkAndRun() {
 /// \param UserArguments
 void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
-  if ((UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2))
+  if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2)
     throw ArgumentsException("Program must take one and only one of the "
                              "arguments: \"--go\",\"--Offset\"");
   else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
@@ -211,9 +211,9 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
   std::vector<OffsetsStruct> OffsetsStruct =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   int64_t MinOffset = OffsetsStruct[0].LowOffset;
-  for (auto Struct : OffsetsStruct) {
-    if (Struct.LowOffset < MinOffset)
-      MinOffset = Struct.LowOffset;
+  for (auto OffsetStruct : OffsetsStruct) {
+    if (OffsetStruct.LowOffset < MinOffset)
+      MinOffset = OffsetStruct.LowOffset;
   }
   subscribeConsumeAtOffset(TopicName, MinOffset);
 }
