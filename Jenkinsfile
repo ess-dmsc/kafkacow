@@ -176,7 +176,7 @@ def docker_release(image_key){
          ls
         ./createAppImage.sh
         """
-        sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT "$project"}\""
+        sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
     } catch (e) {
         failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
     }
