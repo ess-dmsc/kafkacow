@@ -29,11 +29,17 @@ then
 fi
 
 
-echo 'current path:'
-echo "$PWD"
-cd kafkacow.AppDir/usr
-echo 'current path:'
+echo '.................current path:'
 echo "$PWD"
 ls
-
+cd kafkacow.AppDir
+echo '.................current path:'
+echo "$PWD"
+ls
+cd usr
+echo '.................current path:'
+echo "$PWD"
+ls
+cd ..
+cd ..
 ./AppImageAssistant kafkacow.AppDir ./kafkacow-image.AppImage
