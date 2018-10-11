@@ -1,6 +1,5 @@
  #!/bin/bash
 echo "THIS IS an AppImage creator"
-cd ..
 BASELONGNAME=$(pwd)
 echo 'THIS IS **base long name'
 echo "$BASELONGNAME"
@@ -19,12 +18,12 @@ cd ..
 curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppImageAssistant --output AppImageAssistant
 chmod a+x AppImageAssistant
 
-mv $DIR/AppImageResources/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
-mv $DIR/AppImageResources/icon.png $BASELONGNAME/kafkacow.AppDir
+mv $BASELONGNAME/AppImageResources/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
+mv $BASELONGNAME/AppImageResources/icon.png $BASELONGNAME/kafkacow.AppDir
 
-if [ -f "$$BASELONGNAME/kafkacow-image.AppImage" ];
+if [ -f "$BASELONGNAME/kafkacow-image.AppImage" ];
 then
     printf '%s\n' "Overwriting image..."
-    rm -rf "$$BASELONGNAME/kafkacow-image.AppImage"
+    rm -rf "$BASELONGNAME/kafkacow-image.AppImage"
 fi
 ./AppImageAssistant kafkacow.AppDir ./kafkacow-image.AppImage
