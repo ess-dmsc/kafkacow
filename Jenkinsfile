@@ -165,10 +165,9 @@ def docker_release(image_key){
     try {
         def custom_sh = images[image_key]['sh']
         def MYSCRIPT = """
-
         echo 'THIS IS ** docker_release'
         echo "$project"
-        echo 'THIS IS ^^ project's path'
+        echo 'THIS IS project path'
         ./$project/kafkacow/createAppImage "$project"
         """
          sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
