@@ -163,13 +163,14 @@ def docker_formatting(image_key) {
 
 def docker_release(image_key){
     try {
-       def MYSCRIPT = """
+        def custom_sh = images[image_key]['sh']
+        def MYSCRIPT = """
 
         echo 'THIS IS ** docker_release'
-         echo "$image_key"
+        echo "$image_key"
 
         """
-         sh "${MYSCRIPT}"
+         sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
     } catch (e) {
         failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
     }
