@@ -166,18 +166,24 @@ def docker_release(image_key){
         def custom_sh = images[image_key]['sh']
         def MYSCRIPT = """
         echo 'THIS IS ** docker_release'
-        echo "$project"
-        echo 'THIS IS project path'
-        echo "$PWD"
-         echo 'THIS IS long path'
-         echo "${container_name(image_key)}"
-         echo 'THIS IS container name'
+
+         echo 'current path:'
+         echo "$PWD"
          ls
          cd kafkacow
+         echo 'current path:'
+                  echo "$PWD"
          ls
         ./createAppImage.sh
         """
          sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
+        cd ..
+        echo 'current path:'
+                          echo "$PWD"
+        cd kafkacow.AppDir/usr
+        echo 'current path:'
+                          echo "$PWD"
+        ls
     } catch (e) {
         failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
     }
