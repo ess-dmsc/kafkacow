@@ -43,8 +43,4 @@ ls
 cd ..
 cd ..
 
-apt install fuse
-modprobe fuse
-groupadd fuse
-
-./AppImageAssistant kafkacow.AppDir kafkacow.AppImage
+./AppImageAssistant kafkacow.AppDir "$1.AppImage"
