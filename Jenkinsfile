@@ -177,16 +177,6 @@ def docker_release(image_key){
         ./createAppImage.sh
         """
         sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
-        def finishing_script= """
-        cd ..
-        echo 'current path:'
-        echo "$PWD"
-        cd kafkacow.AppDir/usr
-        echo 'current path:'
-        echo "$PWD"
-        ls
-        """
-        sh finishing_script
     } catch (e) {
         failure_function(e, "Check formatting step for (${container_name(image_key)}) failed")
     }

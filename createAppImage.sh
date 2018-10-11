@@ -28,3 +28,9 @@ then
     rm -rf "$BASELONGNAME/kafkacow-image.AppImage"
 fi
 
+echo 'current path:'
+echo "$PWD"
+cd kafkacow.AppDir/usr
+echo 'current path:'
+echo "$PWD"
+ls
