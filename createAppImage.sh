@@ -19,8 +19,8 @@ cd ..
 curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppImageAssistant --output AppImageAssistant
 chmod a+x AppImageAssistant
 
-mv $DIR/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
-mv $DIR/icon.png $BASELONGNAME/kafkacow.AppDir
+mv $DIR/AppImageResources/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
+mv $DIR/AppImageResources/icon.png $BASELONGNAME/kafkacow.AppDir
 
 if [ -f "$$BASELONGNAME/kafkacow-image.AppImage" ];
 then
