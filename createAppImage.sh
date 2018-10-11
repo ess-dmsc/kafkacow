@@ -2,6 +2,8 @@
 echo "THIS IS an AppImage creator"
 cd ..
 BASELONGNAME=$(pwd)
+echo 'THIS IS **base long name'
+echo "$BASELONGNAME"
 DIR="$BASELONGNAME/kafkacow.AppDir/usr"
 if [ -d $DIR ]; 
 then
