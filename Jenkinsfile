@@ -168,7 +168,14 @@ def docker_release(image_key){
         echo 'THIS IS ** docker_release'
         echo "$project"
         echo 'THIS IS project path'
-        ./$project/createAppImage
+        echo "$PWD"
+         echo 'THIS IS long path'
+         echo "${container_name(image_key)}"
+         echo 'THIS IS container name'
+         ls
+         cd kafkacow
+         ls
+        ./createAppImage.sh
         """
          sh "docker exec ${container_name(image_key)} ${custom_sh} -c \"${MYSCRIPT}\""
     } catch (e) {
