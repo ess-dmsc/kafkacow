@@ -5,10 +5,10 @@ BASELONGNAME=$(pwd)
 echo 'THIS IS **base long name'
 echo "$BASELONGNAME"
 DIR="$BASELONGNAME/kafkacow.AppDir/usr"
-if [ -d $DIR ]; 
+if [ -d $BASELONGNAME/kafkacow.AppDir ];
 then
-    printf '%s\n' "Overwriting directory($DIR)"
-    rm -rf $DIR
+    printf '%s\n' "Overwriting directory($BASELONGNAME/kafkacow.AppDir)"
+    rm -rf $BASELONGNAME/kafkacow.AppDir
 fi
 mkdir -p "$DIR";
 cp -r "$BASELONGNAME/build/." "$DIR"
@@ -19,8 +19,8 @@ cd ..
 curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppImageAssistant --output AppImageAssistant
 chmod a+x AppImageAssistant
 
-mv $BASELONGNAME/kafkacow/AppImageResources/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
-mv $BASELONGNAME/kafkacow/AppImageResources/icon.png $BASELONGNAME/kafkacow.AppDir
+mv $BASELONGNAME/build/kafkacow.desktop $BASELONGNAME/kafkacow.AppDir
+mv $BASELONGNAME/build/icon.png $BASELONGNAME/kafkacow.AppDir
 
 if [ -f "$BASELONGNAME/kafkacow-image.AppImage" ];
 then
@@ -43,4 +43,4 @@ ls
 cd ..
 cd ..
 
-./AppImageAssistant kafkacow.AppDir "$1.AppImage"
+./AppImageAssistant kafkacow.AppDir kafkacow.AppImage
