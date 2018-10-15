@@ -18,7 +18,7 @@ ConnectKafkaFake::getTopicsHighAndLowOffsets(const std::string &Topic) {
 
   std::vector<OffsetsStruct> VectorOfPartitions;
 
-  if(Topic!="EmptyTopic") {
+  if (Topic != "EmptyTopic") {
     OffsetsStruct FirstPartition = {1234, 12345, 0};
     OffsetsStruct SecondPartition{2234, 22345, 1};
     OffsetsStruct ThirdPartition = getPartitionHighAndLowOffsets(Topic, 3);
