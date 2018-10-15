@@ -191,7 +191,7 @@ TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
-  UserArguments.OffsetToStart = 12344;
+  UserArguments.OffsetToStart = 22343;
   UserArguments.GoBack = 5;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
