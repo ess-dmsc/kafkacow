@@ -125,15 +125,15 @@ TEST(RequestHandlerTest, display_all_metadata) {
 
 // consumer mode argument test
 
-TEST(RequestHandlerTest, both_goback_and_offsettostart_specified_error) {
+TEST(RequestHandlerTest,
+     display_range_when_both_goback_and_offsettostart_specified) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1234;
-  UserArguments.GoBack = 1234;
+  UserArguments.GoBack = 2;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
-  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
-               ArgumentsException);
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
 TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
