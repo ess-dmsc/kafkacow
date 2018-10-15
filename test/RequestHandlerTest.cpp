@@ -175,3 +175,45 @@ TEST(RequestHandlerTest,
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
+
+TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = 1233;
+  UserArguments.GoBack = 2;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
+               ArgumentsException);
+}
+
+TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = 12344;
+  UserArguments.GoBack = 5;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
+               ArgumentsException);
+}
+
+TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
+               ArgumentsException);
+}
+
+TEST(RequestHandlerTest, throw_error_if_topic_empty) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.Name = "EmptyTopic";
+  UserArguments.GoBack = 5;
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
+               ArgumentsException);
+}
