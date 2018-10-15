@@ -107,7 +107,7 @@ void RequestHandler::checkMetadataModeArguments(
 /// \param Offset
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
-  if (!verifyOffset(Offset, TopicName))
+  if (verifyOffset(Offset, TopicName))
     throw ArgumentsException("Offset not valid!");
 
   int EOFPartitionCounter = 0;
