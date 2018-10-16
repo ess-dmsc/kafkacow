@@ -10,19 +10,19 @@ Client runs once and presents data as requested:
 ```
 bin/kafkacow -h
 
-Options:  
-     -h,--help                   Print this help message and exit
-     -g,--go INT                 How many records back to show from partition "-p". Mutually exclusive with "--Offset"
-     -t,--topic TEXT             Show records of specified topic
-     -b,--broker TEXT            Hostname or IP of Kafka broker
-     -o,--offset INT             Start consuming from an offset. Otherwise print entire topic. Mutually exclusive with "--go"
-     -p,--partition INT          Partition to get messages from
-     -i,--indentation INT        Number of spaces used as indentation. Range 0 - 20. 4 by default.
-     -a,--all                    Show a list of topics. To be used in "-L" mode.
-     -C,--consumer               Run the program in the consumer mode
-     -L,--list                   Metadata mode. Show all topics and partitions. If "-t" specified, shows partition offsets.
-     -E,--entire                 Show all records of a message(truncated by default)
-     -c,--config_file TEXT       Read configuration from an ini file
+Options:
+  -h,--help                   Print this help message and exit
+  -C,--consumer               Run the program in the consumer mode.
+  -L,--list                   Metadata mode. Show all topics and partitions. If "-t" specified, shows partition offsets.
+  -b,--broker TEXT            Hostname or IP of Kafka broker.
+  -t,--topic TEXT             Show records of specified topic.
+  -p,--partition INT          Partition to get messages from.
+  -g,--go INT                 How many records back to show from partition "-p". To display range of messages combine with "-o" as lower offset.
+  -o,--offset INT             Start consuming from an offset. Combine with "-g" to display range of messages with "-o" as lower offset.
+  -i,--indentation INT        Number of spaces used as indentation. Range 0 - 20. 4 by default.
+  -a,--all                    Show a list of topics. To be used in "-L" mode.
+  -e,--entire                 Show all records of a message(truncated by default).
+  -c,--config-file TEXT       Read configuration from an ini file.
   ```
   
   #### Usage example
@@ -34,6 +34,11 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   Show list of all topics from broker hinata.isis.cclrc.ac.uk:9092:
   ```
  bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -L -a
+  ```
+  
+  Starting at offset 1500 show 10 messages from topic MULTIPART_events from broker hinata.isis.cclrc.ac.uk:9092:
+  ```
+  bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -t MULTIPART_events -o 1500 -g 10
   ```
   
   ## Install

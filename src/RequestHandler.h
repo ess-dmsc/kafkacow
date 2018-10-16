@@ -30,20 +30,24 @@ public:
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages, int Partition);
 
+  void subscribeConsumeRange(const int64_t &Offset,
+                             const int64_t &NumberOfMessages,
+                             const int &Partition,
+                             const std::string &TopicName);
+
 private:
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
+  const std::string SchemaPath;
+  
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-
-  std::shared_ptr<spdlog::logger> Logger;
-  UserArgumentStruct UserArguments;
-  const std::string SchemaPath;
-
-  void verifyOffset(const int64_t Offset, const std::string TopicName);
+  bool verifyOffset(const int64_t Offset, const std::string TopicName);
   void verifyNLast(const int64_t NLast, const std::string TopicName,
                    const int16_t Partition);
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
+  void printEntireTopic(const std::string &TopicName);
+  void checkIfTopicEmpty(const std::string &TopicName);
 };
