@@ -29,6 +29,11 @@ public:
   void subscribeConsumeNLastMessages(std::string TopicName,
                                      int64_t NumberOfMessages, int Partition);
 
+  void subscribeConsumeRange(const int64_t &Offset,
+                             const int64_t &NumberOfMessages,
+                             const int &Partition,
+                             const std::string &TopicName);
+
 private:
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
@@ -36,7 +41,7 @@ private:
   void consumePartitions(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  void verifyOffset(const int64_t Offset, const std::string TopicName);
+  bool verifyOffset(const int64_t Offset, const std::string TopicName);
   void verifyNLast(const int64_t NLast, const std::string TopicName,
                    const int16_t Partition);
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);

@@ -23,14 +23,14 @@ int main(int argc, char **argv) {
                  "Show records of specified topic.");
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
                  "Partition to get messages from.");
-  App.add_option(
-         "-g, --go", UserArguments.GoBack,
-         "How many records back to show from partition \"-p\". Mutually "
-         "exclusive with \"--Offset\".")
+  App.add_option("-g, --go", UserArguments.GoBack,
+                 "How many records back to show from partition \"-p\". To "
+                 "display range of messages combine with \"-o\" as lower "
+                 "offset.")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
-  App.add_option(
-         "-o,--offset", UserArguments.OffsetToStart,
-         "Start consuming from an offset. Mutually exclusive with \"--go\"")
+  App.add_option("-o,--offset", UserArguments.OffsetToStart,
+                 "Start consuming from an offset. Combine with \"-g\" to "
+                 "display range of messages with \"-o\" as lower offset.")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
   App.add_option(
          "-i,--indentation", UserArguments.Indentation,
