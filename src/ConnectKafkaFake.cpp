@@ -10,6 +10,9 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
   KafkaMessageMetadataStruct DataToReturn;
   DataToReturn.Payload = "HiddenSecretMessageFromLovingNeutron";
   DataToReturn.PartitionEOF = true;
+  DataToReturn.Timestamp = 1542098662626;
+  DataToReturn.Offset = 1234;
+  DataToReturn.Partition = 0;
   return DataToReturn;
 }
 

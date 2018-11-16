@@ -4,6 +4,7 @@
 #include <chrono>
 #include <date/date.h>
 #include <fmt/format.h>
+#include <sstream>
 #include <time.h>
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
@@ -71,8 +72,9 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
          MessagesCounter <= NumberOfMessages) {
-    KafkaMessageMetadataStruct MessageData;
+
     try {
+      KafkaMessageMetadataStruct MessageData;
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
@@ -124,8 +126,8 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
-    KafkaMessageMetadataStruct MessageData;
     try {
+      KafkaMessageMetadataStruct MessageData;
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
@@ -170,8 +172,8 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   FlatbuffersTranslator FlatBuffers;
 
   while (EOFPartitionCounter < 1) {
-    KafkaMessageMetadataStruct MessageData;
     try {
+      KafkaMessageMetadataStruct MessageData;
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
