@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ArgumentsException.h"
 #include "ConnectKafkaInterface.h"
+#include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
@@ -47,4 +47,5 @@ private:
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
   void printEntireTopic(const std::string &TopicName);
   void checkIfTopicEmpty(const std::string &TopicName);
+  std::string timestampToReadable(const int64_t &Timestamp);
 };

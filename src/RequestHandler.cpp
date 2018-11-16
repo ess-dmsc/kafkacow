@@ -1,6 +1,7 @@
 #include "RequestHandler.h"
-#include "ArgumentsException.h"
+#include "CustomExceptions.h"
 #include "JSONPrinting.h"
+#include <chrono>
 #include <fmt/format.h>
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
@@ -17,7 +18,7 @@ void RequestHandler::checkAndRun() {
     checkMetadataModeArguments(UserArguments);
   // no MetadataMode or ConsumerMode chosen
   else
-    throw ArgumentsException(
+    throw ArgumentException(
         "Program can run in one and only one mode: --consumer or --metadata");
 }
 
@@ -29,7 +30,7 @@ void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.Name.empty()) {
-    throw ArgumentsException("Please specify topic!");
+    throw ArgumentException("Please specify topic!");
   }
   checkIfTopicEmpty(UserArguments.Name);
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
@@ -55,9 +56,9 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
                                            const int &Partition,
                                            const std::string &TopicName) {
   if (verifyOffset(Offset, TopicName))
-    throw ArgumentsException("Lower offset not valid!");
+    throw ArgumentException("Lower offset not valid!");
   if (verifyOffset(Offset + NumberOfMessages, TopicName))
-    throw ArgumentsException("Cannot show that many messages!");
+    throw ArgumentException("Cannot show that many messages!");
 
   int EOFPartitionCounter = 0;
   int NumberOfPartitions =
@@ -68,10 +69,15 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
          MessagesCounter <= NumberOfMessages) {
-    KafkaMessageMetadataStruct MessageData;
-    MessageData = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    MessagesCounter++;
+
+    try {
+      KafkaMessageMetadataStruct MessageData;
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
+    }
   }
 }
 
@@ -84,7 +90,7 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
       EmptyTopic = false;
   }
   if (EmptyTopic)
-    throw ArgumentsException("Topic is empty!");
+    throw ArgumentException("Topic is empty!");
 }
 
 /// Analyzes user arguments to determine which metadata mode functionality to
@@ -108,7 +114,7 @@ void RequestHandler::checkMetadataModeArguments(
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
   if (verifyOffset(Offset, TopicName))
-    throw ArgumentsException("Offset not valid!");
+    throw ArgumentException("Offset not valid!");
 
   int EOFPartitionCounter = 0;
   int NumberOfPartitions =
@@ -117,9 +123,14 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
-    KafkaMessageMetadataStruct MessageData;
-    MessageData = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    try {
+      KafkaMessageMetadataStruct MessageData;
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
+    }
   }
 }
 
@@ -156,11 +167,16 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
   FlatbuffersTranslator FlatBuffers;
-  KafkaMessageMetadataStruct MessageData;
-  while (EOFPartitionCounter < 1) {
 
-    MessageData = KafkaConnection->consumeLastNMessages();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+  while (EOFPartitionCounter < 1) {
+    try {
+      KafkaMessageMetadataStruct MessageData;
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
+    }
   }
 }
 
@@ -176,7 +192,7 @@ void RequestHandler::verifyNLast(const int64_t NLast,
   OffsetsStruct Struct =
       KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
   if (Struct.HighOffset - Struct.LowOffset < NLast)
-    throw ArgumentsException("Cannot display that many messages!");
+    throw ArgumentException("Cannot display that many messages!");
 }
 
 /// Prints to screen a list of partitions' IDs and their low/high offsets.
@@ -221,10 +237,11 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
 /// \param MessageData
 void RequestHandler::printMessageMetadata(
     KafkaMessageMetadataStruct &MessageData) {
-  std::cout << fmt::format("\n{:_>67}{:>67}\nTimestamp: {:>11} || PartitionID: "
-                           "{:>5} || Offset: {:>7}\n",
-                           "\n", "|", MessageData.Timestamp,
-                           MessageData.Partition, MessageData.Offset);
+  std::cout << fmt::format(
+      "\n{:_>67}{}{:>39}\n\nTimestamp: {:>11} || PartitionID: "
+      "{:>5} || Offset: {:>7}\n",
+      "\n", MessageData.TimestampISO, "|", MessageData.Timestamp,
+      MessageData.Partition, MessageData.Offset);
 }
 
 /// Calculates topic's lowest offset and subscribes to it to print the entire
@@ -240,4 +257,15 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
       MinOffset = OffsetStruct.LowOffset;
   }
   subscribeConsumeAtOffset(TopicName, MinOffset);
+}
+
+std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
+  using namespace std;
+  time_t Seconds = Timestamp / 1000;
+  ctime(&Seconds);
+  istringstream iss(asctime(localtime(&Seconds)));
+  vector<string> tokens{istream_iterator<string>{iss},
+                        istream_iterator<string>{}};
+  return fmt::format("{} {}-{}-{} {}::{}", tokens[0], tokens[2], tokens[1],
+                     tokens[4], tokens[3], Timestamp % 1000);
 }

@@ -12,9 +12,7 @@ public:
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consumeFromOffset() override;
-
-  KafkaMessageMetadataStruct consumeLastNMessages() override;
+  KafkaMessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;

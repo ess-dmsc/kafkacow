@@ -1,4 +1,5 @@
 #include "ConnectKafka.h"
+#include "CustomExceptions.h"
 #include "KafkaMessageMetadataStruct.h"
 #include <iomanip>
 
@@ -83,7 +84,7 @@ std::string ConnectKafka::getAllTopics() {
 /// Consumes Kafka messages starting from specified offset.
 ///
 /// \return struct containg serialized message and its metadata.
-KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
+KafkaMessageMetadataStruct ConnectKafka::consume() {
   using RdKafka::Message;
   KafkaMessageMetadataStruct DataToReturn;
 
@@ -109,7 +110,9 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
     break;
 
   case RdKafka::ERR__TIMED_OUT:
-    break;
+    throw TimeoutException(
+        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
+                    RdKafka::err2str(KafkaMsg->err())));
   case RdKafka::ERR__PARTITION_EOF:
     DataToReturn.PartitionEOF = true;
     // Not errors as the broker might come back or more data might be pushed
@@ -205,10 +208,6 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
-}
-
-KafkaMessageMetadataStruct ConnectKafka::consumeLastNMessages() {
-  return consumeFromOffset();
 }
 
 /// Subscribes to a specified Partition of a Topic to get last NMessages.

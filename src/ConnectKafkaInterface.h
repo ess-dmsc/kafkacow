@@ -10,8 +10,7 @@ class ConnectKafkaInterface {
 public:
   virtual std::string getAllTopics() = 0;
 
-  virtual KafkaMessageMetadataStruct consumeFromOffset() = 0;
-  virtual KafkaMessageMetadataStruct consumeLastNMessages() = 0;
+  virtual KafkaMessageMetadataStruct consume() = 0;
 
   virtual std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) = 0;

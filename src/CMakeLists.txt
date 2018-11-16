@@ -6,7 +6,7 @@ add_executable(kafkacow main.cpp
         ConnectKafkaInterface.h
         ConnectKafkaFake.cpp
         ConnectKafkaFake.h
-        ArgumentsException.h
+        CustomExceptions.h
         UserArgumentsStruct.h
         OffsetsStruct.h
         TopicMetadataStruct.h
