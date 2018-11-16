@@ -47,4 +47,5 @@ private:
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
   void printEntireTopic(const std::string &TopicName);
   void checkIfTopicEmpty(const std::string &TopicName);
+  std::string timestampToReadable(const int64_t &Timestamp);
 };

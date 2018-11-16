@@ -9,4 +9,5 @@ struct KafkaMessageMetadataStruct {
   int32_t Partition;
   std::string Payload;
   bool PartitionEOF = false;
+  std::string TimestampISO;
 };

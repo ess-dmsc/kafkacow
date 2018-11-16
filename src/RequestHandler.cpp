@@ -1,7 +1,10 @@
 #include "RequestHandler.h"
 #include "ArgumentsException.h"
 #include "JSONPrinting.h"
+#include <chrono>
+#include <date/date.h>
 #include <fmt/format.h>
+#include <time.h>
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
 /// calls method responsible for handling one of the modes or throws
@@ -69,9 +72,13 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
   while (EOFPartitionCounter < NumberOfPartitions &&
          MessagesCounter <= NumberOfMessages) {
     KafkaMessageMetadataStruct MessageData;
-    MessageData = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    MessagesCounter++;
+    try {
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (std::exception &exception) {
+      std::cout << exception.what() << std::endl;
+    }
   }
 }
 
@@ -118,8 +125,13 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
   FlatbuffersTranslator FlatBuffers;
   while (EOFPartitionCounter < NumberOfPartitions) {
     KafkaMessageMetadataStruct MessageData;
-    MessageData = KafkaConnection->consumeFromOffset();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    try {
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (std::exception &exception) {
+      std::cout << exception.what() << std::endl;
+    }
   }
 }
 
@@ -156,11 +168,16 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
   FlatbuffersTranslator FlatBuffers;
-  KafkaMessageMetadataStruct MessageData;
-  while (EOFPartitionCounter < 1) {
 
-    MessageData = KafkaConnection->consumeLastNMessages();
-    consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+  while (EOFPartitionCounter < 1) {
+    KafkaMessageMetadataStruct MessageData;
+    try {
+      MessageData = KafkaConnection->consume();
+      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
+    } catch (std::exception &exception) {
+      std::cout << exception.what() << std::endl;
+    }
   }
 }
 
@@ -221,10 +238,11 @@ void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
 /// \param MessageData
 void RequestHandler::printMessageMetadata(
     KafkaMessageMetadataStruct &MessageData) {
-  std::cout << fmt::format("\n{:_>67}{:>67}\nTimestamp: {:>11} || PartitionID: "
-                           "{:>5} || Offset: {:>7}\n",
-                           "\n", "|", MessageData.Timestamp,
-                           MessageData.Partition, MessageData.Offset);
+  std::cout << fmt::format(
+      "\n{:_>67}{}{:>39}\n\nTimestamp: {:>11} || PartitionID: "
+      "{:>5} || Offset: {:>7}\n",
+      "\n", MessageData.TimestampISO, "|", MessageData.Timestamp,
+      MessageData.Partition, MessageData.Offset);
 }
 
 /// Calculates topic's lowest offset and subscribes to it to print the entire
@@ -240,4 +258,11 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
       MinOffset = OffsetStruct.LowOffset;
   }
   subscribeConsumeAtOffset(TopicName, MinOffset);
+}
+
+std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
+  std::stringstream ss;
+  date::operator<<(ss,
+                   date::sys_seconds{std::chrono::seconds(Timestamp / 1000)});
+  return fmt::format("{}::{} {}", ss.str(), Timestamp % 1000, "UTC");
 }
