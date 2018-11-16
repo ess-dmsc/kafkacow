@@ -1,5 +1,5 @@
 #include "ConnectKafka.h"
-#include "ArgumentsException.h"
+#include "CustomExceptions.h"
 #include "KafkaMessageMetadataStruct.h"
 #include <iomanip>
 
@@ -110,10 +110,9 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
     break;
 
   case RdKafka::ERR__TIMED_OUT:
-    throw ArgumentsException(
-        fmt::format("ohgod KafkaTopicSubscriber::consumeMessage() - {}",
+    throw TimeoutException(
+        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
                     RdKafka::err2str(KafkaMsg->err())));
-  //    break;
   case RdKafka::ERR__PARTITION_EOF:
     DataToReturn.PartitionEOF = true;
     // Not errors as the broker might come back or more data might be pushed

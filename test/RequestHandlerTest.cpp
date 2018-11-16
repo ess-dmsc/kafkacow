@@ -1,6 +1,6 @@
-#include "../src/ArgumentsException.h"
 #include "../src/ConnectKafkaFake.h"
 #include "../src/ConnectKafkaInterface.h"
+#include "../src/CustomExceptions.h"
 #include "../src/FlatbuffersTranslator.h"
 #include "../src/RequestHandler.h"
 #include <boost/filesystem.hpp>
@@ -17,7 +17,7 @@ TEST(RequestHandlerTest,
 
   EXPECT_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
                    "ExampleTestTopic", 100, 1),
-               ArgumentsException);
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
@@ -37,7 +37,7 @@ TEST(RequestHandlerTest,
 
   EXPECT_THROW(
       NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100),
-      ArgumentsException);
+      ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
@@ -89,7 +89,7 @@ TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
   UserArguments.ConsumerMode = false;
   UserArguments.MetadataMode = false;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
-  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentsException);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
 
 // metadata mode arguments test
@@ -157,7 +157,7 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
   std::string message;
   try {
     NewRequestHandler.checkAndRun();
-  } catch (ArgumentsException &exception) {
+  } catch (ArgumentException &exception) {
     message = exception.what();
   }
   EXPECT_EQ(
@@ -184,7 +184,7 @@ TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
   UserArguments.GoBack = 2;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
-               ArgumentsException);
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
@@ -195,7 +195,7 @@ TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
   UserArguments.GoBack = 5;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
-               ArgumentsException);
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
@@ -204,7 +204,7 @@ TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
-               ArgumentsException);
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_if_topic_empty) {
@@ -215,5 +215,5 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
   UserArguments.GoBack = 5;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
-               ArgumentsException);
+               ArgumentException);
 }

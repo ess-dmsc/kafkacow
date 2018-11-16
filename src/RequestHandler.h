@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ArgumentsException.h"
 #include "ConnectKafkaInterface.h"
+#include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>

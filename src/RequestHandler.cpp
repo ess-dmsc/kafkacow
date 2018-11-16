@@ -1,5 +1,5 @@
 #include "RequestHandler.h"
-#include "ArgumentsException.h"
+#include "CustomExceptions.h"
 #include "JSONPrinting.h"
 #include <chrono>
 #include <fmt/format.h>
@@ -18,7 +18,7 @@ void RequestHandler::checkAndRun() {
     checkMetadataModeArguments(UserArguments);
   // no MetadataMode or ConsumerMode chosen
   else
-    throw ArgumentsException(
+    throw ArgumentException(
         "Program can run in one and only one mode: --consumer or --metadata");
 }
 
@@ -30,7 +30,7 @@ void RequestHandler::checkConsumerModeArguments(
     UserArgumentStruct UserArguments) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.Name.empty()) {
-    throw ArgumentsException("Please specify topic!");
+    throw ArgumentException("Please specify topic!");
   }
   checkIfTopicEmpty(UserArguments.Name);
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
@@ -56,9 +56,9 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
                                            const int &Partition,
                                            const std::string &TopicName) {
   if (verifyOffset(Offset, TopicName))
-    throw ArgumentsException("Lower offset not valid!");
+    throw ArgumentException("Lower offset not valid!");
   if (verifyOffset(Offset + NumberOfMessages, TopicName))
-    throw ArgumentsException("Cannot show that many messages!");
+    throw ArgumentException("Cannot show that many messages!");
 
   int EOFPartitionCounter = 0;
   int NumberOfPartitions =
@@ -75,8 +75,8 @@ void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (std::exception &exception) {
-      std::cout << exception.what() << std::endl;
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
     }
   }
 }
@@ -90,7 +90,7 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
       EmptyTopic = false;
   }
   if (EmptyTopic)
-    throw ArgumentsException("Topic is empty!");
+    throw ArgumentException("Topic is empty!");
 }
 
 /// Analyzes user arguments to determine which metadata mode functionality to
@@ -114,7 +114,7 @@ void RequestHandler::checkMetadataModeArguments(
 void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
                                               int64_t Offset) {
   if (verifyOffset(Offset, TopicName))
-    throw ArgumentsException("Offset not valid!");
+    throw ArgumentException("Offset not valid!");
 
   int EOFPartitionCounter = 0;
   int NumberOfPartitions =
@@ -128,8 +128,8 @@ void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (std::exception &exception) {
-      std::cout << exception.what() << std::endl;
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
     }
   }
 }
@@ -174,8 +174,8 @@ void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
       MessageData = KafkaConnection->consume();
       MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
       consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (std::exception &exception) {
-      std::cout << exception.what() << std::endl;
+    } catch (TimeoutException &Exception) {
+      std::cout << Exception.what() << std::endl;
     }
   }
 }
@@ -192,7 +192,7 @@ void RequestHandler::verifyNLast(const int64_t NLast,
   OffsetsStruct Struct =
       KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
   if (Struct.HighOffset - Struct.LowOffset < NLast)
-    throw ArgumentsException("Cannot display that many messages!");
+    throw ArgumentException("Cannot display that many messages!");
 }
 
 /// Prints to screen a list of partitions' IDs and their low/high offsets.

@@ -1,5 +1,5 @@
 #include "FlatbuffersTranslator.h"
-#include "ArgumentsException.h"
+#include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
 #include <iostream>
 
