@@ -2,10 +2,7 @@
 #include "ArgumentsException.h"
 #include "JSONPrinting.h"
 #include <chrono>
-#include <date/date.h>
 #include <fmt/format.h>
-#include <sstream>
-#include <time.h>
 
 /// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
 /// calls method responsible for handling one of the modes or throws
@@ -263,8 +260,12 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
 }
 
 std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
-  std::stringstream ss;
-  date::operator<<(ss,
-                   date::sys_seconds{std::chrono::seconds(Timestamp / 1000)});
-  return fmt::format("{}::{} {}", ss.str(), Timestamp % 1000, "UTC");
+  using namespace std;
+  time_t Seconds = Timestamp / 1000;
+  ctime(&Seconds);
+  istringstream iss(asctime(localtime(&Seconds)));
+  vector<string> tokens{istream_iterator<string>{iss},
+                        istream_iterator<string>{}};
+  return fmt::format("{} {}-{}-{} {}::{}", tokens[0], tokens[2], tokens[1],
+                     tokens[4], tokens[3], Timestamp % 1000);
 }

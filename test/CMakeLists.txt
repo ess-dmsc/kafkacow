@@ -16,5 +16,4 @@ target_link_libraries(UnitTests
         CONAN_PKG::FlatBuffers
         CONAN_PKG::spdlog
         CONAN_PKG::yaml-cpp
-        CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::date)
+        CONAN_PKG::jsonformoderncpp)

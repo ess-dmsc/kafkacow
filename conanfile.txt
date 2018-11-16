@@ -10,7 +10,6 @@ spdlog/1.1.0@bincrafters/stable
 yaml-cpp/ee99c41@ess-dmsc/stable
 jsonformoderncpp/3.2.0@vthiery/stable
 fmt/5.1.0@bincrafters/stable
-date/4b46deb@ess-dmsc/stable
 
 
 [generators]
