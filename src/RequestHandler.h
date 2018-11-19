@@ -25,20 +25,19 @@ public:
 
   void showTopicPartitionOffsets(UserArgumentStruct UserArguments);
 
-  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset);
-  void subscribeConsumeNLastMessages(std::string TopicName,
-                                     int64_t NumberOfMessages, int Partition);
+  void subscribeAndConsume(std::string TopicName, int64_t Offset);
+  void subscribeAndConsume(std::string TopicName, int64_t NumberOfMessages,
+                           int Partition);
 
-  void subscribeConsumeRange(const int64_t &Offset,
-                             const int64_t &NumberOfMessages,
-                             const int &Partition,
-                             const std::string &TopicName);
+  void subscribeAndConsume(const std::string &TopicName,
+                           const int64_t &NumberOfMessages,
+                           const int &Partition, const int64_t &Offset);
 
 private:
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
-  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
+  void printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
   bool verifyOffset(const int64_t Offset, const std::string TopicName);
@@ -48,4 +47,6 @@ private:
   void printEntireTopic(const std::string &TopicName);
   void checkIfTopicEmpty(const std::string &TopicName);
   std::string timestampToReadable(const int64_t &Timestamp);
+  void consumeSingleMessage(int &EOFPartitionCounter,
+                            FlatbuffersTranslator &FlatBuffers);
 };
