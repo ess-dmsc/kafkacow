@@ -36,47 +36,17 @@ void RequestHandler::checkConsumerModeArguments(
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
     printEntireTopic(UserArguments.Name);
   } else if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
-    subscribeConsumeRange(UserArguments.OffsetToStart, UserArguments.GoBack,
-                          UserArguments.PartitionToConsume, UserArguments.Name);
+    subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+                        UserArguments.PartitionToConsume,
+                        UserArguments.OffsetToStart);
   } else {
     if (UserArguments.OffsetToStart > -2) {
-      subscribeConsumeAtOffset(UserArguments.Name, UserArguments.OffsetToStart);
+      subscribeAndConsume(UserArguments.Name, UserArguments.OffsetToStart);
     } else {
       (UserArguments.PartitionToConsume != -1)
-          ? subscribeConsumeNLastMessages(UserArguments.Name,
-                                          UserArguments.GoBack,
-                                          UserArguments.PartitionToConsume)
+          ? subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+                                UserArguments.PartitionToConsume)
           : Logger->error("Please specify partition");
-    }
-  }
-}
-
-void RequestHandler::subscribeConsumeRange(const int64_t &Offset,
-                                           const int64_t &NumberOfMessages,
-                                           const int &Partition,
-                                           const std::string &TopicName) {
-  if (verifyOffset(Offset, TopicName))
-    throw ArgumentException("Lower offset not valid!");
-  if (verifyOffset(Offset + NumberOfMessages, TopicName))
-    throw ArgumentException("Cannot show that many messages!");
-
-  int EOFPartitionCounter = 0;
-  int NumberOfPartitions =
-      KafkaConnection->getNumberOfTopicPartitions(TopicName);
-
-  KafkaConnection->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers;
-  int MessagesCounter = 0;
-  while (EOFPartitionCounter < NumberOfPartitions &&
-         MessagesCounter <= NumberOfMessages) {
-
-    try {
-      KafkaMessageMetadataStruct MessageData;
-      MessageData = KafkaConnection->consume();
-      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
-      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (TimeoutException &Exception) {
-      std::cout << Exception.what() << std::endl;
     }
   }
 }
@@ -107,33 +77,6 @@ void RequestHandler::checkMetadataModeArguments(
     std::cout << KafkaConnection->showAllMetadata();
 }
 
-/// Subscribes at an offset to a specified TopicName and consumes the data.
-///
-/// \param TopicName
-/// \param Offset
-void RequestHandler::subscribeConsumeAtOffset(std::string TopicName,
-                                              int64_t Offset) {
-  if (verifyOffset(Offset, TopicName))
-    throw ArgumentException("Offset not valid!");
-
-  int EOFPartitionCounter = 0;
-  int NumberOfPartitions =
-      KafkaConnection->getNumberOfTopicPartitions(TopicName);
-
-  KafkaConnection->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers;
-  while (EOFPartitionCounter < NumberOfPartitions) {
-    try {
-      KafkaMessageMetadataStruct MessageData;
-      MessageData = KafkaConnection->consume();
-      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
-      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (TimeoutException &Exception) {
-      std::cout << Exception.what() << std::endl;
-    }
-  }
-}
-
 /// Ensures there are messages to read at offset provided by the user, otherwise
 /// throws an ArgumentsException.
 ///
@@ -151,33 +94,6 @@ bool RequestHandler::verifyOffset(const int64_t Offset,
     }
   }
   return InvalidOffset;
-}
-
-/// Subscribes to NumberOfMessages from Partition of specified TopicName and
-/// consumes the data.
-///
-/// \param TopicName
-/// \param NumberOfMessages
-/// \param Partition
-void RequestHandler::subscribeConsumeNLastMessages(std::string TopicName,
-                                                   int64_t NumberOfMessages,
-                                                   int Partition) {
-  verifyNLast(NumberOfMessages, TopicName, Partition);
-  int EOFPartitionCounter = 0;
-  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
-                                            Partition);
-  FlatbuffersTranslator FlatBuffers;
-
-  while (EOFPartitionCounter < 1) {
-    try {
-      KafkaMessageMetadataStruct MessageData;
-      MessageData = KafkaConnection->consume();
-      MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
-      consumePartitions(MessageData, EOFPartitionCounter, FlatBuffers);
-    } catch (TimeoutException &Exception) {
-      std::cout << Exception.what() << std::endl;
-    }
-  }
 }
 
 /// Checks if there is enough messages to read on a specified partition.
@@ -215,7 +131,7 @@ void RequestHandler::showTopicPartitionOffsets(
 /// \param MessageAndEOF
 /// \param EOFPartitionCounter
 /// \param FlatBuffers
-void RequestHandler::consumePartitions(KafkaMessageMetadataStruct &MessageData,
+void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
@@ -256,7 +172,7 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
     if (OffsetStruct.LowOffset < MinOffset)
       MinOffset = OffsetStruct.LowOffset;
   }
-  subscribeConsumeAtOffset(TopicName, MinOffset);
+  subscribeAndConsume(TopicName, MinOffset);
 }
 
 std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
@@ -268,4 +184,85 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
                         istream_iterator<string>{}};
   return fmt::format("{} {}-{}-{} {}::{}", tokens[0], tokens[2], tokens[1],
                      tokens[4], tokens[3], Timestamp % 1000);
+}
+
+/// Subscribes to NumberOfMessages from Partition of specified TopicName and
+/// consumes the data.
+///
+/// \param TopicName
+/// \param NumberOfMessages
+/// \param Partition
+void RequestHandler::subscribeAndConsume(std::string TopicName,
+                                         int64_t NumberOfMessages,
+                                         int Partition) {
+  verifyNLast(NumberOfMessages, TopicName, Partition);
+  int EOFPartitionCounter = 0;
+  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
+                                            Partition);
+  FlatbuffersTranslator FlatBuffers;
+
+  while (EOFPartitionCounter < 1) {
+    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+  }
+}
+
+/// Subscribes at an offset to a specified TopicName and consumes the data.
+///
+/// \param TopicName
+/// \param Offset
+void RequestHandler::subscribeAndConsume(std::string TopicName,
+                                         int64_t Offset) {
+  if (verifyOffset(Offset, TopicName))
+    throw ArgumentException("Offset not valid!");
+
+  int EOFPartitionCounter = 0;
+  int NumberOfPartitions =
+      KafkaConnection->getNumberOfTopicPartitions(TopicName);
+
+  KafkaConnection->subscribeAtOffset(Offset, TopicName);
+  FlatbuffersTranslator FlatBuffers;
+  while (EOFPartitionCounter < NumberOfPartitions) {
+    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+  }
+}
+
+/// Subscribes to a TopicName and consumes NumberOfMessages from Offset from
+/// specified Partition.
+///
+/// \param TopicName
+/// \param NumberOfMessages
+/// \param Partition
+/// \param Offset
+void RequestHandler::subscribeAndConsume(const std::string &TopicName,
+                                         const int64_t &NumberOfMessages,
+                                         const int &Partition,
+                                         const int64_t &Offset) {
+  if (verifyOffset(Offset, TopicName))
+    throw ArgumentException("Lower offset not valid!");
+  if (verifyOffset(Offset + NumberOfMessages, TopicName))
+    throw ArgumentException("Cannot show that many messages!");
+
+  int EOFPartitionCounter = 0;
+  int NumberOfPartitions =
+      KafkaConnection->getNumberOfTopicPartitions(TopicName);
+
+  KafkaConnection->subscribeAtOffset(Offset, TopicName);
+  FlatbuffersTranslator FlatBuffers;
+  int MessagesCounter = 0;
+  while (EOFPartitionCounter < NumberOfPartitions &&
+         MessagesCounter <= NumberOfMessages) {
+    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+  }
+}
+
+void RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
+                                          FlatbuffersTranslator &FlatBuffers) {
+  try {
+    KafkaMessageMetadataStruct MessageData;
+    MessageData = KafkaConnection->consume();
+    MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+    printKafkaMessage(MessageData, EOFPartitionCounter, FlatBuffers);
+  } catch (TimeoutException &Exception) {
+    std::cout << Exception.what() << std::endl;
+  }
 }

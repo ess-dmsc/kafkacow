@@ -15,9 +15,9 @@ TEST(RequestHandlerTest,
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
 
-  EXPECT_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
-                   "ExampleTestTopic", 100, 1),
-               ArgumentException);
+  EXPECT_THROW(
+      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100, 1),
+      ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
@@ -25,8 +25,8 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
 
-  EXPECT_NO_THROW(NewRequestHandler.subscribeConsumeNLastMessages(
-      "ExampleTestTopic", 1, 1));
+  EXPECT_NO_THROW(
+      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1));
 }
 
 TEST(RequestHandlerTest,
@@ -35,9 +35,8 @@ TEST(RequestHandlerTest,
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
 
-  EXPECT_THROW(
-      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 100),
-      ArgumentException);
+  EXPECT_THROW(NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100),
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
@@ -46,7 +45,7 @@ TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
 
   EXPECT_NO_THROW(
-      NewRequestHandler.subscribeConsumeAtOffset("ExampleTestTopic", 12344));
+      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344));
 }
 
 TEST(RequestHandlerTest, topic_metadata_creation_test) {
