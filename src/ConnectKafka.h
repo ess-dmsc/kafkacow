@@ -44,6 +44,8 @@ private:
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
   std::shared_ptr<spdlog::logger> Logger;
 
+  const RdKafka::TopicMetadata *getTopicMetadata(const std::string &Topic);
+
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
 
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
