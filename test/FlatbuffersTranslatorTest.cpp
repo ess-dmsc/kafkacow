@@ -57,6 +57,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
+  EXPECT_EQ(FileID, "f142");
 }
 
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
