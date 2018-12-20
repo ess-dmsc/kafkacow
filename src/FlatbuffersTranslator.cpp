@@ -8,18 +8,21 @@
 ///
 /// \param Message
 /// \return single string with YAML/JSON message.
-std::string FlatbuffersTranslator::deserializeToYAML(
-    KafkaMessageMetadataStruct MessageData) {
+std::string
+FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
+                                         std::string &FileID) {
   // get the ID from a message
-  std::string FileID = MessageData.Payload.substr(4, 4);
+  FileID = MessageData.Payload.substr(4, 4);
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
     std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
     // if FileID is invalid, assume message is in JSON and return it
-    if (!SchemaFile.first)
+    if (!SchemaFile.first) {
+      FileID = FileID + " (not recognised)";
       return MessageData.Payload;
+    }
 
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.second.c_str(), false, &Schema);

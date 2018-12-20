@@ -1,7 +1,6 @@
 #include "JSONPrinting.h"
 #include <algorithm>
 #include <fmt/format.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
 
@@ -11,7 +10,6 @@
 /// \param JSONMessage
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
-  using std::cout;
   using nlohmann::json;
 
   // convert into valid JSON
@@ -35,7 +33,6 @@ std::string getEntireMessage(const std::string &JSONMessage,
 /// \param JSONMessage
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
-  using std::cout;
   using nlohmann::json;
 
   YAML::Node Node = truncateMessage(JSONMessage);
