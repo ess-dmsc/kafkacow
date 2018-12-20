@@ -68,3 +68,11 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
             MessageMetadata.Payload);
 }
+
+TEST(FlatbuffersTranslatorTest, no_throw_for_short_messages_without_file_identifier) {
+  FlatbuffersTranslator FlatBuffersTranslator;
+  std::string FileID;
+  KafkaMessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = "test";
+  EXPECT_NO_THROW(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID));
+}

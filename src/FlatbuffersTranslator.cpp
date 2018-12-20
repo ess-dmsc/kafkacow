@@ -14,6 +14,8 @@ FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
   // get the ID from a message
   if (MessageData.Payload.size() > 8) {
     FileID = MessageData.Payload.substr(4, 4);
+  } else {
+    FileID.clear();
   }
 
   if (FileIDMap.find(FileID) ==
@@ -63,6 +65,9 @@ FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
 /// path was found, or FALSE and empty string if otherwise.
 std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
+  if (FileID.empty())
+    return std::make_pair(false, "");
+
   boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
