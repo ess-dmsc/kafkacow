@@ -12,7 +12,10 @@ std::string
 FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
                                          std::string &FileID) {
   // get the ID from a message
-  FileID = MessageData.Payload.substr(4, 4);
+  if (MessageData.Payload.size() > 8) {
+    FileID = MessageData.Payload.substr(4, 4);
+  }
+
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
