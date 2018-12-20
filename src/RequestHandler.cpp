@@ -83,7 +83,7 @@ void RequestHandler::checkMetadataModeArguments(
 /// \param Offset
 /// \param TopicName
 bool RequestHandler::verifyOffset(const int64_t Offset,
-                                  const std::string TopicName) {
+                                  const std::string &TopicName) {
   std::vector<OffsetsStruct> Offsets =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
@@ -103,7 +103,7 @@ bool RequestHandler::verifyOffset(const int64_t Offset,
 /// \param TopicName
 /// \param Partition
 void RequestHandler::verifyNLast(const int64_t NLast,
-                                 const std::string TopicName,
+                                 const std::string &TopicName,
                                  const int16_t Partition) {
   OffsetsStruct Struct =
       KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
@@ -135,8 +135,10 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
-    std::string JSONMessage = FlatBuffers.deserializeToYAML(MessageData);
-    printMessageMetadata(MessageData);
+    std::string FileIdentifier;
+    std::string JSONMessage =
+        FlatBuffers.deserializeToYAML(MessageData, FileIdentifier);
+    printMessageMetadata(MessageData, FileIdentifier);
     (UserArguments.ShowEntireMessage)
         ? std::cout << fmt::format(
               "{}", getEntireMessage(JSONMessage, UserArguments.Indentation))
@@ -152,12 +154,13 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
 ///
 /// \param MessageData
 void RequestHandler::printMessageMetadata(
-    KafkaMessageMetadataStruct &MessageData) {
+    KafkaMessageMetadataStruct &MessageData,
+    const std::string &FileIdentifier) {
   std::cout << fmt::format(
       "\n{:_>67}{}{:>39}\n\nTimestamp: {:>11} || PartitionID: "
-      "{:>5} || Offset: {:>7}\n",
+      "{:>5} || Offset: {:>7} || File Identifier: {}\n",
       "\n", MessageData.TimestampISO, "|", MessageData.Timestamp,
-      MessageData.Partition, MessageData.Offset);
+      MessageData.Partition, MessageData.Offset, FileIdentifier);
 }
 
 /// Calculates topic's lowest offset and subscribes to it to print the entire
