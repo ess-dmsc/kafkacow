@@ -8,18 +8,26 @@
 ///
 /// \param Message
 /// \return single string with YAML/JSON message.
-std::string FlatbuffersTranslator::deserializeToYAML(
-    KafkaMessageMetadataStruct MessageData) {
+std::string
+FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
+                                         std::string &FileID) {
   // get the ID from a message
-  std::string FileID = MessageData.Payload.substr(4, 4);
+  if (MessageData.Payload.size() > 8) {
+    FileID = MessageData.Payload.substr(4, 4);
+  } else {
+    FileID.clear();
+  }
+
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
     std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
     // if FileID is invalid, assume message is in JSON and return it
-    if (!SchemaFile.first)
+    if (!SchemaFile.first) {
+      FileID = FileID + " (not recognised)";
       return MessageData.Payload;
+    }
 
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.second.c_str(), false, &Schema);
@@ -57,6 +65,9 @@ std::string FlatbuffersTranslator::deserializeToYAML(
 /// path was found, or FALSE and empty string if otherwise.
 std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
+  if (FileID.empty())
+    return std::make_pair(false, "");
+
   boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {

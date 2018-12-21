@@ -6,8 +6,9 @@
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
 public:
-  static std::string getStringToCompare(std::string Source, std::string Value,
-                                        std::string TimeStamp) {
+  static std::string getStringToCompare(const std::string &Source,
+                                        const std::string &Value,
+                                        const std::string &TimeStamp) {
     std::string ToCompare = R"({
   source_name: ")";
     ToCompare.append(Source);
@@ -51,16 +52,29 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   FlatbuffersTranslator FlatBuffersTranslator;
 
   // Run first time to populate schema map
-  FlatBuffersTranslator.deserializeToYAML(MessageMetadata);
-  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
+  std::string FileID;
+  FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID);
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
+  EXPECT_EQ(FileID, "f142");
 }
 
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
   FlatbuffersTranslator FlatBuffersTranslator;
-  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
+  std::string FileID;
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
             MessageMetadata.Payload);
+}
+
+TEST(FlatbuffersTranslatorTest,
+     no_throw_for_short_messages_without_file_identifier) {
+  FlatbuffersTranslator FlatBuffersTranslator;
+  std::string FileID;
+  KafkaMessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = "test";
+  EXPECT_NO_THROW(
+      FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID));
 }

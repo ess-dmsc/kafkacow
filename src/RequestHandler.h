@@ -40,10 +40,11 @@ private:
   void printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  bool verifyOffset(const int64_t Offset, const std::string TopicName);
-  void verifyNLast(const int64_t NLast, const std::string TopicName,
-                   const int16_t Partition);
-  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
+  bool verifyOffset(int64_t Offset, const std::string &TopicName);
+  void verifyNLast(int64_t NLast, const std::string &TopicName,
+                   int16_t Partition);
+  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData,
+                            const std::string &FileIdentifier);
   void printEntireTopic(const std::string &TopicName);
   void checkIfTopicEmpty(const std::string &TopicName);
   std::string timestampToReadable(const int64_t &Timestamp);
