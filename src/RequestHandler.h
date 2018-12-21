@@ -23,13 +23,14 @@ public:
 
   void showTopicPartitionOffsets(UserArgumentStruct UserArguments);
 
-  void subscribeAndConsume(std::string TopicName, int64_t Offset);
-  void subscribeAndConsume(std::string TopicName, int64_t NumberOfMessages,
-                           int Partition);
+  void subscribeAndConsume(const std::string &TopicName, int64_t Offset,
+                           bool TerminateAtEndOfTopic = false);
+  void subscribeAndConsume(const std::string &TopicName,
+                           int64_t NumberOfMessages, int Partition);
 
   void subscribeAndConsume(const std::string &TopicName,
-                           const int64_t &NumberOfMessages,
-                           const int &Partition, const int64_t &Offset);
+                           int64_t NumberOfMessages, int Partition,
+                           int64_t Offset);
 
 private:
   std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
@@ -47,6 +48,6 @@ private:
   void printEntireTopic(const std::string &TopicName);
   void checkIfTopicEmpty(const std::string &TopicName);
   std::string timestampToReadable(const int64_t &Timestamp);
-  void consumeSingleMessage(int &EOFPartitionCounter,
+  bool consumeSingleMessage(int &EOFPartitionCounter,
                             FlatbuffersTranslator &FlatBuffers);
 };
