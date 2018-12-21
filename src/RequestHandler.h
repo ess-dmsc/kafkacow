@@ -11,11 +11,9 @@ class RequestHandler {
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
-      UserArgumentStruct &UserArguments)
-      : KafkaConnection(std::move(KafkaConnection)) {
-    Logger = spdlog::get("LOG");
-    this->UserArguments = UserArguments;
-  }
+      UserArgumentStruct &UserArguments, std::string FullSchemaPath)
+      : KafkaConnection(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
+        UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
 
   void checkAndRun();
 
@@ -34,9 +32,10 @@ public:
                            const int &Partition, const int64_t &Offset);
 
 private:
+  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
-  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
+  const std::string SchemaPath;
   void printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);

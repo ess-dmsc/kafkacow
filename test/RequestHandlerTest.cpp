@@ -3,6 +3,8 @@
 #include "../src/CustomExceptions.h"
 #include "../src/FlatbuffersTranslator.h"
 #include "../src/RequestHandler.h"
+#include "../src/SchemaPath.h"
+#include "SchemaPathForTest.h"
 #include <boost/filesystem.hpp>
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
@@ -13,7 +15,8 @@ TEST(RequestHandlerTest,
      subscribe_consume_n_last_messages_throws_if_incorrect_arguments_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   EXPECT_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100, 1),
@@ -23,7 +26,8 @@ TEST(RequestHandlerTest,
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1));
@@ -33,7 +37,8 @@ TEST(RequestHandlerTest,
      subscribe_at_an_offset_throws_if_incorrect_arguments_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   EXPECT_THROW(NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100),
                ArgumentException);
@@ -42,7 +47,8 @@ TEST(RequestHandlerTest,
 TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344));
@@ -66,7 +72,8 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   UserArguments.ConsumerMode = true;
   UserArguments.OffsetToStart = 1235;
   UserArguments.Name = "TestTopicName";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
@@ -77,7 +84,8 @@ TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
   UserArgumentStruct UserArguments;
   UserArguments.MetadataMode = true;
   UserArguments.ShowAllTopics = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
 
@@ -87,7 +95,8 @@ TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = false;
   UserArguments.MetadataMode = false;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
 
@@ -98,7 +107,8 @@ TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
   UserArgumentStruct UserArguments;
   UserArguments.Name = "MULTIPART_events";
   UserArguments.ConsumerMode = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
 TEST(RequestHandlerTest, show_all_topics_no_error) {
@@ -106,7 +116,8 @@ TEST(RequestHandlerTest, show_all_topics_no_error) {
 
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments(UserArguments));
 }
 
@@ -115,7 +126,8 @@ TEST(RequestHandlerTest, display_all_metadata) {
 
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = false;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   testing::internal::CaptureStdout();
   NewRequestHandler.checkMetadataModeArguments(UserArguments);
   std::string OutputMessage = testing::internal::GetCapturedStdout();
@@ -131,7 +143,8 @@ TEST(RequestHandlerTest,
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1234;
   UserArguments.GoBack = 2;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
@@ -141,7 +154,8 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
   UserArguments.PartitionToConsume = 1;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
@@ -151,7 +165,8 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
   UserArguments.MetadataMode = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
 
   std::string message;
   try {
@@ -171,7 +186,8 @@ TEST(RequestHandlerTest,
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
   UserArguments.Name = "ExampleTestTopic";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
@@ -181,7 +197,8 @@ TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1233;
   UserArguments.GoBack = 2;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
                ArgumentException);
 }
@@ -192,7 +209,8 @@ TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 22343;
   UserArguments.GoBack = 5;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
                ArgumentException);
 }
@@ -201,7 +219,8 @@ TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
   auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
                ArgumentException);
 }
@@ -212,7 +231,8 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
   UserArgumentStruct UserArguments;
   UserArguments.Name = "EmptyTopic";
   UserArguments.GoBack = 5;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPathForTest());
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
                ArgumentException);
 }

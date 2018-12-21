@@ -7,7 +7,8 @@
 
 class FlatbuffersTranslator {
 public:
-  FlatbuffersTranslator() { Logger = spdlog::get("LOG"); }
+  explicit FlatbuffersTranslator(std::string FullSchemaPath)
+      : SchemaPath(std::move(FullSchemaPath)), Logger(spdlog::get("LOG")) {}
 
   std::string deserializeToYAML(KafkaMessageMetadataStruct MessageData,
                                 std::string &FileID);
@@ -21,6 +22,6 @@ public:
 private:
   // for each FILEID store path to schema file and schema itself
   std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
-  std::string FullPath = "schemas/";
+  std::string SchemaPath;
   std::shared_ptr<spdlog::logger> Logger;
 };

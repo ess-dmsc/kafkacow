@@ -1,6 +1,7 @@
 #include "ConnectKafka.h"
 #include "CustomExceptions.h"
 #include "RequestHandler.h"
+#include "SchemaPath.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
@@ -46,10 +47,15 @@ int main(int argc, char **argv) {
 
   auto Logger = spdlog::stderr_color_mt("LOG");
 
+  const std::string BinDirectory(argv[0]);
+  auto SchemaPath = getSchemaPath(BinDirectory);
+  Logger->debug("Using schemas in: {}", SchemaPath);
+
   CLI11_PARSE(App, argc, argv);
 
   auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments);
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   SchemaPath);
   try {
     NewRequestHandler.checkAndRun();
   } catch (std::exception &E) {

@@ -68,7 +68,7 @@ FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   if (FileID.empty())
     return std::make_pair(false, "");
 
-  boost::filesystem::directory_iterator DirectoryIterator(FullPath), e;
+  boost::filesystem::directory_iterator DirectoryIterator(SchemaPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
     if (DirectoryEntry.string().find(FileID) != std::string::npos) {
@@ -93,7 +93,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   flatbuffers::IDLOptions opts;
   auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
-  const char *include_directories[] = {FullPath.c_str(), nullptr};
+  const char *include_directories[] = {SchemaPath.c_str(), nullptr};
   bool ok =
       Parser->Parse(Schema.c_str(), include_directories, FullName.c_str());
   if (!ok)
