@@ -24,6 +24,7 @@ if(NOT CONAN_DISABLE)
             BUILD_TYPE "None"
             BUILD outdated)
 endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX AND COV)
     include(CodeCoverage)
     setup_target_for_coverage(coverage UnitTests coverage)

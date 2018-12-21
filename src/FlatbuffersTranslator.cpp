@@ -1,7 +1,6 @@
 #include "FlatbuffersTranslator.h"
 #include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
-#include <iostream>
 
 /// Deserializes Kafka message and returns YAML or, if no schema found, assumes
 /// message is in JSON/YAML and simply returns it.

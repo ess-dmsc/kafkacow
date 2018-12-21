@@ -1,12 +1,12 @@
 #include "SchemaPath.h"
+#include <boost/dll.hpp>
 #include <boost/filesystem.hpp>
 
-std::string getSchemaPath(const std::string &BinPath) {
+std::string getSchemaPath() {
   namespace fs = boost::filesystem;
 
-  fs::path FullBinPath(fs::initial_path<fs::path>());
-  FullBinPath = fs::system_complete(fs::path(BinPath));
-  auto BinDirPath = FullBinPath.parent_path();
+  boost::system::error_code Error;
+  auto BinDirPath = boost::dll::program_location(Error).parent_path();
   auto BuildDir = BinDirPath.parent_path();
   auto SchemaPath = BuildDir / "schemas";
 

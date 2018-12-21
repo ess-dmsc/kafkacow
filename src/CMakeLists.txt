@@ -19,6 +19,7 @@ add_executable(kafkacow main.cpp
 target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka
         CONAN_PKG::FlatBuffers
+        CONAN_PKG::boost_system
         CONAN_PKG::boost_filesystem
         CONAN_PKG::spdlog
         CONAN_PKG::yaml-cpp

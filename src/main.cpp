@@ -47,8 +47,7 @@ int main(int argc, char **argv) {
 
   auto Logger = spdlog::stderr_color_mt("LOG");
 
-  const std::string BinDirectory(argv[0]);
-  auto SchemaPath = getSchemaPath(BinDirectory);
+  auto SchemaPath = getSchemaPath();
   Logger->debug("Using schemas in: {}", SchemaPath);
 
   CLI11_PARSE(App, argc, argv);

@@ -5,8 +5,11 @@ file(GLOB SRC_FILES
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
 list(FILTER SRC_FILES EXCLUDE REGEX ".*ConnectKafka.cpp$")
 
-add_executable(UnitTests ${SRC_FILES} SchemaPathForTest.h SchemaPathForTest.cpp RequestHandlerTest.cpp
-        FlatbuffersTranslatorTest.cpp JSONPrintingTest.cpp gtest_main.cpp)
+add_executable(UnitTests
+        ${SRC_FILES}
+        RequestHandlerTest.cpp
+        FlatbuffersTranslatorTest.cpp
+        JSONPrintingTest.cpp)
 
 target_link_libraries(UnitTests
         CONAN_PKG::gtest
