@@ -1,6 +1,6 @@
 #include "../src/FlatbuffersTranslator.h"
-#include "f142_logdata_generated.h"
 #include "SchemaPathForTest.h"
+#include "f142_logdata_generated.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 
