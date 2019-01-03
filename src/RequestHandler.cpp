@@ -32,21 +32,23 @@ void RequestHandler::checkConsumerModeArguments(
       UserArguments.Name.empty()) {
     throw ArgumentException("Please specify topic!");
   }
-  checkIfTopicEmpty(UserArguments.Name);
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
     printEntireTopic(UserArguments.Name);
-  } else if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
-    subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
-                        UserArguments.PartitionToConsume,
-                        UserArguments.OffsetToStart);
   } else {
-    if (UserArguments.OffsetToStart > -2) {
-      subscribeAndConsume(UserArguments.Name, UserArguments.OffsetToStart);
+    checkIfTopicEmpty(UserArguments.Name);
+    if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
+      subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+                          UserArguments.PartitionToConsume,
+                          UserArguments.OffsetToStart);
     } else {
-      (UserArguments.PartitionToConsume != -1)
-          ? subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
-                                UserArguments.PartitionToConsume)
-          : Logger->error("Please specify partition");
+      if (UserArguments.OffsetToStart > -2) {
+        subscribeAndConsume(UserArguments.Name, UserArguments.OffsetToStart);
+      } else {
+        (UserArguments.PartitionToConsume != -1)
+            ? subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+                                  UserArguments.PartitionToConsume)
+            : Logger->error("Please specify partition");
+      }
     }
   }
 }
@@ -195,7 +197,7 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
 /// \param TopicName
 /// \param NumberOfMessages
 /// \param Partition
-void RequestHandler::subscribeAndConsume(std::string TopicName,
+void RequestHandler::subscribeAndConsume(const std::string &TopicName,
                                          int64_t NumberOfMessages,
                                          int Partition) {
   verifyNLast(NumberOfMessages, TopicName, Partition);
@@ -209,12 +211,15 @@ void RequestHandler::subscribeAndConsume(std::string TopicName,
   }
 }
 
-/// Subscribes at an offset to a specified TopicName and consumes the data.
+/// Subscribes at an offset on a specified topic and consumes data until
+/// manually terminated, or optionally, until reaches end of all partitions
 ///
 /// \param TopicName
-/// \param Offset
-void RequestHandler::subscribeAndConsume(std::string TopicName,
-                                         int64_t Offset) {
+/// \param Offset Starting offset, to consume from
+/// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
+void RequestHandler::subscribeAndConsume(const std::string &TopicName,
+                                         int64_t Offset,
+                                         bool TerminateAtEndOfTopic) {
   if (verifyOffset(Offset, TopicName))
     throw ArgumentException("Offset not valid!");
 
@@ -224,8 +229,14 @@ void RequestHandler::subscribeAndConsume(std::string TopicName,
 
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers(SchemaPath);
-  while (EOFPartitionCounter < NumberOfPartitions) {
-    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+  if (TerminateAtEndOfTopic) {
+    while (EOFPartitionCounter < NumberOfPartitions) {
+      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+    }
+  } else {
+    while (true) {
+      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+    }
   }
 }
 
@@ -237,9 +248,9 @@ void RequestHandler::subscribeAndConsume(std::string TopicName,
 /// \param Partition
 /// \param Offset
 void RequestHandler::subscribeAndConsume(const std::string &TopicName,
-                                         const int64_t &NumberOfMessages,
-                                         const int &Partition,
-                                         const int64_t &Offset) {
+                                         const int64_t NumberOfMessages,
+                                         const int Partition,
+                                         const int64_t Offset) {
   if (verifyOffset(Offset, TopicName))
     throw ArgumentException("Lower offset not valid!");
   if (verifyOffset(Offset + NumberOfMessages, TopicName))
@@ -254,18 +265,21 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
          MessagesCounter <= NumberOfMessages) {
-    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+    if (consumeSingleMessage(EOFPartitionCounter, FlatBuffers))
+      MessagesCounter++;
   }
 }
 
-void RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
+bool RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
                                           FlatbuffersTranslator &FlatBuffers) {
   try {
     KafkaMessageMetadataStruct MessageData;
     MessageData = KafkaConnection->consume();
     MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
     printKafkaMessage(MessageData, EOFPartitionCounter, FlatBuffers);
+    return true; // got a message
   } catch (TimeoutException &Exception) {
-    std::cout << Exception.what() << std::endl;
+    Logger->debug(Exception.what());
   }
+  return false; // didn't get a message
 }

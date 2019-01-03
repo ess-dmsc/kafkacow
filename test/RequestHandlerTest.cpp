@@ -50,7 +50,7 @@ TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
                                    getSchemaPath());
 
   EXPECT_NO_THROW(
-      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344));
+      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344, true));
 }
 
 TEST(RequestHandlerTest, topic_metadata_creation_test) {
@@ -70,6 +70,7 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
   UserArguments.OffsetToStart = 1235;
+  UserArguments.GoBack = 1;
   UserArguments.Name = "TestTopicName";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    getSchemaPath());
@@ -176,18 +177,6 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
   EXPECT_EQ(
       message,
       "Program can run in one and only one mode: --consumer or --metadata");
-}
-
-TEST(RequestHandlerTest,
-     default_consumer_behaviour_or_print_entire_topic_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
-  UserArgumentStruct UserArguments;
-  UserArguments.ConsumerMode = true;
-  UserArguments.Name = "ExampleTestTopic";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   getSchemaPath());
-  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments));
 }
 
 TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
