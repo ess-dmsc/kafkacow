@@ -5,14 +5,19 @@ file(GLOB SRC_FILES
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
 list(FILTER SRC_FILES EXCLUDE REGEX ".*ConnectKafka.cpp$")
 
-add_executable(UnitTests RequestHandlerTest.cpp ${SRC_FILES}
-        FlatbuffersTranslatorTest.cpp ${SRC_FILES} JSONPrintingTest.cpp)
+add_executable(UnitTests
+        ${SRC_FILES}
+        RequestHandlerTest.cpp
+        FlatbuffersTranslatorTest.cpp
+        JSONPrintingTest.cpp)
 
 target_link_libraries(UnitTests
         CONAN_PKG::gtest
         CONAN_PKG::cli11
         CONAN_PKG::librdkafka
         CONAN_PKG::boost_filesystem
+        CONAN_PKG::boost_system
+        CONAN_PKG::boost_dll
         CONAN_PKG::FlatBuffers
         CONAN_PKG::spdlog
         CONAN_PKG::yaml-cpp

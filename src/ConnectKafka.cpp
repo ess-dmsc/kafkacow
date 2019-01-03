@@ -133,22 +133,6 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
 /// \return vector<int32_t> of partition IDs
 std::vector<int32_t>
 ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
-  auto TopicMetadata = getTopicMetadata(Topic);
-  std::vector<int32_t> TopicPartitionNumbers;
-  auto PartitionMetadata = TopicMetadata->partitions();
-  // save needed partition metadata here
-  for (auto &Partition : *PartitionMetadata) {
-    TopicPartitionNumbers.push_back(Partition->id());
-  }
-  sort(TopicPartitionNumbers.begin(), TopicPartitionNumbers.end());
-  return TopicPartitionNumbers;
-}
-/// Searches for Topic metadata. Throws an error, if topic not found.
-///
-/// \param Topic
-/// return Pointer to RdKafka::TopicMetadata.
-const RdKafka::TopicMetadata *
-ConnectKafka::getTopicMetadata(const std::string &Topic) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
   auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
@@ -158,7 +142,15 @@ ConnectKafka::getTopicMetadata(const std::string &Topic) {
   auto MatchedTopic = *Iterator;
   if (MatchedTopic == nullptr)
     throw ArgumentException(fmt::format("No such topic: {}", Topic));
-  return MatchedTopic;
+
+  std::vector<int32_t> TopicPartitionNumbers;
+  auto PartitionMetadata = MatchedTopic->partitions();
+  // save needed partition metadata here
+  for (auto &Partition : *PartitionMetadata) {
+    TopicPartitionNumbers.push_back(Partition->id());
+  }
+  sort(TopicPartitionNumbers.begin(), TopicPartitionNumbers.end());
+  return TopicPartitionNumbers;
 }
 
 /// Returns a vector of structs containing offsets of partitions for specified

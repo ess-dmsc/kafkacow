@@ -202,7 +202,7 @@ void RequestHandler::subscribeAndConsume(std::string TopicName,
   int EOFPartitionCounter = 0;
   KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                             Partition);
-  FlatbuffersTranslator FlatBuffers;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
 
   while (EOFPartitionCounter < 1) {
     consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
@@ -223,7 +223,7 @@ void RequestHandler::subscribeAndConsume(std::string TopicName,
       KafkaConnection->getNumberOfTopicPartitions(TopicName);
 
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
   while (EOFPartitionCounter < NumberOfPartitions) {
     consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
   }
@@ -250,7 +250,7 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
       KafkaConnection->getNumberOfTopicPartitions(TopicName);
 
   KafkaConnection->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
          MessagesCounter <= NumberOfMessages) {
