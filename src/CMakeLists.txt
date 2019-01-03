@@ -21,6 +21,7 @@ target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::FlatBuffers
         CONAN_PKG::boost_system
         CONAN_PKG::boost_filesystem
+        CONAN_PKG::boost_dll
         CONAN_PKG::spdlog
         CONAN_PKG::yaml-cpp
         CONAN_PKG::jsonformoderncpp
