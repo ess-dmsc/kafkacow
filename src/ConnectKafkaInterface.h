@@ -8,6 +8,8 @@
 
 class ConnectKafkaInterface {
 public:
+  virtual ~ConnectKafkaInterface() = default;
+
   virtual std::string getAllTopics() = 0;
 
   virtual KafkaMessageMetadataStruct consume() = 0;
