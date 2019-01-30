@@ -51,11 +51,10 @@ int main(int argc, char **argv) {
   Logger->debug("Using schemas in: {}", SchemaPath);
 
   CLI11_PARSE(App, argc, argv);
-
-  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   SchemaPath);
   try {
+    auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
+    RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                     SchemaPath);
     NewRequestHandler.checkAndRun();
   } catch (std::exception &E) {
     Logger->error(E.what());
