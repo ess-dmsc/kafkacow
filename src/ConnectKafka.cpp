@@ -43,14 +43,13 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
 /// \return unique_ptr to RdKafka::Metadata
 std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
-  Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
+  RdKafka::ErrorCode ErrorCode =
+      Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
+  if (ErrorCode == RdKafka::ERR__TRANSPORT)
+    throw std::runtime_error("Broker does not exist!");
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
-  try {
-    if (!metadata) {
-      throw std::runtime_error("Failed to query metadata from broker");
-    }
-  } catch (std::exception &E) {
-    Logger->error(E.what());
+  if (metadata == nullptr) {
+    throw std::runtime_error("Error while retrieving metadata.");
   }
   return metadata;
 }
