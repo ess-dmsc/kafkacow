@@ -224,3 +224,14 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(UserArguments),
                ArgumentException);
 }
+
+TEST(RequestHandlerTest, print_entire_topic_success) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.Name = "TestTopic";
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPath());
+  EXPECT_NO_THROW(
+      NewRequestHandler.checkConsumerModeArguments(UserArguments, true));
+}

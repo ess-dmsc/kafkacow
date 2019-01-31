@@ -17,7 +17,8 @@ public:
 
   void checkAndRun();
 
-  void checkConsumerModeArguments(UserArgumentStruct UserArguments);
+  void checkConsumerModeArguments(UserArgumentStruct UserArguments,
+                                  bool TerminateAtEndOfTopic = false);
 
   void checkMetadataModeArguments(UserArgumentStruct UserArguments);
 
@@ -45,7 +46,8 @@ private:
                    int16_t Partition);
   void printMessageMetadata(KafkaMessageMetadataStruct &MessageData,
                             const std::string &FileIdentifier);
-  void printEntireTopic(const std::string &TopicName);
+  void printEntireTopic(const std::string &TopicName,
+                        bool TerminateAtEndOfTopic = false);
   void checkIfTopicEmpty(const std::string &TopicName);
   std::string timestampToReadable(const int64_t &Timestamp);
   bool consumeSingleMessage(int &EOFPartitionCounter,
