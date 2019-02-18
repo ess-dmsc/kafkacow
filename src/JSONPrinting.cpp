@@ -1,6 +1,7 @@
 #include "JSONPrinting.h"
 #include <algorithm>
 #include <fmt/format.h>
+#include <iostream>
 #include <nlohmann/json.hpp>
 #include <yaml-cpp/yaml.h>
 
@@ -11,12 +12,7 @@
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
   using nlohmann::json;
-
-  // convert into valid JSON
-  YAML::Node node = YAML::Load(JSONMessage);
-  YAML::Emitter Emitter;
-  Emitter << YAML::DoubleQuoted << YAML::Flow << node;
-  auto JSONModernMessage = json::parse(Emitter.c_str());
+  auto JSONModernMessage = json::parse(JSONMessage.c_str());
   std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
@@ -34,7 +30,6 @@ std::string getEntireMessage(const std::string &JSONMessage,
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
   using nlohmann::json;
-
   YAML::Node Node = truncateMessage(JSONMessage);
   YAML::Emitter Emitter;
   Emitter << YAML::DoubleQuoted << YAML::Flow << Node;

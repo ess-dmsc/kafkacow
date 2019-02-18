@@ -140,7 +140,7 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
   if (!MessageData.Payload.empty()) {
     std::string FileIdentifier;
     std::string JSONMessage =
-        FlatBuffers.deserializeToYAML(MessageData, FileIdentifier);
+            FlatBuffers.deserializeToJSON(MessageData, FileIdentifier);
     printMessageMetadata(MessageData, FileIdentifier);
     (UserArguments.ShowEntireMessage)
         ? std::cout << fmt::format(

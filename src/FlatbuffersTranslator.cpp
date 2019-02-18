@@ -8,7 +8,7 @@
 /// \param Message
 /// \return single string with YAML/JSON message.
 std::string
-FlatbuffersTranslator::deserializeToYAML(KafkaMessageMetadataStruct MessageData,
+FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
                                          std::string &FileID) {
   // get the ID from a message
   if (MessageData.Payload.size() > 8) {
@@ -90,6 +90,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
                                     const std::string &Schema) {
   flatbuffers::IDLOptions opts;
+  opts.strict_json = true;
   auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
   const char *include_directories[] = {SchemaPath.c_str(), nullptr};
