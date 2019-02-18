@@ -26,14 +26,15 @@ void RequestHandler::checkAndRun() {
 /// run.
 ///
 /// \param UserArguments
+/// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
 void RequestHandler::checkConsumerModeArguments(
-    UserArgumentStruct UserArguments) {
+    UserArgumentStruct UserArguments, bool TerminateAtEndOfTopic) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.Name.empty()) {
     throw ArgumentException("Please specify topic!");
   }
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
-    printEntireTopic(UserArguments.Name);
+    printEntireTopic(UserArguments.Name, TerminateAtEndOfTopic);
   } else {
     checkIfTopicEmpty(UserArguments.Name);
     if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
@@ -169,7 +170,9 @@ void RequestHandler::printMessageMetadata(
 /// topic.
 ///
 /// \param TopicName
-void RequestHandler::printEntireTopic(const std::string &TopicName) {
+/// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
+void RequestHandler::printEntireTopic(const std::string &TopicName,
+                                      bool TerminateAtEndOfTopic) {
   std::vector<OffsetsStruct> OffsetsStruct =
       KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
   int64_t MinOffset = OffsetsStruct[0].LowOffset;
@@ -177,7 +180,7 @@ void RequestHandler::printEntireTopic(const std::string &TopicName) {
     if (OffsetStruct.LowOffset < MinOffset)
       MinOffset = OffsetStruct.LowOffset;
   }
-  subscribeAndConsume(TopicName, MinOffset);
+  subscribeAndConsume(TopicName, MinOffset, TerminateAtEndOfTopic);
 }
 
 std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
