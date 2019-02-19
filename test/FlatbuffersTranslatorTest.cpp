@@ -11,16 +11,16 @@ public:
                                         const std::string &Value,
                                         const std::string &TimeStamp) {
     std::string ToCompare = R"({
-  source_name: ")";
+  "source_name": ")";
     ToCompare.append(Source);
     ToCompare.append(R"(",
-  value_type: "Int",
-  value: {
-    value: )");
+  "value_type": "Int",
+  "value": {
+    "value": )");
     ToCompare.append(Value);
     ToCompare.append(R"(
   },
-  timestamp: )");
+  "timestamp": )");
     ToCompare.append(TimeStamp);
     ToCompare.append(R"(
 }
