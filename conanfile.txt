@@ -18,8 +18,8 @@ virtualrunenv
 [options]
 librdkafka:shared=True
 FlatBuffers:shared=False
-boost_filesystem:shared=True
-boost_system:shared=True
+boost_filesystem:shared=False
+boost_system:shared=False
 
 [imports]
 ., *.dylib* -> ./lib @ keep_path=False
