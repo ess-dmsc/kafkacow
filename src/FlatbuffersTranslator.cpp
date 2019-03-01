@@ -2,11 +2,12 @@
 #include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
 
-/// Deserializes Kafka message and returns YAML or, if no schema found, assumes
-/// message is in JSON/YAML and simply returns it.
+/// If schema is found, deserializes message and returns it as string.
+/// Otherwise assumes message is valid JSON and returns it.
 ///
-/// \param Message
-/// \return single string with YAML/JSON message.
+/// \param MessageData
+/// \param FileID
+/// \return single string with JSON message.
 std::string
 FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
                                          std::string &FileID) {
@@ -38,22 +39,22 @@ FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
         createParser(SchemaFile.second, MessageData.Payload, Schema);
 
     // save translated message
-    std::string YAMLMessage;
+    std::string DeserializedMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &YAMLMessage))
+                      &DeserializedMessage))
       Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
-    return YAMLMessage;
+    return DeserializedMessage;
   } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
         FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
-    std::string YAMLMessage;
+    std::string DeserializedMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &YAMLMessage))
+                      &DeserializedMessage))
       Logger->error("Couldn't generate text using existing parser!\n");
-    return YAMLMessage;
+    return DeserializedMessage;
   }
 }
 

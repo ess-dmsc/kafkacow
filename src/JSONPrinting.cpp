@@ -45,7 +45,7 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Recursive method that receives YAML node and truncates
+/// Recursive method that truncates
 /// long arrays that it contains.
 ///
 /// \param Node
@@ -60,7 +60,7 @@ void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
   }
 }
 
-/// Recursive method that receives YAML node and truncates
+/// Recursive method that truncates
 /// long arrays that it contains.
 ///
 /// \param Node
