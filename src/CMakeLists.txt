@@ -24,4 +24,5 @@ target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::boost_dll
         CONAN_PKG::spdlog
         CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::fmt)
+        CONAN_PKG::fmt
+        CONAN_PKG::yaml-cpp )
