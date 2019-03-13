@@ -24,4 +24,4 @@ FlatBuffers:shared=True
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
 ., *.dll -> ./bin @ keep_path=False
 ., *.a* -> ./lib @ keep_path=False
-., *.lib -> -> ./bin @ keep_path=False
+., *.lib -> ./bin @ keep_path=False
