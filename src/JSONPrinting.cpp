@@ -4,7 +4,8 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-/// Receives deserialized flatbuffers message, formats it and prints it to the
+/// Receives deserialized flatbuffers message, formats it using Indent and
+/// prints it to the
 /// screen.
 ///
 /// \param JSONMessage
@@ -23,9 +24,10 @@ std::string getEntireMessage(const std::string &JSONMessage,
 }
 
 /// Receives deserialized flatbuffers message, truncated large arrays, formats
-/// it and prints it to the screen.
+/// it using Indent and prints it to the screen.
 ///
 /// \param JSONMessage
+/// \param Indent
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
 
@@ -45,10 +47,10 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Recursive method that truncates
-/// long arrays that it contains.
+/// Recursive method that receives JSON and truncates long arrays that it
+/// contains.
 ///
-/// \param Node
+/// \param JSONMessage
 void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
   for (nlohmann::json::iterator it = JSONMessage.begin();
        it != JSONMessage.end(); ++it) {
@@ -60,10 +62,10 @@ void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
   }
 }
 
-/// Recursive method that truncates
-/// long arrays that it contains.
+/// Recursive method that receives JSON and truncates long arrays that it
+/// contains.
 ///
-/// \param Node
+/// \param JSONMessage
 void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage) {
   int Counter = 0;
   size_t OriginalSize = JSONMessage.size();
