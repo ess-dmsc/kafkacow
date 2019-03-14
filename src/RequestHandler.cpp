@@ -140,7 +140,7 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
   if (!MessageData.Payload.empty()) {
     std::string FileIdentifier;
     std::string JSONMessage =
-        FlatBuffers.deserializeToYAML(MessageData, FileIdentifier);
+        FlatBuffers.deserializeToJSON(MessageData, FileIdentifier);
     printMessageMetadata(MessageData, FileIdentifier);
     (UserArguments.ShowEntireMessage)
         ? std::cout << fmt::format(
@@ -194,7 +194,7 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
   istringstream iss(asctime(localtime(&Seconds)));
   vector<string> tokens{istream_iterator<string>{iss},
                         istream_iterator<string>{}};
-  return fmt::format("{} {}-{}-{} {}::{}", tokens[0], tokens[2], tokens[1],
+  return fmt::format("{} {}-{}-{} {}.{}", tokens[0], tokens[2], tokens[1],
                      tokens[4], tokens[3], Timestamp % 1000);
 }
 

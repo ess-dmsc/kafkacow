@@ -8,7 +8,7 @@ std::string ConnectKafkaFake::getAllTopics() {
 
 KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
   KafkaMessageMetadataStruct DataToReturn;
-  DataToReturn.Payload = "HiddenSecretMessageFromLovingNeutron";
+  DataToReturn.Payload = "\"HiddenSecretMessageFromLovingNeutron\"";
   DataToReturn.PartitionEOF = true;
   DataToReturn.Timestamp = 1542;
   DataToReturn.Offset = 1234;

@@ -20,5 +20,4 @@ target_link_libraries(UnitTests
         CONAN_PKG::boost_dll
         CONAN_PKG::FlatBuffers
         CONAN_PKG::spdlog
-        CONAN_PKG::yaml-cpp
         CONAN_PKG::jsonformoderncpp)

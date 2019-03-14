@@ -110,7 +110,6 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
                                "was received");
     }
     break;
-
   case RdKafka::ERR__TIMED_OUT:
     throw TimeoutException(
         fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
@@ -119,7 +118,6 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
     DataToReturn.PartitionEOF = true;
     // Not errors as the broker might come back or more data might be pushed
     break;
-
   default:
     /* All other errors */
     throw std::runtime_error(
