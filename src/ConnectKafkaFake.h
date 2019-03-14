@@ -10,9 +10,6 @@ class ConnectKafkaFake : public ConnectKafkaInterface {
 public:
   ConnectKafkaFake();
 
-  // if ReturnKey set to true consume() returns message with key
-  ConnectKafkaFake(bool ReturnKey);
-
   std::string getAllTopics() override;
 
   KafkaMessageMetadataStruct consume() override;
@@ -30,7 +27,4 @@ public:
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;
   std::string showAllMetadata() override;
-
-private:
-  bool ReturnKey = false;
 };

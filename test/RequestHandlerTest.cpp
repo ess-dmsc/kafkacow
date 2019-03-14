@@ -237,8 +237,7 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
 }
 
 TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
-  auto KafkaConnection =
-      std::make_unique<ConnectKafkaFake>(ConnectKafkaFake(true));
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "TestTopic";
