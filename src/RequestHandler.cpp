@@ -164,9 +164,11 @@ void RequestHandler::printMessageMetadata(
       "{:>5} || Offset: {:>7} || File Identifier: {} ||",
       "\n", MessageData.TimestampISO, "||", MessageData.Timestamp,
       MessageData.Partition, MessageData.Offset, FileIdentifier);
-  (MessageData.KeyPresent)
-      ? std::cout << fmt::format(" Key: {}\n", MessageData.Key)
-      : std::cout << "\n";
+  if (MessageData.KeyPresent) {
+    std::cout << fmt::format(" Key: {}\n", MessageData.Key);
+  } else {
+    std::cout << "\n";
+  }
 }
 
 /// Calculates topic's lowest offset and subscribes to it to print the entire
