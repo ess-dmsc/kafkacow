@@ -236,8 +236,9 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
       NewRequestHandler.checkConsumerModeArguments(UserArguments, true));
 }
 
-TEST(RequestHandlerTest, display_message_metadata) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
+  auto KafkaConnection =
+      std::make_unique<ConnectKafkaFake>(ConnectKafkaFake(true));
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "TestTopic";

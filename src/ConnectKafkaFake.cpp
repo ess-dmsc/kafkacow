@@ -2,6 +2,8 @@
 
 ConnectKafkaFake::ConnectKafkaFake() {}
 
+ConnectKafkaFake::ConnectKafkaFake(bool ReturnKey) : ReturnKey(ReturnKey) {}
+
 std::string ConnectKafkaFake::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
@@ -13,8 +15,10 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
   DataToReturn.Timestamp = 1542;
   DataToReturn.Offset = 1234;
   DataToReturn.Partition = 0;
-  DataToReturn.KeyPresent = true;
-  DataToReturn.Key = "MessageKey";
+  if (ReturnKey) {
+    DataToReturn.KeyPresent = true;
+    DataToReturn.Key = "MessageKey";
+  }
   return DataToReturn;
 }
 
