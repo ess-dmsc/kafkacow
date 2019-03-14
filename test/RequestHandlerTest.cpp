@@ -235,3 +235,16 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
   EXPECT_NO_THROW(
       NewRequestHandler.checkConsumerModeArguments(UserArguments, true));
 }
+
+TEST(RequestHandlerTest, display_message_metadata) {
+  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+
+  UserArgumentStruct UserArguments;
+  UserArguments.Name = "TestTopic";
+  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                   getSchemaPath());
+  testing::internal::CaptureStdout();
+  NewRequestHandler.checkConsumerModeArguments(UserArguments, true);
+  std::string OutputMessage = testing::internal::GetCapturedStdout();
+  EXPECT_TRUE(OutputMessage.find("Key: MessageKey") != std::string::npos);
+}
