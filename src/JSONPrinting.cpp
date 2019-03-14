@@ -1,14 +1,13 @@
 #include "JSONPrinting.h"
-#include <algorithm>
 #include <fmt/format.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
 
-/// Receives deserialized flatbuffers message, formats it using Indent and
-/// prints it to the
-/// screen.
+/// Receives deserialized flatbuffers message, and prints it to screen according
+/// to Indent.
 ///
 /// \param JSONMessage
+/// \param Indent - number of characters of whitespace to use for indentation(4
+/// by default)
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
   using nlohmann::json;
@@ -23,11 +22,12 @@ std::string getEntireMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Receives deserialized flatbuffers message, truncated large arrays, formats
-/// it using Indent and prints it to the screen.
+/// Receives deserialized flatbuffers message, and prints it to screen according
+/// to Indent.
 ///
 /// \param JSONMessage
-/// \param Indent
+/// \param Indent - number of characters of whitespace to use for indentation(4
+/// by default)
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
 

@@ -91,7 +91,11 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
                                     const std::string &Schema) {
   flatbuffers::IDLOptions opts;
+
+  // Make sure flatbuffers returns strict json. Otherwise messages give parsing
+  // errors and break truncation.
   opts.strict_json = true;
+
   auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
   const char *include_directories[] = {SchemaPath.c_str(), nullptr};
