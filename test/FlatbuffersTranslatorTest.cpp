@@ -11,16 +11,16 @@ public:
                                         const std::string &Value,
                                         const std::string &TimeStamp) {
     std::string ToCompare = R"({
-  source_name: ")";
+  "source_name": ")";
     ToCompare.append(Source);
     ToCompare.append(R"(",
-  value_type: "Int",
-  value: {
-    value: )");
+  "value_type": "Int",
+  "value": {
+    "value": )");
     ToCompare.append(Value);
     ToCompare.append(R"(
   },
-  timestamp: )");
+  "timestamp": )");
     ToCompare.append(TimeStamp);
     ToCompare.append(R"(
 }
@@ -54,8 +54,8 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 
   // Run first time to populate schema map
   std::string FileID;
-  FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID);
-  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
+  FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID);
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
   EXPECT_EQ(FileID, "f142");
@@ -66,7 +66,7 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
   FlatbuffersTranslator FlatBuffersTranslator(getSchemaPath());
   std::string FileID;
-  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID),
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             MessageMetadata.Payload);
 }
 
@@ -77,5 +77,5 @@ TEST(FlatbuffersTranslatorTest,
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "test";
   EXPECT_NO_THROW(
-      FlatBuffersTranslator.deserializeToYAML(MessageMetadata, FileID));
+      FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID));
 }
