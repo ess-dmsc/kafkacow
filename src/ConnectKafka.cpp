@@ -98,6 +98,10 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
       DataToReturn.Partition = KafkaMsg->partition();
       DataToReturn.Offset = KafkaMsg->offset();
       DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
+      if (KafkaMsg->key_len() != 0) {
+        DataToReturn.Key = *KafkaMsg->key();
+        DataToReturn.KeyPresent = true;
+      }
     } else {
       // If RdKafka indicates no error then we should always get a
       // non-zero length message

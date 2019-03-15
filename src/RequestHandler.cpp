@@ -160,10 +160,14 @@ void RequestHandler::printMessageMetadata(
     KafkaMessageMetadataStruct &MessageData,
     const std::string &FileIdentifier) {
   std::cout << fmt::format(
-      "\n{:_>67}{}{:>39}\n\nTimestamp: {:>11} || PartitionID: "
-      "{:>5} || Offset: {:>7} || File Identifier: {}\n",
-      "\n", MessageData.TimestampISO, "|", MessageData.Timestamp,
+      "\n{:_>93}{}{:>64}\n\nTimestamp: {:>11} || PartitionID: "
+      "{:>5} || Offset: {:>7} || File Identifier: {} ||",
+      "\n", MessageData.TimestampISO, "||", MessageData.Timestamp,
       MessageData.Partition, MessageData.Offset, FileIdentifier);
+  if (MessageData.KeyPresent) {
+    std::cout << fmt::format(" Key: {}", MessageData.Key);
+  }
+  std::cout << "\n";
 }
 
 /// Calculates topic's lowest offset and subscribes to it to print the entire
