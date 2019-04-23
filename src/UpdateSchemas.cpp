@@ -57,9 +57,14 @@ std::string updateSchemas() {
   const std::string RepoURL = "git://github.com/ess-dmsc/streaming-data-types";
   auto RepoPath = BuildDir / "streaming-data-types";
 
-  Logger->info("Updating schema information...");
+  Logger->debug("Updating schema information...");
 
   git_repository *Repo = tryRepositoryClone(Logger, RepoURL, RepoPath.string());
+  if (Repo == nullptr) {
+    Logger->warn("Could not get up-to-date schema information, falling back on "
+                 "possibly-outdated schemas.");
+    return SchemaPath.string();
+  }
 
   int GitError = tryRepositoryPull(Repo);
 
@@ -69,7 +74,7 @@ std::string updateSchemas() {
     Logger->warn("Could not get up-to-date schema information, falling back on "
                  "possibly-outdated schemas.");
   } else {
-    Logger->info("Done getting schema updates.");
+    Logger->debug("Done getting schema updates.");
     SchemaPath = RepoPath / "schemas";
   }
 
