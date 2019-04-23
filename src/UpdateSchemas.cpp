@@ -1,4 +1,5 @@
 #include "UpdateSchemas.h"
+#include <boost/dll.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <git2.h>
@@ -44,27 +45,33 @@ int tryRepositoryPull(git_repository *Repo) {
 }
 }
 
-std::string updateSchemas(std::string SchemaRepositoryPath) {
+std::string updateSchemas() {
+  boost::system::error_code Error;
+  auto BinDirPath = boost::dll::program_location(Error).parent_path();
+  auto BuildDir = BinDirPath.parent_path();
+  auto SchemaPath = BuildDir / "schemas";
+
   git_libgit2_init();
   std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
 
   const std::string RepoURL = "git://github.com/ess-dmsc/streaming-data-types";
-  const std::string RepoPath = "streaming-data-types/";
+  auto RepoPath = BuildDir / "streaming-data-types";
 
   Logger->info("Updating schema information...");
 
-  git_repository *Repo = tryRepositoryClone(Logger, RepoURL, RepoPath);
+  git_repository *Repo = tryRepositoryClone(Logger, RepoURL, RepoPath.string());
 
-  int Error = tryRepositoryPull(Repo);
+  int GitError = tryRepositoryPull(Repo);
 
   cleanupGit(Repo);
 
-  if (Error != 0) {
+  if (GitError != 0) {
     Logger->warn("Could not get up-to-date schema information, falling back on "
                  "possibly-outdated schemas.");
-    return "schemas/";
+  } else {
+    Logger->info("Done getting schema updates.");
+    SchemaPath = RepoPath / "schemas";
   }
 
-  Logger->info("Done getting schema updates.");
-  return RepoPath + "schemas/";
+  return SchemaPath.string();
 }

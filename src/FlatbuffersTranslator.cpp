@@ -1,25 +1,33 @@
 #include "FlatbuffersTranslator.h"
-#include "ArgumentsException.h"
+#include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
-#include <iostream>
 
-/// Deserializes Kafka message and returns YAML or, if no schema found, assumes
-/// message is in JSON/YAML and simply returns it.
+/// If schema is found, deserializes message and returns it as string.
+/// Otherwise assumes message is valid JSON and returns it.
 ///
-/// \param Message
-/// \return single string with YAML/JSON message.
-std::string FlatbuffersTranslator::deserializeToYAML(
-    KafkaMessageMetadataStruct MessageData) {
+/// \param MessageData
+/// \param FileID
+/// \return single string with JSON message.
+std::string
+FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
+                                         std::string &FileID) {
   // get the ID from a message
-  std::string FileID = MessageData.Payload.substr(4, 4);
+  if (MessageData.Payload.size() > 8) {
+    FileID = MessageData.Payload.substr(4, 4);
+  } else {
+    FileID.clear();
+  }
+
   if (FileIDMap.find(FileID) ==
       FileIDMap.end()) { // if no ID present in the map:
 
     std::pair<bool, std::string> SchemaFile = getSchemaPathForID(FileID);
 
     // if FileID is invalid, assume message is in JSON and return it
-    if (!SchemaFile.first)
+    if (!SchemaFile.first) {
+      FileID = FileID + " (not recognised)";
       return MessageData.Payload;
+    }
 
     std::string Schema;
     bool ok = flatbuffers::LoadFile(SchemaFile.second.c_str(), false, &Schema);
@@ -31,22 +39,22 @@ std::string FlatbuffersTranslator::deserializeToYAML(
         createParser(SchemaFile.second, MessageData.Payload, Schema);
 
     // save translated message
-    std::string YAMLMessage;
+    std::string DeserializedMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &YAMLMessage))
+                      &DeserializedMessage))
       Logger->error("Couldn't generate new text!\n");
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
-    return YAMLMessage;
+    return DeserializedMessage;
   } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
         FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
-    std::string YAMLMessage;
+    std::string DeserializedMessage;
     if (!GenerateText(*Parser, Parser->builder_.GetBufferPointer(),
-                      &YAMLMessage))
+                      &DeserializedMessage))
       Logger->error("Couldn't generate text using existing parser!\n");
-    return YAMLMessage;
+    return DeserializedMessage;
   }
 }
 
@@ -57,7 +65,10 @@ std::string FlatbuffersTranslator::deserializeToYAML(
 /// path was found, or FALSE and empty string if otherwise.
 std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
-  boost::filesystem::directory_iterator DirectoryIterator(PathToSchemas), e;
+  if (FileID.empty())
+    return std::make_pair(false, "");
+
+  boost::filesystem::directory_iterator DirectoryIterator(SchemaPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
     if (DirectoryEntry.string().find(FileID) != std::string::npos) {
@@ -80,9 +91,14 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
                                     const std::string &Message,
                                     const std::string &Schema) {
   flatbuffers::IDLOptions opts;
+
+  // Make sure flatbuffers returns strict json. Otherwise messages give parsing
+  // errors and break truncation.
+  opts.strict_json = true;
+
   auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
-  const char *include_directories[] = {PathToSchemas.c_str(), nullptr};
+  const char *include_directories[] = {SchemaPath.c_str(), nullptr};
   bool ok =
       Parser->Parse(Schema.c_str(), include_directories, FullName.c_str());
   if (!ok)

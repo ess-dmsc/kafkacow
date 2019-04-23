@@ -6,7 +6,7 @@ add_executable(kafkacow main.cpp
         ConnectKafkaInterface.h
         ConnectKafkaFake.cpp
         ConnectKafkaFake.h
-        ArgumentsException.h
+        CustomExceptions.h
         UserArgumentsStruct.h
         OffsetsStruct.h
         TopicMetadataStruct.h
@@ -17,13 +17,13 @@ add_executable(kafkacow main.cpp
         UpdateSchemas.cpp
         UpdateSchemas.h)
 
-target_link_libraries(kafkacow
-        CONAN_PKG::cli11
+target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka
         CONAN_PKG::FlatBuffers
+        CONAN_PKG::boost_system
         CONAN_PKG::boost_filesystem
+        CONAN_PKG::boost_dll
         CONAN_PKG::spdlog
-        CONAN_PKG::yaml-cpp
         CONAN_PKG::jsonformoderncpp
         CONAN_PKG::libgit2
         CONAN_PKG::fmt)

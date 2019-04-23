@@ -1,24 +1,17 @@
 #include "JSONPrinting.h"
-#include <algorithm>
 #include <fmt/format.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <yaml-cpp/yaml.h>
 
-/// Receives deserialized flatbuffers message, formats it and prints it to the
-/// screen.
+/// Receives deserialized flatbuffers message, and prints it to screen according
+/// to Indent.
 ///
 /// \param JSONMessage
+/// \param Indent - number of characters of whitespace to use for indentation(4
+/// by default)
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
-  using std::cout;
   using nlohmann::json;
-
-  // convert into valid JSON
-  YAML::Node node = YAML::Load(JSONMessage);
-  YAML::Emitter Emitter;
-  Emitter << YAML::DoubleQuoted << YAML::Flow << node;
-  auto JSONModernMessage = json::parse(Emitter.c_str());
+  auto JSONModernMessage = json::parse(JSONMessage.c_str());
   std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
@@ -29,19 +22,21 @@ std::string getEntireMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Receives deserialized flatbuffers message, truncated large arrays, formats
-/// it and prints it to the screen.
+/// Receives deserialized flatbuffers message, and prints it to screen according
+/// to Indent.
 ///
 /// \param JSONMessage
+/// \param Indent - number of characters of whitespace to use for indentation(4
+/// by default)
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
-  using std::cout;
-  using nlohmann::json;
 
-  YAML::Node Node = truncateMessage(JSONMessage);
-  YAML::Emitter Emitter;
-  Emitter << YAML::DoubleQuoted << YAML::Flow << Node;
-  auto JSONModernMessage = json::parse(Emitter.c_str());
+  auto JSONModernMessage = nlohmann::json::parse(JSONMessage.c_str());
+  if (JSONModernMessage.is_array()) {
+    recursiveTruncateJSONSequence(JSONModernMessage);
+  } else if (JSONModernMessage.is_object()) {
+    recursiveTruncateJSONMap(JSONModernMessage);
+  }
   std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
   MessageWithNoQuotes.erase(
       std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
@@ -52,61 +47,45 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Initializes truncating and returns edited YAML node.
+/// Recursive method that receives JSON and truncates long arrays that it
+/// contains.
 ///
 /// \param JSONMessage
-/// \return
-YAML::Node truncateMessage(const std::string &JSONMessage) {
-  YAML::Node Node = YAML::Load(JSONMessage);
-  if (Node.IsMap())
-    recursiveTruncateJSONMap(Node);
-  else if (Node.IsSequence())
-    recursiveTruncateJSONSequence(Node);
-  return Node;
-}
-
-/// Recursive method that receives YAML node and truncates
-/// long arrays that it contains.
-///
-/// \param Node
-void recursiveTruncateJSONMap(YAML::Node &Node) {
-  for (YAML::const_iterator it = Node.begin(); it != Node.end(); ++it) {
-    auto childNode = *it;
-    if (it->second.IsMap()) {
-      recursiveTruncateJSONMap(childNode.second);
-    } else if (it->second.IsSequence()) {
-      recursiveTruncateJSONSequence(childNode.second);
+void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
+  for (nlohmann::json::iterator it = JSONMessage.begin();
+       it != JSONMessage.end(); ++it) {
+    if (it.value().is_object()) {
+      recursiveTruncateJSONMap(it.value());
+    } else if (it.value().is_array()) {
+      recursiveTruncateJSONSequence(it.value());
     }
   }
 }
 
-/// Recursive method that receives YAML node and truncates
-/// long arrays that it contains.
+/// Recursive method that receives JSON and truncates long arrays that it
+/// contains.
 ///
-/// \param Node
-void recursiveTruncateJSONSequence(YAML::Node &Node) {
+/// \param JSONMessage
+void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage) {
   int Counter = 0;
-  size_t OriginalSize = Node.size();
-  auto Begin = Node.begin();
-  auto End = Node.end();
-  for (YAML::const_iterator it = Begin; it != End; ++it) {
-
+  size_t OriginalSize = JSONMessage.size();
+  for (nlohmann::json::iterator it = JSONMessage.end() - 1;
+       it != JSONMessage.begin(); --it) {
     auto childNode = *it;
-    if (childNode.IsMap()) {
-
-      recursiveTruncateJSONMap(childNode);
-    } else if (childNode.IsSequence()) {
-
-      recursiveTruncateJSONSequence(childNode);
+    if (childNode.is_object()) {
+      recursiveTruncateJSONMap(it.value());
+    } else if (childNode.is_array()) {
+      recursiveTruncateJSONSequence(it.value());
     } else {
       Counter++;
-      size_t NodeSize = Node.size();
-      if (NodeSize - Counter > 9) {
-        Node.remove(NodeSize - Counter);
-
-      } else if (NodeSize - Counter == 0 && OriginalSize > 10) {
-        Node.push_back("...");
-        Node.push_back(fmt::format("Truncated {} elements.", NodeSize - 10));
+      size_t MessageSize = JSONMessage.size();
+      if (MessageSize > 10) {
+        JSONMessage.erase(MessageSize - 1);
+      } else if (MessageSize == 10 && OriginalSize > 10) {
+        JSONMessage.push_back("...");
+        JSONMessage.push_back(
+            fmt::format("Truncated {} elements.", OriginalSize - 10));
+        return;
       }
     }
   }

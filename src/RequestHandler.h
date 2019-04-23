@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ArgumentsException.h"
 #include "ConnectKafkaInterface.h"
+#include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
@@ -11,43 +11,44 @@ class RequestHandler {
 public:
   explicit RequestHandler(
       std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
-      UserArgumentStruct &UserArguments, std::string SchemaPath)
-      : KafkaConnection(std::move(KafkaConnection)),
-        SchemaPath(std::move(SchemaPath)) {
-    Logger = spdlog::get("LOG");
-    this->UserArguments = UserArguments;
-  }
+      UserArgumentStruct &UserArguments, std::string FullSchemaPath)
+      : KafkaConnection(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
+        UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
 
   void checkAndRun();
 
-  void checkConsumerModeArguments(UserArgumentStruct UserArguments);
+  void checkConsumerModeArguments(bool TerminateAtEndOfTopic = false);
 
-  void checkMetadataModeArguments(UserArgumentStruct UserArguments);
+  void checkMetadataModeArguments();
 
-  void showTopicPartitionOffsets(UserArgumentStruct UserArguments);
+  void showTopicPartitionOffsets();
 
-  void subscribeConsumeAtOffset(std::string TopicName, int64_t Offset);
-  void subscribeConsumeNLastMessages(std::string TopicName,
-                                     int64_t NumberOfMessages, int Partition);
+  void subscribeAndConsume(const std::string &TopicName, int64_t Offset,
+                           bool TerminateAtEndOfTopic = false);
+  void subscribeAndConsume(const std::string &TopicName,
+                           int64_t NumberOfMessages, int Partition);
 
-  void subscribeConsumeRange(const int64_t &Offset,
-                             const int64_t &NumberOfMessages,
-                             const int &Partition,
-                             const std::string &TopicName);
+  void subscribeAndConsume(const std::string &TopicName,
+                           int64_t NumberOfMessages, int Partition,
+                           int64_t Offset);
 
 private:
+  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
-  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
   const std::string SchemaPath;
-  
-  void consumePartitions(KafkaMessageMetadataStruct &MessageData,
+  void printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
-  bool verifyOffset(const int64_t Offset, const std::string TopicName);
-  void verifyNLast(const int64_t NLast, const std::string TopicName,
-                   const int16_t Partition);
-  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData);
-  void printEntireTopic(const std::string &TopicName);
+  bool verifyOffset(int64_t Offset, const std::string &TopicName);
+  void verifyNLast(int64_t NLast, const std::string &TopicName,
+                   int16_t Partition);
+  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData,
+                            const std::string &FileIdentifier);
+  void printEntireTopic(const std::string &TopicName,
+                        bool TerminateAtEndOfTopic = false);
   void checkIfTopicEmpty(const std::string &TopicName);
+  std::string timestampToReadable(const int64_t &Timestamp);
+  bool consumeSingleMessage(int &EOFPartitionCounter,
+                            FlatbuffersTranslator &FlatBuffers);
 };

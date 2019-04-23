@@ -1,13 +1,12 @@
 [requires]
-cli11/1.5.3@bincrafters/stable
+cli11/1.6.0@bincrafters/stable
 FlatBuffers/1.9.0@ess-dmsc/stable
-librdkafka/0.11.4@ess-dmsc/stable
+librdkafka/0.11.5@ess-dmsc/stable
 gtest/3121b20-dm3@ess-dmsc/stable
-cmake_findboost_modular/1.65.1@bincrafters/stable
-boost_filesystem/1.65.1@bincrafters/stable
-boost_system/1.65.1@bincrafters/stable
+boost_filesystem/1.69.0@bincrafters/stable
+boost_system/1.69.0@bincrafters/stable
+boost_dll/1.69.0@bincrafters/stable
 spdlog/1.1.0@bincrafters/stable
-yaml-cpp/ee99c41@ess-dmsc/stable
 jsonformoderncpp/3.2.0@vthiery/stable
 libgit2/0.27.4-dm1@ess-dmsc/testing
 fmt/5.1.0@bincrafters/stable
@@ -28,4 +27,4 @@ boost_system:shared=True
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
 ., *.dll -> ./bin @ keep_path=False
 ., *.a* -> ./lib @ keep_path=False
-., *.lib -> -> ./bin @ keep_path=False
+., *.lib -> ./bin @ keep_path=False

@@ -1,4 +1,5 @@
 #include "../src/FlatbuffersTranslator.h"
+#include "../src/UpdateSchemas.h"
 #include "f142_logdata_generated.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
@@ -10,16 +11,16 @@ public:
                                         const std::string &Value,
                                         const std::string &TimeStamp) {
     std::string ToCompare = R"({
-  source_name: ")";
+  "source_name": ")";
     ToCompare.append(Source);
     ToCompare.append(R"(",
-  value_type: "Int",
-  value: {
-    value: )");
+  "value_type": "Int",
+  "value": {
+    "value": )");
     ToCompare.append(Value);
     ToCompare.append(R"(
   },
-  timestamp: )");
+  "timestamp": )");
     ToCompare.append(TimeStamp);
     ToCompare.append(R"(
 }
@@ -49,19 +50,32 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;
-  FlatbuffersTranslator FlatBuffersTranslator("schemas/");
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
 
   // Run first time to populate schema map
-  FlatBuffersTranslator.deserializeToYAML(MessageMetadata);
-  EXPECT_EQ(FlatBuffersTranslator.deserializeToYAML(MessageMetadata),
+  std::string FileID;
+  FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID);
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             FlatbuffersTranslatorTest::getStringToCompare(
                 SourceNameCompare, ValueCompare, TimeStampCompare));
+  EXPECT_EQ(FileID, "f142");
 }
 
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
-  FlatbuffersTranslator FlatBuffersTranslator("schemas/");
-  EXPECT_EQ(FlatBuffersTranslator.translateToJSON(MessageMetadata),
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
+  std::string FileID;
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             MessageMetadata.Payload);
+}
+
+TEST(FlatbuffersTranslatorTest,
+     no_throw_for_short_messages_without_file_identifier) {
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
+  std::string FileID;
+  KafkaMessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = "test";
+  EXPECT_NO_THROW(
+      FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID));
 }

@@ -1,4 +1,5 @@
 #include "ConnectKafka.h"
+#include "CustomExceptions.h"
 #include "KafkaMessageMetadataStruct.h"
 #include <iomanip>
 
@@ -42,14 +43,13 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
 /// \return unique_ptr to RdKafka::Metadata
 std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
-  Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
+  RdKafka::ErrorCode ErrorCode =
+      Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
+  if (ErrorCode == RdKafka::ERR__TRANSPORT)
+    throw std::runtime_error("Broker does not exist!");
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
-  try {
-    if (!metadata) {
-      throw std::runtime_error("Failed to query metadata from broker");
-    }
-  } catch (std::exception &E) {
-    Logger->error(E.what());
+  if (metadata == nullptr) {
+    throw std::runtime_error("Error while retrieving metadata.");
   }
   return metadata;
 }
@@ -83,7 +83,7 @@ std::string ConnectKafka::getAllTopics() {
 /// Consumes Kafka messages starting from specified offset.
 ///
 /// \return struct containg serialized message and its metadata.
-KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
+KafkaMessageMetadataStruct ConnectKafka::consume() {
   using RdKafka::Message;
   KafkaMessageMetadataStruct DataToReturn;
 
@@ -98,7 +98,10 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
       DataToReturn.Partition = KafkaMsg->partition();
       DataToReturn.Offset = KafkaMsg->offset();
       DataToReturn.Timestamp = KafkaMsg->timestamp().timestamp;
-
+      if (KafkaMsg->key_len() != 0) {
+        DataToReturn.Key = *KafkaMsg->key();
+        DataToReturn.KeyPresent = true;
+      }
     } else {
       // If RdKafka indicates no error then we should always get a
       // non-zero length message
@@ -107,14 +110,14 @@ KafkaMessageMetadataStruct ConnectKafka::consumeFromOffset() {
                                "was received");
     }
     break;
-
   case RdKafka::ERR__TIMED_OUT:
-    break;
+    throw TimeoutException(
+        fmt::format("KafkaTopicSubscriber::consumeMessage() - {}",
+                    RdKafka::err2str(KafkaMsg->err())));
   case RdKafka::ERR__PARTITION_EOF:
     DataToReturn.PartitionEOF = true;
     // Not errors as the broker might come back or more data might be pushed
     break;
-
   default:
     /* All other errors */
     throw std::runtime_error(
@@ -136,9 +139,12 @@ ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
                                [Topic](const RdKafka::TopicMetadata *tpc) {
                                  return tpc->topic() == Topic;
                                });
-  auto matchedTopic = *Iterator;
+  auto MatchedTopic = *Iterator;
+  if (MatchedTopic == nullptr)
+    throw ArgumentException(fmt::format("No such topic: {}", Topic));
+
   std::vector<int32_t> TopicPartitionNumbers;
-  auto PartitionMetadata = matchedTopic->partitions();
+  auto PartitionMetadata = MatchedTopic->partitions();
   // save needed partition metadata here
   for (auto &Partition : *PartitionMetadata) {
     TopicPartitionNumbers.push_back(Partition->id());
@@ -205,10 +211,6 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
-}
-
-KafkaMessageMetadataStruct ConnectKafka::consumeLastNMessages() {
-  return consumeFromOffset();
 }
 
 /// Subscribes to a specified Partition of a Topic to get last NMessages.

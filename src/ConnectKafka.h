@@ -23,9 +23,7 @@ public:
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consumeFromOffset() override;
-
-  KafkaMessageMetadataStruct consumeLastNMessages() override;
+  KafkaMessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
@@ -45,6 +43,8 @@ private:
   std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
   std::shared_ptr<spdlog::logger> Logger;
+
+  const RdKafka::TopicMetadata *getTopicMetadata(const std::string &Topic);
 
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
 

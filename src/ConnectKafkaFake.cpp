@@ -6,10 +6,15 @@ std::string ConnectKafkaFake::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-KafkaMessageMetadataStruct ConnectKafkaFake::consumeFromOffset() {
+KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
   KafkaMessageMetadataStruct DataToReturn;
-  DataToReturn.Payload = "HiddenSecretMessageFromLovingNeutron";
+  DataToReturn.Payload = "\"HiddenSecretMessageFromLovingNeutron\"";
   DataToReturn.PartitionEOF = true;
+  DataToReturn.Timestamp = 1542;
+  DataToReturn.Offset = 1234;
+  DataToReturn.Partition = 0;
+  DataToReturn.KeyPresent = true;
+  DataToReturn.Key = "MessageKey";
   return DataToReturn;
 }
 
@@ -39,10 +44,6 @@ void ConnectKafkaFake::subscribeAtOffset(int64_t Offset,
 void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
                                                 const std::string &TopicName,
                                                 int Partition) {}
-
-KafkaMessageMetadataStruct ConnectKafkaFake::consumeLastNMessages() {
-  return consumeFromOffset();
-}
 
 std::string ConnectKafkaFake::showAllMetadata() { return "Test return"; }
 

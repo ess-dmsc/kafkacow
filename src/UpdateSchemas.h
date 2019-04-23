@@ -2,5 +2,4 @@
 
 #include <string>
 
-std::string
-updateSchemas(std::string SchemaRepositoryPath = "schema_repository/");
+std::string updateSchemas();

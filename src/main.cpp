@@ -1,5 +1,5 @@
-#include "ArgumentsException.h"
 #include "ConnectKafka.h"
+#include "CustomExceptions.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
@@ -51,13 +51,12 @@ int main(int argc, char **argv) {
   auto Logger = spdlog::stderr_color_mt("LOG");
   Logger->info("Welcome to kafkacow!");
 
-  std::string SchemaPath = updateSchemas();
-
-  auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
-
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   SchemaPath);
   try {
+    std::string SchemaPath = updateSchemas();
+    Logger->debug("Using schemas in: {}", SchemaPath);
+    auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
+    RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
+                                     SchemaPath);
     NewRequestHandler.checkAndRun();
   } catch (std::exception &E) {
     Logger->error(E.what());

@@ -1,8 +1,9 @@
 # kafkacow
 [![codecov](https://codecov.io/gh/ess-dmsc/kafkacow/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/kafkacow)  [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/kafkacow/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/kafkacow/job/master/) [![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/kafkacow/blob/master/LICENSE)
 
-## Like kafkacat but understands flatbuffers.
+### Project relying on a submodule. Please clone using ```--recurse-submodules```.
 
+## Like kafkacat but understands flatbuffers.
 The aim of kafkacow is to retrieve messages from kafka and present them in human-readable form(JSON).
 Similarly to kafkacat application runs in either __metadata__ or __consumer__ mode.
 Client runs once and presents data as requested:
