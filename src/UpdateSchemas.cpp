@@ -45,6 +45,9 @@ int tryRepositoryPull(git_repository *Repo) {
 }
 }
 
+/// Update schemas from github repository at runtime if possible, else fall back
+/// on using schema included at build time
+/// \return Path to schema directory
 std::string updateSchemas() {
   boost::system::error_code Error;
   auto BinDirPath = boost::dll::program_location(Error).parent_path();
