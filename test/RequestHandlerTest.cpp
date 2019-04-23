@@ -241,8 +241,7 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
   UserArguments.Name = "TestTopic";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas());
-  EXPECT_NO_THROW(
-      NewRequestHandler.checkConsumerModeArguments(true));
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
 
 TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
