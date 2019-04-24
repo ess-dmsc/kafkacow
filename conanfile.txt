@@ -8,7 +8,7 @@ boost_system/1.69.0@bincrafters/stable
 boost_dll/1.69.0@bincrafters/stable
 spdlog/1.1.0@bincrafters/stable
 jsonformoderncpp/3.2.0@vthiery/stable
-libgit2/0.27.4-dm1@ess-dmsc/testing
+libgit2/0.27.4-dm1@ess-dmsc/stable
 fmt/5.1.0@bincrafters/stable
 
 [generators]
