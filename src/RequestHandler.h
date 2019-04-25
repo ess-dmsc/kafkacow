@@ -17,12 +17,11 @@ public:
 
   void checkAndRun();
 
-  void checkConsumerModeArguments(UserArgumentStruct UserArguments,
-                                  bool TerminateAtEndOfTopic = false);
+  void checkConsumerModeArguments(bool TerminateAtEndOfTopic = false);
 
-  void checkMetadataModeArguments(UserArgumentStruct UserArguments);
+  void checkMetadataModeArguments();
 
-  void showTopicPartitionOffsets(UserArgumentStruct UserArguments);
+  void showTopicPartitionOffsets();
 
   void subscribeAndConsume(const std::string &TopicName, int64_t Offset,
                            bool TerminateAtEndOfTopic = false);

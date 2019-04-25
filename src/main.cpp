@@ -1,7 +1,7 @@
 #include "ConnectKafka.h"
 #include "CustomExceptions.h"
 #include "RequestHandler.h"
-#include "SchemaPath.h"
+#include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
@@ -45,13 +45,15 @@ int main(int argc, char **argv) {
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 
-  auto Logger = spdlog::stderr_color_mt("LOG");
-
-  auto SchemaPath = getSchemaPath();
-  Logger->debug("Using schemas in: {}", SchemaPath);
-
   CLI11_PARSE(App, argc, argv);
+
+  // setup logger
+  auto Logger = spdlog::stderr_color_mt("LOG");
+  Logger->info("Welcome to kafkacow!");
+
   try {
+    std::string SchemaPath = updateSchemas();
+    Logger->debug("Using schemas in: {}", SchemaPath);
     auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
     RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                      SchemaPath);

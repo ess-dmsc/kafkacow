@@ -14,8 +14,9 @@ add_executable(kafkacow main.cpp
         FlatbuffersTranslator.h
         JSONPrinting.cpp
         JSONPrinting.h
-        SchemaPath.h
-        SchemaPath.cpp)
+        UpdateSchemas.cpp
+        UpdateSchemas.h)
+
 target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka
         CONAN_PKG::FlatBuffers
@@ -24,4 +25,5 @@ target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::boost_dll
         CONAN_PKG::spdlog
         CONAN_PKG::jsonformoderncpp
+        CONAN_PKG::libgit2
         CONAN_PKG::fmt)

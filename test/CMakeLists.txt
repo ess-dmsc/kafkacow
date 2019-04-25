@@ -9,7 +9,8 @@ add_executable(UnitTests
         ${SRC_FILES}
         RequestHandlerTest.cpp
         FlatbuffersTranslatorTest.cpp
-        JSONPrintingTest.cpp)
+        JSONPrintingTest.cpp
+        UnitTests.cpp)
 
 target_link_libraries(UnitTests
         CONAN_PKG::gtest
@@ -20,4 +21,5 @@ target_link_libraries(UnitTests
         CONAN_PKG::boost_dll
         CONAN_PKG::FlatBuffers
         CONAN_PKG::spdlog
-        CONAN_PKG::jsonformoderncpp)
+        CONAN_PKG::jsonformoderncpp
+        CONAN_PKG::libgit2)

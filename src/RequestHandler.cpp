@@ -11,11 +11,11 @@
 void RequestHandler::checkAndRun() {
   // check input if ConsumerMode chosen
   if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
-    checkConsumerModeArguments(UserArguments);
+    checkConsumerModeArguments();
 
   // check input if MetadataMode chosen
   else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode)
-    checkMetadataModeArguments(UserArguments);
+    checkMetadataModeArguments();
   // no MetadataMode or ConsumerMode chosen
   else
     throw ArgumentException(
@@ -27,8 +27,7 @@ void RequestHandler::checkAndRun() {
 ///
 /// \param UserArguments
 /// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
-void RequestHandler::checkConsumerModeArguments(
-    UserArgumentStruct UserArguments, bool TerminateAtEndOfTopic) {
+void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.Name.empty()) {
     throw ArgumentException("Please specify topic!");
@@ -70,12 +69,11 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
 /// run.
 ///
 /// \param UserArguments
-void RequestHandler::checkMetadataModeArguments(
-    UserArgumentStruct UserArguments) {
+void RequestHandler::checkMetadataModeArguments() {
   if (UserArguments.ShowAllTopics)
     std::cout << KafkaConnection->getAllTopics() << "\n";
   else if (!UserArguments.Name.empty())
-    showTopicPartitionOffsets(UserArguments);
+    showTopicPartitionOffsets();
   else if (!UserArguments.ShowAllTopics)
     std::cout << KafkaConnection->showAllMetadata();
 }
@@ -117,8 +115,7 @@ void RequestHandler::verifyNLast(const int64_t NLast,
 /// Prints to screen a list of partitions' IDs and their low/high offsets.
 ///
 /// \param UserArguments
-void RequestHandler::showTopicPartitionOffsets(
-    UserArgumentStruct UserArguments) {
+void RequestHandler::showTopicPartitionOffsets() {
   std::cout << UserArguments.Name << "\n";
   for (auto &SingleStruct :
        KafkaConnection->getTopicsHighAndLowOffsets(UserArguments.Name)) {
