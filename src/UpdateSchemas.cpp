@@ -53,7 +53,7 @@ std::string updateSchemas(bool PullUpdates) {
   auto BinDirPath = boost::dll::program_location(Error).parent_path();
   auto BuildDir = BinDirPath.parent_path();
   auto SchemaPath = BuildDir / "schemas";
-  
+
   if (!PullUpdates) {
     return SchemaPath.string();
   }
