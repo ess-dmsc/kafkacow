@@ -19,7 +19,7 @@ target_link_libraries(UnitTests
         CONAN_PKG::boost_filesystem
         CONAN_PKG::boost_system
         CONAN_PKG::boost_dll
-        CONAN_PKG::FlatBuffers
+        CONAN_PKG::flatbuffers
         CONAN_PKG::spdlog
         CONAN_PKG::jsonformoderncpp
         CONAN_PKG::libgit2)
