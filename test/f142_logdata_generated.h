@@ -652,7 +652,7 @@ struct String FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyString(value()) &&
            verifier.EndTable();
   }
 };
@@ -701,7 +701,7 @@ struct ArrayByte FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -750,7 +750,7 @@ struct ArrayUByte FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -799,7 +799,7 @@ struct ArrayShort FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -848,7 +848,7 @@ struct ArrayUShort FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -897,7 +897,7 @@ struct ArrayInt FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -946,7 +946,7 @@ struct ArrayUInt FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -995,7 +995,7 @@ struct ArrayLong FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -1044,7 +1044,7 @@ struct ArrayULong FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -1093,7 +1093,7 @@ struct ArrayFloat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -1142,7 +1142,7 @@ struct ArrayDouble FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.EndTable();
   }
 };
@@ -1191,7 +1191,7 @@ struct ArrayString FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.Verify(value()) &&
+           verifier.VerifyVector(value()) &&
            verifier.VerifyVectorOfStrings(value()) &&
            verifier.EndTable();
   }
@@ -1332,7 +1332,7 @@ struct LogData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SOURCE_NAME) &&
-           verifier.Verify(source_name()) &&
+           verifier.VerifyString(source_name()) &&
            VerifyField<uint8_t>(verifier, VT_VALUE_TYPE) &&
            VerifyOffset(verifier, VT_VALUE) &&
            VerifyValue(verifier, value(), value_type()) &&

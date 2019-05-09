@@ -197,6 +197,8 @@ def get_macos_pipeline()
 
                 dir("${project}/code") {
                     try {
+                        // Conan remove is temporary until all projects have moved to lowercase package name
+                        sh "conan remove -f FlatBuffers/*"
                         checkout scm
                         sh "git submodule update --init --recursive"
                     } catch (e) {
@@ -237,7 +239,9 @@ def get_win10_pipeline() {
           }  // stage
 
         	stage("win10: Setup") {
-            bat """if exist _build rd /q /s _build
+        	// Conan remove is temporary until all projects have moved to lowercase package name
+            bat """conan remove -f FlatBuffers/*
+              if exist _build rd /q /s _build
         	  mkdir _build
         	  """
         	} // stage

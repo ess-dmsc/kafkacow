@@ -50,7 +50,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
 
   // Run first time to populate schema map
   std::string FileID;
@@ -64,7 +64,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
   std::string FileID;
   EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             MessageMetadata.Payload);
@@ -72,7 +72,7 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
 
 TEST(FlatbuffersTranslatorTest,
      no_throw_for_short_messages_without_file_identifier) {
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas());
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
   std::string FileID;
   KafkaMessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "test";
