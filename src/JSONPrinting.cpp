@@ -54,9 +54,9 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
 void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
   for (nlohmann::json::iterator it = JSONMessage.begin();
        it != JSONMessage.end(); ++it) {
-    if (it.value().is_object()) {
+    if (it.value().is_object() && !it.value().empty()) {
       recursiveTruncateJSONMap(it.value());
-    } else if (it.value().is_array()) {
+    } else if (it.value().is_array() && !it.value().empty()) {
       recursiveTruncateJSONSequence(it.value());
     }
   }
@@ -72,9 +72,9 @@ void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage) {
   for (nlohmann::json::iterator it = JSONMessage.end() - 1;
        it != JSONMessage.begin(); --it) {
     auto childNode = *it;
-    if (childNode.is_object()) {
+    if (childNode.is_object() && !childNode.empty()) {
       recursiveTruncateJSONMap(it.value());
-    } else if (childNode.is_array()) {
+    } else if (childNode.is_array() && !childNode.empty()) {
       recursiveTruncateJSONSequence(it.value());
     } else {
       Counter++;
