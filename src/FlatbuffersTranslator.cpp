@@ -67,7 +67,7 @@ std::pair<bool, std::string>
 FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   if (FileID.empty())
     return std::make_pair(false, "");
-  
+
   boost::filesystem::directory_iterator DirectoryIterator(SchemaPath), e;
   std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
