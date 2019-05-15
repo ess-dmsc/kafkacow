@@ -2,12 +2,13 @@
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
-/// Receives deserialized flatbuffers message, and prints it to screen according
-/// to Indent.
+/// Receives deserialized flatbuffers message, removes quotes and adds
+/// indentation for readability.
 ///
 /// \param JSONMessage
 /// \param Indent - number of characters of whitespace to use for indentation(4
 /// by default)
+/// \return readable message as string
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
   using nlohmann::json;
@@ -22,12 +23,13 @@ std::string getEntireMessage(const std::string &JSONMessage,
   return MessageWithNoQuotes;
 }
 
-/// Receives deserialized flatbuffers message, and prints it to screen according
-/// to Indent.
+/// Receives deserialized flatbuffers message, truncates, removes quotes and
+/// adds indentation for readability.
 ///
 /// \param JSONMessage
 /// \param Indent - number of characters of whitespace to use for indentation(4
 /// by default)
+/// \return truncated readable message as string
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
 
