@@ -33,3 +33,19 @@ TEST(JSONPrintingTest, print_nested_maps_and_sequences_test) {
                              "    32972}},[15579, 91072] ]";
   EXPECT_NO_THROW(getTruncatedMessage(InputMessage, 4));
 }
+
+TEST(JSONPrintingTest, print_empty_arrays_empty_maps) {
+  std::string InputMessage = "{"
+                             "    \"emptyArray\":[],"
+                             "    \"emptyObject\": {}"
+                             "}";
+  EXPECT_NO_THROW(getTruncatedMessage(InputMessage, 4));
+}
+
+TEST(JSONPrintingTest, print_entire_message_empty_arrays_empty_maps) {
+  std::string InputMessage = "{"
+                             "    \"emptyArray\":[],"
+                             "    \"emptyObject\": {}"
+                             "}";
+  EXPECT_NO_THROW(getEntireMessage(InputMessage, 4));
+}
