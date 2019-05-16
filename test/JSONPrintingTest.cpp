@@ -57,8 +57,14 @@ TEST(JSONPrintingTest, print_entire_non_json) {
 }
 
 TEST(JSONPrintingTest, print_truncated_non_json) {
-  std::string InputMessage =
-      "This is not a json message and it should be displayed without parsing";
-  EXPECT_TRUE(InputMessage.find(getTruncatedMessage(InputMessage, 4)) !=
+  std::string LongMessage = "This is a message that should be long enough to "
+                            "truncate, and it is not JSON.";
+  EXPECT_TRUE(LongMessage.find(getTruncatedMessage(LongMessage, 4)) !=
+              std::string::npos);
+}
+
+TEST(JSONPrintingTest, print_non_json_too_short_to_truncate) {
+  std::string ShortMessage = "Too short";
+  EXPECT_TRUE(ShortMessage.find(getTruncatedMessage(ShortMessage, 4)) !=
               std::string::npos);
 }
