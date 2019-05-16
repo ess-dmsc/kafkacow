@@ -1,7 +1,7 @@
-#include "../src/ConnectKafkaFake.h"
-#include "../src/ConnectKafkaInterface.h"
 #include "../src/CustomExceptions.h"
 #include "../src/FlatbuffersTranslator.h"
+#include "../src/KafkaW/FakeConsumer.h"
+#include "../src/KafkaW/ConsumerInterface.h"
 #include "../src/RequestHandler.h"
 #include "../src/UpdateSchemas.h"
 #include <boost/filesystem.hpp>
@@ -16,7 +16,7 @@ class RequestHandlerTest : public ::testing::Test {};
 
 TEST(RequestHandlerTest,
      subscribe_consume_n_last_messages_throws_if_incorrect_arguments_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -27,7 +27,7 @@ TEST(RequestHandlerTest,
 }
 
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -38,7 +38,7 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
 
 TEST(RequestHandlerTest,
      subscribe_at_an_offset_throws_if_incorrect_arguments_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -48,7 +48,7 @@ TEST(RequestHandlerTest,
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -69,7 +69,7 @@ TEST(RequestHandlerTest, topic_metadata_creation_test) {
 }
 
 TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
@@ -83,7 +83,7 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
 }
 
 TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.MetadataMode = true;
@@ -95,7 +95,7 @@ TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
 }
 
 TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = false;
@@ -107,7 +107,7 @@ TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
 
 // metadata mode arguments test
 TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "MULTIPART_events";
@@ -117,7 +117,7 @@ TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments());
 }
 TEST(RequestHandlerTest, show_all_topics_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = true;
@@ -128,7 +128,7 @@ TEST(RequestHandlerTest, show_all_topics_no_error) {
 }
 
 TEST(RequestHandlerTest, display_all_metadata) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = false;
@@ -145,7 +145,7 @@ TEST(RequestHandlerTest, display_all_metadata) {
 
 TEST(RequestHandlerTest,
      display_range_when_both_goback_and_offsettostart_specified) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1234;
@@ -157,7 +157,7 @@ TEST(RequestHandlerTest,
 }
 
 TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
@@ -169,7 +169,7 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
 }
 
 TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
@@ -189,7 +189,7 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
 }
 
 TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1233;
@@ -201,7 +201,7 @@ TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
 }
 
 TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 22343;
@@ -213,7 +213,7 @@ TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
 }
 
 TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
@@ -223,7 +223,7 @@ TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
 }
 
 TEST(RequestHandlerTest, throw_error_if_topic_empty) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "EmptyTopic";
@@ -235,7 +235,7 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
 }
 
 TEST(RequestHandlerTest, print_entire_topic_success) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "TestTopic";
@@ -245,7 +245,7 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
 }
 
 TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+  auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
   UserArguments.Name = "TestTopic";

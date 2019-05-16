@@ -1,11 +1,11 @@
 add_executable(kafkacow main.cpp
         RequestHandler.cpp
         RequestHandler.h
-        ConnectKafka.cpp
-        ConnectKafka.h
-        ConnectKafkaInterface.h
-        ConnectKafkaFake.cpp
-        ConnectKafkaFake.h
+        KafkaW/Consumer.cpp
+        KafkaW/Consumer.h
+        KafkaW/ConsumerInterface.h
+KafkaW/FakeConsumer.cpp
+KafkaW/FakeConsumer.h
         CustomExceptions.h
         UserArgumentsStruct.h
         OffsetsStruct.h
@@ -15,7 +15,10 @@ add_executable(kafkacow main.cpp
         JSONPrinting.cpp
         JSONPrinting.h
         UpdateSchemas.cpp
-        UpdateSchemas.h)
+        UpdateSchemas.h
+        KafkaW/Producer.cpp
+        KafkaW/Producer.h
+        KafkaW/KafkaConfig.h)
 
 target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka

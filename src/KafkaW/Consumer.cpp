@@ -1,50 +1,16 @@
-#include "ConnectKafka.h"
-#include "CustomExceptions.h"
+#include "Consumer.h"
+#include "../CustomExceptions.h"
+#include "KafkaConfig.h"
 #include "KafkaMessageMetadataStruct.h"
 #include <iomanip>
-
-namespace {
-
-void setConfig(RdKafka::Conf &conf, const std::string &ConfigName,
-               const std::string &ConfigValue) {
-  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
-  std::string ErrStr;
-  conf.set(ConfigName, ConfigValue, ErrStr);
-  if (!ErrStr.empty()) {
-    ErrStr.append(" in createGlobalConfiguration([...])");
-    Logger->error(ErrStr);
-  }
-}
-
-std::unique_ptr<RdKafka::Conf>
-createGlobalConfiguration(const std::string &BrokerAddr) {
-  auto conf = std::unique_ptr<RdKafka::Conf>(
-      RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-
-  setConfig(*conf, "metadata.broker.list", BrokerAddr);
-  setConfig(*conf, "session.timeout.ms", "10000");
-  setConfig(*conf, "message.max.bytes", "10000000");
-  setConfig(*conf, "fetch.message.max.bytes", "10000000");
-  setConfig(*conf, "enable.auto.commit", "false");
-  setConfig(*conf, "enable.auto.offset.store", "false");
-  setConfig(*conf, "offset.store.method", "none");
-  setConfig(*conf, "api.version.request", "true");
-  setConfig(*conf, "auto.offset.reset", "largest");
-  // kafkacow uses assign not subscribe, so group id is not used for consumer
-  // balancing.
-  setConfig(*conf, "group.id", "kafkacow");
-
-  return conf;
-}
-}
 
 /// Gets Metadata object from Kafka.
 ///
 /// \return unique_ptr to RdKafka::Metadata
-std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
+std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   RdKafka::ErrorCode ErrorCode =
-      Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
+      KafkaConsumer->metadata(true, nullptr, &metadataRawPtr, 1000);
   if (ErrorCode == RdKafka::ERR__TRANSPORT)
     throw std::runtime_error("Broker does not exist!");
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
@@ -54,14 +20,13 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   return metadata;
 }
 
-ConnectKafka::ConnectKafka(std::string Broker) : Logger(spdlog::get("LOG")) {
+Consumer::Consumer(std::string Broker) : Logger(spdlog::get("LOG")) {
   std::string ErrStr;
-  this->Consumer =
+  this->KafkaConsumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
   if (!ErrStr.empty()) {
-    ErrStr.append(
-        "Error creating KafkaConsumer in ConnectKafka::ConnectKafka.");
+    ErrStr.append("Error creating KafkaConsumer in Consumer::Consumer.");
     Logger->error(ErrStr);
   }
   this->MetadataPointer = this->queryMetadata();
@@ -70,7 +35,7 @@ ConnectKafka::ConnectKafka(std::string Broker) : Logger(spdlog::get("LOG")) {
 /// Returns a list of topics stored by the broker.
 ///
 /// \return single string containing all topics.
-std::string ConnectKafka::getAllTopics() {
+std::string Consumer::getAllTopics() {
   auto Topics = MetadataPointer->topics();
   std::string ListOfTopics;
   for (const auto &TopicName : *Topics) {
@@ -83,11 +48,11 @@ std::string ConnectKafka::getAllTopics() {
 /// Consumes Kafka messages starting from specified offset.
 ///
 /// \return struct containg serialized message and its metadata.
-KafkaMessageMetadataStruct ConnectKafka::consume() {
+KafkaMessageMetadataStruct Consumer::consume() {
   using RdKafka::Message;
   KafkaMessageMetadataStruct DataToReturn;
 
-  auto KafkaMsg = std::unique_ptr<Message>(Consumer->consume(1000));
+  auto KafkaMsg = std::unique_ptr<Message>(KafkaConsumer->consume(1000));
   switch (KafkaMsg->err()) {
   case RdKafka::ERR_NO_ERROR:
     // Real message
@@ -132,7 +97,7 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
 /// \param Topic
 /// \return vector<int32_t> of partition IDs
 std::vector<int32_t>
-ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
+Consumer::getTopicPartitionNumbers(const std::string &Topic) {
   auto Metadata = queryMetadata();
   auto Topics = Metadata->topics();
   auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
@@ -159,7 +124,7 @@ ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
 /// \param Topic
 /// \return
 std::vector<OffsetsStruct>
-ConnectKafka::getTopicsHighAndLowOffsets(const std::string &Topic) {
+Consumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
   auto TopicPartitions = getTopicPartitionNumbers(Topic);
   std::vector<OffsetsStruct> HighAndLowOffsets;
   for (auto &PartitionID : TopicPartitions) {
@@ -175,11 +140,10 @@ ConnectKafka::getTopicsHighAndLowOffsets(const std::string &Topic) {
 /// \param Topic
 /// \param PartitionID
 /// \return OffsetsStruct containing PartitionID and High- and LowOffset.
-OffsetsStruct
-ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
-                                            int32_t PartitionID) {
+OffsetsStruct Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
+                                                      int32_t PartitionID) {
   int64_t Low, High;
-  Consumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
+  KafkaConsumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
   OffsetsStruct OffsetsToSave;
   OffsetsToSave.HighOffset = High;
   OffsetsToSave.LowOffset = Low;
@@ -191,7 +155,7 @@ ConnectKafka::getPartitionHighAndLowOffsets(const std::string &Topic,
 ///
 /// \param Topic
 /// \return
-int ConnectKafka::getNumberOfTopicPartitions(std::string Topic) {
+int Consumer::getNumberOfTopicPartitions(std::string Topic) {
   return getTopicPartitionNumbers(Topic).size();
 }
 
@@ -199,7 +163,7 @@ int ConnectKafka::getNumberOfTopicPartitions(std::string Topic) {
 ///
 /// \param Offset
 /// \param Topic
-void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
+void Consumer::subscribeAtOffset(int64_t Offset, std::string Topic) {
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
   for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
     auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
@@ -207,7 +171,7 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
     TopicPartition->set_offset(Offset);
     TopicPartitionsWithOffsets.push_back(TopicPartition);
   }
-  Consumer->assign(TopicPartitionsWithOffsets);
+  KafkaConsumer->assign(TopicPartitionsWithOffsets);
   std::for_each(TopicPartitionsWithOffsets.cbegin(),
                 TopicPartitionsWithOffsets.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
@@ -218,9 +182,9 @@ void ConnectKafka::subscribeAtOffset(int64_t Offset, std::string Topic) {
 /// \param NMessages
 /// \param Topic
 /// \param Partition
-void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
-                                            const std::string &Topic,
-                                            int Partition) {
+void Consumer::subscribeToLastNMessages(int64_t NMessages,
+                                        const std::string &Topic,
+                                        int Partition) {
   std::vector<OffsetsStruct> HighAndLowOffsets =
       getTopicsHighAndLowOffsets(Topic);
 
@@ -244,7 +208,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
     }
     TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
   }
-  Consumer->assign(TopicPartitionsWithOffsetsSet);
+  KafkaConsumer->assign(TopicPartitionsWithOffsetsSet);
   std::for_each(TopicPartitionsWithOffsetsSet.cbegin(),
                 TopicPartitionsWithOffsetsSet.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
@@ -253,7 +217,7 @@ void ConnectKafka::subscribeToLastNMessages(int64_t NMessages,
 /// Displays brokers, topics, partitions and their details.
 ///
 /// \return single string containing metadata.
-std::string ConnectKafka::showAllMetadata() {
+std::string Consumer::showAllMetadata() {
   using std::setw;
   std::stringstream SS;
   SS << MetadataPointer->brokers()->size() << " brokers:\n";

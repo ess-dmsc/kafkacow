@@ -1,17 +1,17 @@
 #pragma once
 
-#include "ConnectKafkaInterface.h"
 #include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
+#include "KafkaW/ConsumerInterface.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
 class RequestHandler {
 public:
-  explicit RequestHandler(
-      std::unique_ptr<ConnectKafkaInterface> KafkaConnection,
-      UserArgumentStruct &UserArguments, std::string FullSchemaPath)
+  explicit RequestHandler(std::unique_ptr<ConsumerInterface> KafkaConnection,
+                          UserArgumentStruct &UserArguments,
+                          std::string FullSchemaPath)
       : KafkaConnection(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
         UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
 
@@ -33,7 +33,7 @@ public:
                            int64_t Offset);
 
 private:
-  std::unique_ptr<ConnectKafkaInterface> KafkaConnection;
+  std::unique_ptr<ConsumerInterface> KafkaConnection;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   const std::string SchemaPath;

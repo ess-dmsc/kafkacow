@@ -1,14 +1,14 @@
 #pragma once
 
+#include "../OffsetsStruct.h"
+#include "../TopicMetadataStruct.h"
 #include "KafkaMessageMetadataStruct.h"
-#include "OffsetsStruct.h"
-#include "TopicMetadataStruct.h"
 #include <CLI/CLI.hpp>
 #include <librdkafka/rdkafkacpp.h>
 
-class ConnectKafkaInterface {
+class ConsumerInterface {
 public:
-  virtual ~ConnectKafkaInterface() = default;
+  virtual ~ConsumerInterface() = default;
 
   virtual std::string getAllTopics() = 0;
 

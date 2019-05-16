@@ -1,6 +1,6 @@
 #pragma once
 
-#include "KafkaMessageMetadataStruct.h"
+#include "KafkaW/KafkaMessageMetadataStruct.h"
 #include <flatbuffers/idl.h>
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>

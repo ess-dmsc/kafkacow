@@ -1,12 +1,12 @@
-#include "ConnectKafkaFake.h"
+#include "FakeConsumer.h"
 
-ConnectKafkaFake::ConnectKafkaFake() {}
+FakeConsumer::FakeConsumer() {}
 
-std::string ConnectKafkaFake::getAllTopics() {
+std::string FakeConsumer::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
+KafkaMessageMetadataStruct FakeConsumer::consume() {
   KafkaMessageMetadataStruct DataToReturn;
   DataToReturn.Payload = "\"HiddenSecretMessageFromLovingNeutron\"";
   DataToReturn.PartitionEOF = true;
@@ -19,7 +19,7 @@ KafkaMessageMetadataStruct ConnectKafkaFake::consume() {
 }
 
 std::vector<OffsetsStruct>
-ConnectKafkaFake::getTopicsHighAndLowOffsets(const std::string &Topic) {
+FakeConsumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
 
   std::vector<OffsetsStruct> VectorOfPartitions;
 
@@ -34,22 +34,21 @@ ConnectKafkaFake::getTopicsHighAndLowOffsets(const std::string &Topic) {
   return VectorOfPartitions;
 }
 
-int ConnectKafkaFake::getNumberOfTopicPartitions(std::string TopicName) {
+int FakeConsumer::getNumberOfTopicPartitions(std::string TopicName) {
   return 1;
 }
 
-void ConnectKafkaFake::subscribeAtOffset(int64_t Offset,
-                                         std::string TopicName) {}
+void FakeConsumer::subscribeAtOffset(int64_t Offset, std::string TopicName) {}
 
-void ConnectKafkaFake::subscribeToLastNMessages(int64_t NMessages,
-                                                const std::string &TopicName,
-                                                int Partition) {}
+void FakeConsumer::subscribeToLastNMessages(int64_t NMessages,
+                                            const std::string &TopicName,
+                                            int Partition) {}
 
-std::string ConnectKafkaFake::showAllMetadata() { return "Test return"; }
+std::string FakeConsumer::showAllMetadata() { return "Test return"; }
 
 OffsetsStruct
-ConnectKafkaFake::getPartitionHighAndLowOffsets(const std::string &Topic,
-                                                int32_t PartitionID) {
+FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
+                                            int32_t PartitionID) {
   OffsetsStruct OffsetsToReturn;
   OffsetsToReturn.HighOffset = 5;
   OffsetsToReturn.LowOffset = 1;

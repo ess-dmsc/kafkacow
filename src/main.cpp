@@ -1,5 +1,5 @@
-#include "ConnectKafka.h"
 #include "CustomExceptions.h"
+#include "KafkaW/Consumer.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
+    auto KafkaConnection = std::make_unique<Consumer>(Broker);
     RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                      SchemaPath);
     NewRequestHandler.checkAndRun();

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "ConnectKafkaInterface.h"
-#include "TopicMetadataStruct.h"
+#include "../TopicMetadataStruct.h"
+#include "ConsumerInterface.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
-class ConnectKafkaFake : public ConnectKafkaInterface {
+class FakeConsumer : public ConsumerInterface {
 public:
-  ConnectKafkaFake();
+  FakeConsumer();
 
   std::string getAllTopics() override;
 
