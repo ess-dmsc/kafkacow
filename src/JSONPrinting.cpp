@@ -12,15 +12,19 @@
 std::string getEntireMessage(const std::string &JSONMessage,
                              const int &Indent) {
   using nlohmann::json;
-  auto JSONModernMessage = json::parse(JSONMessage.c_str());
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
-  MessageWithNoQuotes.erase(
-      std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
-      MessageWithNoQuotes.end());
-  MessageWithNoQuotes.erase(
-      std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
-      MessageWithNoQuotes.end());
-  return MessageWithNoQuotes;
+  try {
+    auto JSONModernMessage = json::parse(JSONMessage.c_str());
+    std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
+    MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
+                                          MessageWithNoQuotes.end(), '\"'),
+                              MessageWithNoQuotes.end());
+    MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
+                                          MessageWithNoQuotes.end(), ','),
+                              MessageWithNoQuotes.end());
+    return MessageWithNoQuotes;
+  } catch (nlohmann::json::exception) {
+    return JSONMessage;
+  }
 }
 
 /// Receives deserialized flatbuffers message, truncates, removes quotes and
@@ -32,21 +36,25 @@ std::string getEntireMessage(const std::string &JSONMessage,
 /// \return truncated readable message as string
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent) {
+  try {
+    auto JSONModernMessage = nlohmann::json::parse(JSONMessage.c_str());
+    if (JSONModernMessage.is_array()) {
+      recursiveTruncateJSONSequence(JSONModernMessage);
+    } else if (JSONModernMessage.is_object()) {
+      recursiveTruncateJSONMap(JSONModernMessage);
+    }
+    std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
+    MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
+                                          MessageWithNoQuotes.end(), '\"'),
+                              MessageWithNoQuotes.end());
+    MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
+                                          MessageWithNoQuotes.end(), ','),
+                              MessageWithNoQuotes.end());
+    return MessageWithNoQuotes;
 
-  auto JSONModernMessage = nlohmann::json::parse(JSONMessage.c_str());
-  if (JSONModernMessage.is_array()) {
-    recursiveTruncateJSONSequence(JSONModernMessage);
-  } else if (JSONModernMessage.is_object()) {
-    recursiveTruncateJSONMap(JSONModernMessage);
+  } catch (nlohmann::json::exception) {
+    return truncateNONJSON(JSONMessage);
   }
-  std::string MessageWithNoQuotes = JSONModernMessage.dump(Indent);
-  MessageWithNoQuotes.erase(
-      std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), '\"'),
-      MessageWithNoQuotes.end());
-  MessageWithNoQuotes.erase(
-      std::remove(MessageWithNoQuotes.begin(), MessageWithNoQuotes.end(), ','),
-      MessageWithNoQuotes.end());
-  return MessageWithNoQuotes;
 }
 
 /// Recursive method that receives JSON and truncates long arrays that it
@@ -91,4 +99,11 @@ void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage) {
       }
     }
   }
+}
+
+std::string truncateNONJSON(const std::string &Message) {
+  unsigned int MaxNumberOfCharacters = 50;
+  if (Message.size() > MaxNumberOfCharacters)
+    return Message.substr(0, MaxNumberOfCharacters);
+  return Message;
 }

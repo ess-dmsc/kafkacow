@@ -12,3 +12,5 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
 void recursiveTruncateJSONMap(nlohmann::json &JSONMessage);
 
 void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage);
+
+std::string truncateNONJSON(const std::string &Message);
