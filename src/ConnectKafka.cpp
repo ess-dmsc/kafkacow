@@ -45,8 +45,12 @@ std::unique_ptr<RdKafka::Metadata> ConnectKafka::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   RdKafka::ErrorCode ErrorCode =
       Consumer->metadata(true, nullptr, &metadataRawPtr, 1000);
-  if (ErrorCode == RdKafka::ERR__TRANSPORT)
+  if (ErrorCode == RdKafka::ERR__TRANSPORT) {
     throw std::runtime_error("Broker does not exist!");
+  } else if (ErrorCode != RdKafka::ERR_NO_ERROR) {
+    throw std::runtime_error(fmt::format(
+        "Error while retrieving metadata. RdKafka errorcode: {}", ErrorCode));
+  }
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
   if (metadata == nullptr) {
     throw std::runtime_error("Error while retrieving metadata.");
@@ -133,8 +137,7 @@ KafkaMessageMetadataStruct ConnectKafka::consume() {
 /// \return vector<int32_t> of partition IDs
 std::vector<int32_t>
 ConnectKafka::getTopicPartitionNumbers(const std::string &Topic) {
-  auto Metadata = queryMetadata();
-  auto Topics = Metadata->topics();
+  auto Topics = MetadataPointer->topics();
   auto Iterator = std::find_if(Topics->cbegin(), Topics->cend(),
                                [Topic](const RdKafka::TopicMetadata *tpc) {
                                  return tpc->topic() == Topic;

@@ -6,7 +6,7 @@
 /// Otherwise assumes message is valid JSON and returns it.
 ///
 /// \param MessageData
-/// \param FileID
+/// \param FileID : return value
 /// \return single string with JSON message.
 std::string
 FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
