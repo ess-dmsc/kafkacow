@@ -75,7 +75,7 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   UserArguments.ConsumerMode = true;
   UserArguments.OffsetToStart = 1235;
   UserArguments.GoBack = 1;
-  UserArguments.Name = "TestTopicName";
+  UserArguments.TopicName = "TestTopicName";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
 
@@ -110,7 +110,7 @@ TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
   auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "MULTIPART_events";
+  UserArguments.TopicName = "MULTIPART_events";
   UserArguments.ConsumerMode = true;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -226,7 +226,7 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
   auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "EmptyTopic";
+  UserArguments.TopicName = "EmptyTopic";
   UserArguments.GoBack = 5;
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
@@ -238,7 +238,7 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
   auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "TestTopic";
+  UserArguments.TopicName = "TestTopic";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
@@ -248,7 +248,7 @@ TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
   auto KafkaConnection = std::make_unique<FakeConsumer>(FakeConsumer());
 
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "TestTopic";
+  UserArguments.TopicName = "TestTopic";
   RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
                                    updateSchemas(false));
   testing::internal::CaptureStdout();

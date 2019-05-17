@@ -11,23 +11,23 @@
 /// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
 void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-      UserArguments.Name.empty()) {
+      UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
   }
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
-    printEntireTopic(UserArguments.Name, TerminateAtEndOfTopic);
+    printEntireTopic(UserArguments.TopicName, TerminateAtEndOfTopic);
   } else {
-    checkIfTopicEmpty(UserArguments.Name);
+    checkIfTopicEmpty(UserArguments.TopicName);
     if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
-      subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+      subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
                           UserArguments.PartitionToConsume,
                           UserArguments.OffsetToStart);
     } else {
       if (UserArguments.OffsetToStart > -2) {
-        subscribeAndConsume(UserArguments.Name, UserArguments.OffsetToStart);
+        subscribeAndConsume(UserArguments.TopicName, UserArguments.OffsetToStart);
       } else {
         (UserArguments.PartitionToConsume != -1)
-            ? subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+            ? subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
                                   UserArguments.PartitionToConsume)
             : Logger->error("Please specify partition");
       }
@@ -54,7 +54,7 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
 void RequestHandler::checkMetadataModeArguments() {
   if (UserArguments.ShowAllTopics)
     std::cout << KafkaConsumer->getAllTopics() << "\n";
-  else if (!UserArguments.Name.empty())
+  else if (!UserArguments.TopicName.empty())
     showTopicPartitionOffsets();
   else if (!UserArguments.ShowAllTopics)
     std::cout << KafkaConsumer->showAllMetadata();
@@ -102,9 +102,9 @@ void RequestHandler::verifyNLast(const int64_t NLast,
 ///
 /// \param UserArguments
 void RequestHandler::showTopicPartitionOffsets() {
-  std::cout << UserArguments.Name << "\n";
+  std::cout << UserArguments.TopicName << "\n";
   for (auto &SingleStruct :
-       KafkaConsumer->getTopicsHighAndLowOffsets(UserArguments.Name)) {
+       KafkaConsumer->getTopicsHighAndLowOffsets(UserArguments.TopicName)) {
     fmt::print("Partition ID: {} || Low offset: {} || High offset: {}",
                SingleStruct.PartitionId, SingleStruct.LowOffset,
                SingleStruct.HighOffset);
