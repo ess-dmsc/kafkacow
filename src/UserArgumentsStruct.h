@@ -16,5 +16,6 @@ struct UserArgumentStruct {
   bool ShowAllTopics = false;
   bool ConsumerMode = false;
   bool MetadataMode = false;
+  bool ProducerMode = false;
   bool ShowEntireMessage = false;
 };

@@ -11,8 +11,12 @@ std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   RdKafka::ErrorCode ErrorCode =
       KafkaConsumer->metadata(true, nullptr, &metadataRawPtr, 1000);
-  if (ErrorCode == RdKafka::ERR__TRANSPORT)
+  if (ErrorCode == RdKafka::ERR__TRANSPORT) {
     throw std::runtime_error("Broker does not exist!");
+  } else if (ErrorCode != RdKafka::ERR_NO_ERROR) {
+    throw std::runtime_error(fmt::format(
+        "Error while retrieving metadata. RdKafka errorcode: {}", ErrorCode));
+  }
   std::unique_ptr<RdKafka::Metadata> metadata(metadataRawPtr);
   if (metadata == nullptr) {
     throw std::runtime_error("Error while retrieving metadata.");

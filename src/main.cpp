@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
   App.add_flag("-L, --list", UserArguments.MetadataMode,
                "Metadata mode. Show all topics and partitions. If \"-t\" "
                "specified, shows partition offsets.");
+  App.add_flag("-P, --producer", UserArguments.ProducerMode,
+               "Run program in producer mode.");
   App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker.");
   App.add_option("-t, --topic", UserArguments.Name,
                  "Show records of specified topic.");
