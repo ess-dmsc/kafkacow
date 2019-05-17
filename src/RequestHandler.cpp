@@ -139,12 +139,14 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
     std::string JSONMessage =
         FlatBuffers.deserializeToJSON(MessageData, FileIdentifier);
     printMessageMetadata(MessageData, FileIdentifier);
+
     (UserArguments.ShowEntireMessage)
         ? std::cout << fmt::format(
               "{}", getEntireMessage(JSONMessage, UserArguments.Indentation))
         : std::cout << fmt::format(
-              "{}",
-              getTruncatedMessage(JSONMessage, UserArguments.Indentation));
+                           "{}", getTruncatedMessage(JSONMessage,
+                                                     UserArguments.Indentation))
+                    << std::endl;
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
