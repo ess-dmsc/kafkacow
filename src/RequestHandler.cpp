@@ -4,24 +4,6 @@
 #include <chrono>
 #include <fmt/format.h>
 
-/// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
-/// calls method responsible for handling one of the modes or throws
-/// ArgumentsException if arguments invalid.
-/// \param UserArguments
-void RequestHandler::checkAndRun() {
-  // check input if ConsumerMode chosen
-  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
-    checkConsumerModeArguments();
-
-  // check input if MetadataMode chosen
-  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode)
-    checkMetadataModeArguments();
-  // no MetadataMode or ConsumerMode chosen
-  else
-    throw ArgumentException(
-        "Program can run in one and only one mode: --consumer or --metadata");
-}
-
 /// Analyzes user arguments to determine which consumer mode functionality to
 /// run.
 ///

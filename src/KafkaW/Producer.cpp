@@ -1,4 +1,5 @@
 #include "Producer.h"
+#include "KafkaConfig.h"
 #include <memory>
 
 Producer::Producer(std::string Broker) {

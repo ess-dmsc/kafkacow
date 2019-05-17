@@ -1,5 +1,6 @@
 #include "CustomExceptions.h"
 #include "KafkaW/Consumer.h"
+#include "KafkaW/Producer.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
@@ -7,6 +8,9 @@
 #include <librdkafka/rdkafkacpp.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+
+void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
+                 std::string Broker);
 
 int main(int argc, char **argv) {
 
@@ -56,12 +60,42 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    auto KafkaConnection = std::make_unique<Consumer>(Broker);
-    RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                     SchemaPath);
-    NewRequestHandler.checkAndRun();
+    checkAndRun(UserArguments, SchemaPath, Broker);
   } catch (std::exception &E) {
     Logger->error(E.what());
   }
   return 0;
+}
+
+/// Checks which mode(consumer/metadata/producer) is chosen and
+/// calls method responsible for handling one of the modes or throws
+/// ArgumentsException if arguments invalid.
+/// \param UserArguments
+void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
+                 std::string Broker) {
+  // check input if ConsumerMode chosen
+  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
+      !UserArguments.ProducerMode) {
+    auto KafkaConsumer = std::make_unique<Consumer>(Broker);
+    RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
+                                     SchemaPath);
+    NewRequestHandler.checkConsumerModeArguments();
+
+  }
+  // check input if MetadataMode chosen
+  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
+           !UserArguments.ProducerMode) {
+    auto KafkaConsumer = std::make_unique<Consumer>(Broker);
+    RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
+                                     SchemaPath);
+    NewRequestHandler.checkMetadataModeArguments();
+  } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
+             !UserArguments.MetadataMode) {
+    auto KafkaProducer = std::make_unique<Producer>(Broker);
+    spdlog::get("LOG")->error("Producer branch");
+  }
+  // no MetadataMode or ConsumerMode chosen
+  else
+    throw ArgumentException("Program can run in one and only one mode: "
+                            "--consumer, --metadata or --producer");
 }

@@ -15,8 +15,6 @@ public:
       : KafkaConnection(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
         UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
 
-  void checkAndRun();
-
   void checkConsumerModeArguments(bool TerminateAtEndOfTopic = false);
 
   void checkMetadataModeArguments();

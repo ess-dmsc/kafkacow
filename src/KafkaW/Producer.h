@@ -1,9 +1,10 @@
 #pragma once
 
-#include "KafkaConfig.h"
 #include <librdkafka/rdkafkacpp.h>
+#include <spdlog/logger.h>
 
 class Producer {
+public:
   Producer(std::string Broker);
 
 private:
