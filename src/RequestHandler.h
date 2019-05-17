@@ -3,6 +3,7 @@
 #include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
 #include "KafkaW/ConsumerInterface.h"
+#include "KafkaW/Producer.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
@@ -12,12 +13,20 @@ public:
   explicit RequestHandler(std::unique_ptr<ConsumerInterface> KafkaConnection,
                           UserArgumentStruct &UserArguments,
                           std::string FullSchemaPath)
-      : KafkaConnection(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
+      : KafkaConsumer(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
+        UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
+
+  explicit RequestHandler(std::unique_ptr<Producer> Producer,
+                          UserArgumentStruct &UserArguments,
+                          std::string FullSchemaPath)
+      : KafkaProducer(std::move(Producer)), Logger(spdlog::get("LOG")),
         UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
 
   void checkConsumerModeArguments(bool TerminateAtEndOfTopic = false);
 
   void checkMetadataModeArguments();
+
+  void checkProducerModeArguments();
 
   void showTopicPartitionOffsets();
 
@@ -31,7 +40,8 @@ public:
                            int64_t Offset);
 
 private:
-  std::unique_ptr<ConsumerInterface> KafkaConnection;
+  std::unique_ptr<ConsumerInterface> KafkaConsumer;
+  std::unique_ptr<Producer> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   const std::string SchemaPath;

@@ -92,7 +92,9 @@ void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
   } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
              !UserArguments.MetadataMode) {
     auto KafkaProducer = std::make_unique<Producer>(Broker);
-    spdlog::get("LOG")->error("Producer branch");
+    RequestHandler NewRequestHandler(std::move(KafkaProducer), UserArguments,
+                                     SchemaPath);
+    NewRequestHandler.checkProducerModeArguments();
   }
   // no MetadataMode or ConsumerMode chosen
   else
