@@ -4,6 +4,7 @@
 
 struct UserArgumentStruct {
   std::string TopicName;
+  std::string Broker;
 
   // value -2 signalises that the variable hasn't been set by a user and won't
   // be used

@@ -9,8 +9,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
-                 std::string Broker);
+void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath);
 
 int main(int argc, char **argv) {
 
@@ -25,7 +24,8 @@ int main(int argc, char **argv) {
                "specified, shows partition offsets.");
   App.add_flag("-P, --producer", UserArguments.ProducerMode,
                "Run program in producer mode.");
-  App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker.");
+  App.add_option("-b,--broker", UserArguments.Broker,
+                 "Hostname or IP of Kafka broker.");
   App.add_option("-t, --topic", UserArguments.TopicName,
                  "Show records of specified topic.");
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    checkAndRun(UserArguments, SchemaPath, Broker);
+    checkAndRun(UserArguments, SchemaPath);
   } catch (std::exception &E) {
     Logger->error(E.what());
   }
@@ -71,12 +71,11 @@ int main(int argc, char **argv) {
 /// calls method responsible for handling one of the modes or throws
 /// ArgumentsException if arguments invalid.
 /// \param UserArguments
-void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
-                 std::string Broker) {
+void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath) {
   // check input if ConsumerMode chosen
   if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
       !UserArguments.ProducerMode) {
-    auto KafkaConsumer = std::make_unique<Consumer>(Broker);
+    auto KafkaConsumer = std::make_unique<Consumer>(UserArguments.Broker);
     RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
                                      SchemaPath);
     NewRequestHandler.checkConsumerModeArguments();
@@ -85,13 +84,13 @@ void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath,
   // check input if MetadataMode chosen
   else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
            !UserArguments.ProducerMode) {
-    auto KafkaConsumer = std::make_unique<Consumer>(Broker);
+    auto KafkaConsumer = std::make_unique<Consumer>(UserArguments.Broker);
     RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
                                      SchemaPath);
     NewRequestHandler.checkMetadataModeArguments();
   } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
              !UserArguments.MetadataMode) {
-    auto KafkaProducer = std::make_unique<Producer>(Broker);
+    auto KafkaProducer = std::make_unique<Producer>(UserArguments.Broker);
     RequestHandler NewRequestHandler(std::move(KafkaProducer), UserArguments,
                                      SchemaPath);
     NewRequestHandler.checkProducerModeArguments();
