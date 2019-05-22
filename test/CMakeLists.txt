@@ -11,8 +11,15 @@ add_executable(UnitTests
         FlatbuffersTranslatorTest.cpp
         JSONPrintingTest.cpp
         UnitTests.cpp
-../src/KafkaW/FakeConsumer.cpp
-../src/KafkaW/FakeConsumer.h)
+        ../src/KafkaW/FakeConsumer.cpp
+        ../src/KafkaW/FakeConsumer.h
+        ../src/KafkaW/Consumer.h
+        ../src/KafkaW/Consumer.cpp
+        ../src/KafkaW/ConsumerFactory.h
+        ../src/KafkaW/ConsumerFactory.cpp
+        ../src/KafkaW/Producer.h
+        ../src/KafkaW/Producer.cpp)
+
 
 target_link_libraries(UnitTests
         CONAN_PKG::gtest
