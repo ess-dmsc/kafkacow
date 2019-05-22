@@ -2,6 +2,7 @@
 
 #include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
+#include "KafkaW/ConsumerFactory.h"
 #include "KafkaW/ConsumerInterface.h"
 #include "KafkaW/Producer.h"
 #include "UserArgumentsStruct.h"
@@ -12,8 +13,26 @@ class RequestHandler {
 public:
   explicit RequestHandler(UserArgumentStruct &UserArguments,
                           std::string FullSchemaPath, bool Real = true)
-      : Real(Real), Logger(spdlog::get("LOG")), UserArguments(UserArguments),
-        SchemaPath(std::move(FullSchemaPath)) {}
+      : Logger(spdlog::get("LOG")), UserArguments(UserArguments),
+        SchemaPath(std::move(FullSchemaPath)) {
+    // check input if ConsumerMode chosen
+    if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
+        !UserArguments.ProducerMode) {
+      KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
+    }
+    // check input if MetadataMode chosen
+    else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
+             !UserArguments.ProducerMode) {
+      KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
+    } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
+               !UserArguments.MetadataMode) {
+      KafkaProducer = std::make_unique<Producer>(UserArguments.Broker);
+    }
+    // no MetadataMode or ConsumerMode chosen
+    else
+      throw ArgumentException("Program can run in one and only one mode: "
+                              "--consumer, --metadata or --producer");
+  }
 
   void checkAndRun();
 
@@ -35,7 +54,6 @@ public:
                            int64_t Offset);
 
 private:
-  bool Real = true;
   std::unique_ptr<ConsumerInterface> KafkaConsumer;
   std::unique_ptr<Producer> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger;

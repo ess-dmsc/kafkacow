@@ -1,7 +1,6 @@
 #include "RequestHandler.h"
 #include "CustomExceptions.h"
 #include "JSONPrinting.h"
-#include "KafkaW/ConsumerFactory.h"
 #include <chrono>
 #include <fmt/format.h>
 
@@ -10,24 +9,13 @@
 /// ArgumentsException if arguments invalid.
 /// \param UserArguments
 void RequestHandler::checkAndRun() {
-  // check input if ConsumerMode chosen
-  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
-      !UserArguments.ProducerMode) {
-    KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
-    checkConsumerModeArguments();
-  }
-  // check input if MetadataMode chosen
-  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
-           !UserArguments.ProducerMode) {
-    checkMetadataModeArguments();
-  } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
-             !UserArguments.MetadataMode) {
+  if (UserArguments.ProducerMode) {
     checkProducerModeArguments();
+  } else if (UserArguments.ConsumerMode) {
+    checkConsumerModeArguments();
+  } else {
+    checkMetadataModeArguments();
   }
-  // no MetadataMode or ConsumerMode chosen
-  else
-    throw ArgumentException("Program can run in one and only one mode: "
-                            "--consumer, --metadata or --producer");
 }
 
 /// Analyzes user arguments to determine which consumer mode functionality to

@@ -58,9 +58,8 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    auto KafkaConnection = std::make_unique<Consumer>(Broker);
-
     RequestHandler MainRequestHandler(UserArguments, SchemaPath);
+    MainRequestHandler.checkAndRun();
   } catch (std::exception &E) {
     Logger->error(E.what());
   }
