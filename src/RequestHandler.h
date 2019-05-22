@@ -10,17 +10,12 @@
 
 class RequestHandler {
 public:
-  explicit RequestHandler(std::unique_ptr<ConsumerInterface> KafkaConnection,
-                          UserArgumentStruct &UserArguments,
-                          std::string FullSchemaPath)
-      : KafkaConsumer(std::move(KafkaConnection)), Logger(spdlog::get("LOG")),
-        UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
+  explicit RequestHandler(UserArgumentStruct &UserArguments,
+                          std::string FullSchemaPath, bool Real = true)
+      : Real(Real), Logger(spdlog::get("LOG")), UserArguments(UserArguments),
+        SchemaPath(std::move(FullSchemaPath)) {}
 
-  explicit RequestHandler(std::unique_ptr<Producer> Producer,
-                          UserArgumentStruct &UserArguments,
-                          std::string FullSchemaPath)
-      : KafkaProducer(std::move(Producer)), Logger(spdlog::get("LOG")),
-        UserArguments(UserArguments), SchemaPath(std::move(FullSchemaPath)) {}
+  void checkAndRun();
 
   void checkConsumerModeArguments(bool TerminateAtEndOfTopic = false);
 
@@ -40,6 +35,7 @@ public:
                            int64_t Offset);
 
 private:
+  bool Real = true;
   std::unique_ptr<ConsumerInterface> KafkaConsumer;
   std::unique_ptr<Producer> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger;

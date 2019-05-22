@@ -1,8 +1,34 @@
 #include "RequestHandler.h"
 #include "CustomExceptions.h"
 #include "JSONPrinting.h"
+#include "KafkaW/ConsumerFactory.h"
 #include <chrono>
 #include <fmt/format.h>
+
+/// Checks which mode(consumer/metadata/producer) is chosen and
+/// calls method responsible for handling one of the modes or throws
+/// ArgumentsException if arguments invalid.
+/// \param UserArguments
+void RequestHandler::checkAndRun() {
+  // check input if ConsumerMode chosen
+  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
+      !UserArguments.ProducerMode) {
+    KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
+    checkConsumerModeArguments();
+  }
+  // check input if MetadataMode chosen
+  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
+           !UserArguments.ProducerMode) {
+    checkMetadataModeArguments();
+  } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
+             !UserArguments.MetadataMode) {
+    checkProducerModeArguments();
+  }
+  // no MetadataMode or ConsumerMode chosen
+  else
+    throw ArgumentException("Program can run in one and only one mode: "
+                            "--consumer, --metadata or --producer");
+}
 
 /// Analyzes user arguments to determine which consumer mode functionality to
 /// run.
@@ -24,7 +50,8 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
                           UserArguments.OffsetToStart);
     } else {
       if (UserArguments.OffsetToStart > -2) {
-        subscribeAndConsume(UserArguments.TopicName, UserArguments.OffsetToStart);
+        subscribeAndConsume(UserArguments.TopicName,
+                            UserArguments.OffsetToStart);
       } else {
         (UserArguments.PartitionToConsume != -1)
             ? subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,

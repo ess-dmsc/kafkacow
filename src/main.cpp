@@ -9,8 +9,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath);
-
 int main(int argc, char **argv) {
 
   CLI::App App{"From Kafka with love"};
@@ -60,43 +58,11 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    checkAndRun(UserArguments, SchemaPath);
+    auto KafkaConnection = std::make_unique<Consumer>(Broker);
+
+    RequestHandler MainRequestHandler(UserArguments, SchemaPath);
   } catch (std::exception &E) {
     Logger->error(E.what());
   }
   return 0;
-}
-
-/// Checks which mode(consumer/metadata/producer) is chosen and
-/// calls method responsible for handling one of the modes or throws
-/// ArgumentsException if arguments invalid.
-/// \param UserArguments
-void checkAndRun(UserArgumentStruct UserArguments, std::string SchemaPath) {
-  // check input if ConsumerMode chosen
-  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
-      !UserArguments.ProducerMode) {
-    auto KafkaConsumer = std::make_unique<Consumer>(UserArguments.Broker);
-    RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
-                                     SchemaPath);
-    NewRequestHandler.checkConsumerModeArguments();
-
-  }
-  // check input if MetadataMode chosen
-  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
-           !UserArguments.ProducerMode) {
-    auto KafkaConsumer = std::make_unique<Consumer>(UserArguments.Broker);
-    RequestHandler NewRequestHandler(std::move(KafkaConsumer), UserArguments,
-                                     SchemaPath);
-    NewRequestHandler.checkMetadataModeArguments();
-  } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
-             !UserArguments.MetadataMode) {
-    auto KafkaProducer = std::make_unique<Producer>(UserArguments.Broker);
-    RequestHandler NewRequestHandler(std::move(KafkaProducer), UserArguments,
-                                     SchemaPath);
-    NewRequestHandler.checkProducerModeArguments();
-  }
-  // no MetadataMode or ConsumerMode chosen
-  else
-    throw ArgumentException("Program can run in one and only one mode: "
-                            "--consumer, --metadata or --producer");
 }
