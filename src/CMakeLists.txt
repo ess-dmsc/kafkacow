@@ -34,4 +34,5 @@ target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::spdlog
         CONAN_PKG::jsonformoderncpp
         CONAN_PKG::libgit2
-        CONAN_PKG::fmt)
+        CONAN_PKG::fmt
+        CONAN_PKG::streaming-data-types)
