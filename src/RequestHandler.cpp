@@ -76,7 +76,7 @@ void RequestHandler::checkMetadataModeArguments() {
 }
 
 void RequestHandler::checkProducerModeArguments() {
-  spdlog::get("LOG")->error("Producer branch");
+  Logger->error("Producer branch");
 }
 
 /// Ensures there are messages to read at offset provided by the user, otherwise

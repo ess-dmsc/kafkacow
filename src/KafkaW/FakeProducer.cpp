@@ -1,3 +1,3 @@
 #include "FakeProducer.h"
 
-void FakeProducer::produce() {}
+void FakeProducer::produce(KafkaW::Message &Message) {}

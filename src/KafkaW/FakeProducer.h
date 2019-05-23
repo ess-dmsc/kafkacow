@@ -5,5 +5,5 @@
 class FakeProducer : public ProducerInterface {
 public:
   FakeProducer(){};
-  void produce() override;
+  void produce(KafkaW::Message &Message) override;
 };

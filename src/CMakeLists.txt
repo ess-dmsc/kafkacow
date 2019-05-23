@@ -23,7 +23,7 @@ add_executable(kafkacow main.cpp
         KafkaW/ConsumerFactory.h
         KafkaW/ProducerInterface.h
         KafkaW/ProducerFactory.cpp
-        KafkaW/ProducerFactory.h KafkaW/FakeProducer.cpp KafkaW/FakeProducer.h)
+        KafkaW/ProducerFactory.h KafkaW/FakeProducer.cpp KafkaW/FakeProducer.h KafkaW/Message.h)
 
 target_link_libraries(kafkacow CONAN_PKG::cli11
         CONAN_PKG::librdkafka
