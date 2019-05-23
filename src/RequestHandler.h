@@ -41,7 +41,7 @@ public:
 
   void checkMetadataModeArguments();
 
-  void checkProducerModeArguments();
+  void checkProducerModeArguments(const char *Message);
 
   void showTopicPartitionOffsets();
 

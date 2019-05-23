@@ -1,6 +1,7 @@
 #include "RequestHandler.h"
 #include "CustomExceptions.h"
 #include "JSONPrinting.h"
+#include "json_json_generated.h"
 #include <chrono>
 #include <fmt/format.h>
 
@@ -10,7 +11,8 @@
 /// \param UserArguments
 void RequestHandler::checkAndRun() {
   if (UserArguments.ProducerMode) {
-    checkProducerModeArguments();
+    auto message = "{\"array\":[1,2,3]}";
+    checkProducerModeArguments(message);
   } else if (UserArguments.ConsumerMode) {
     checkConsumerModeArguments();
   } else {
@@ -75,7 +77,14 @@ void RequestHandler::checkMetadataModeArguments() {
     std::cout << KafkaConsumer->showAllMetadata();
 }
 
-void RequestHandler::checkProducerModeArguments() {
+void RequestHandler::checkProducerModeArguments(const char *Message) {
+  std::string JSONToSerialise = R"({"array":[1,2,3]})";
+  flatbuffers::FlatBufferBuilder builder;
+  builder.Clear();
+  auto FBOffset = CreateJsonDataDirect(builder, Message);
+  FinishJsonDataBuffer(builder, FBOffset);
+  KafkaW::Message KMessage(builder.Release());
+  KafkaProducer->produce(KMessage);
   Logger->error("Producer branch");
 }
 
