@@ -18,7 +18,11 @@ add_executable(UnitTests
         ../src/KafkaW/ConsumerFactory.h
         ../src/KafkaW/ConsumerFactory.cpp
         ../src/KafkaW/Producer.h
-        ../src/KafkaW/Producer.cpp)
+        ../src/KafkaW/Producer.cpp
+        ../src/KafkaW/ProducerFactory.h
+        ../src/KafkaW/ProducerFactory.cpp
+        ../src/KafkaW/FakeProducer.cpp
+        ../src/KafkaW/FakeProducer.h)
 
 
 target_link_libraries(UnitTests

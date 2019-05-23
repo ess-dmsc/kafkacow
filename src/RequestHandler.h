@@ -4,7 +4,8 @@
 #include "FlatbuffersTranslator.h"
 #include "KafkaW/ConsumerFactory.h"
 #include "KafkaW/ConsumerInterface.h"
-#include "KafkaW/Producer.h"
+#include "KafkaW/ProducerFactory.h"
+#include "KafkaW/ProducerInterface.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
@@ -26,7 +27,7 @@ public:
       KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
     } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
                !UserArguments.MetadataMode) {
-      KafkaProducer = std::make_unique<Producer>(UserArguments.Broker);
+      KafkaProducer = KafkaW::createProducer(UserArguments.Broker, Real);
     }
     // no MetadataMode or ConsumerMode chosen
     else
@@ -55,7 +56,7 @@ public:
 
 private:
   std::unique_ptr<ConsumerInterface> KafkaConsumer;
-  std::unique_ptr<Producer> KafkaProducer;
+  std::unique_ptr<ProducerInterface> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   const std::string SchemaPath;
