@@ -2,7 +2,6 @@
 #include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
 #include <flatbuffers/flatbuffers.h>
-#include <iostream>
 #include <json_json_generated.h>
 
 /// If schema is found, deserializes message and returns it as string.
@@ -123,7 +122,8 @@ KafkaW::Message
 FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
   flatbuffers::FlatBufferBuilder builder;
   builder.Clear();
-  auto FBOffset = CreateJsonDataDirect(builder, getMessageFromFile(JSONPath));
+  auto FBOffset =
+      CreateJsonDataDirect(builder, getMessageFromFile(JSONPath).c_str());
   FinishJsonDataBuffer(builder, FBOffset);
   return KafkaW::Message(builder.Release());
 }
@@ -131,10 +131,10 @@ FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
 /// Reads \p JSONPath file and returns message to serialize.
 /// \param JSONPath Path to file
 /// \return contents of file
-const char *
+std::string
 FlatbuffersTranslator::getMessageFromFile(const std::string JSONPath) {
   std::ifstream IfStream(JSONPath);
   std::stringstream StringStream;
   StringStream << IfStream.rdbuf();
-  return StringStream.str().c_str();
+  return StringStream.str();
 }
