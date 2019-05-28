@@ -33,6 +33,8 @@ int main(int argc, char **argv) {
                  "display range of messages combine with \"-o\" as lower "
                  "offset.")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
+  App.add_option("-f,--file", UserArguments.JSONPath, "Path to JSON file.")
+      ->check(CLI::ExistingFile);
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
                  "Start consuming from an offset. Combine with \"-g\" to "
                  "display range of messages with \"-o\" as lower offset.")

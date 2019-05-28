@@ -14,9 +14,11 @@ public:
       RdKafka::wait_destroyed(5000);
     }
   }
-  void produce(KafkaW::Message &Message) override;
+  void produce(KafkaW::Message Message) override;
 
 private:
+  std::string loadFromFile(const std::string *Path);
+
   std::shared_ptr<RdKafka::Topic>
   createTopicHandle(const std::string &topicPrefix,
                     const std::string &topicSuffix,

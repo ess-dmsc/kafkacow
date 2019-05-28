@@ -7,5 +7,7 @@ class ProducerInterface {
 public:
   virtual ~ProducerInterface() = default;
 
-  virtual void produce(KafkaW::Message &Message) = 0;
+  virtual void produce(KafkaW::Message Message) = 0;
+
+private:
 };

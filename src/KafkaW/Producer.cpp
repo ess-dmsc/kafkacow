@@ -1,6 +1,8 @@
 #include "Producer.h"
 #include "KafkaConfig.h"
+#include <fstream>
 #include <memory>
+#include <sstream>
 
 Producer::Producer(std::string Broker) {
   std::string ErrStr;
@@ -54,9 +56,16 @@ Producer::createTopicHandle(const std::string &topicPrefix,
   return topic_ptr;
 }
 
-void Producer::produce(KafkaW::Message &Message) {
+void Producer::produce(KafkaW::Message Message) {
   auto TopicConfiguration = std::shared_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
   auto TopicHandle = createTopicHandle("TopicA", "TopicB", TopicConfiguration);
   produceMessage(Message, TopicHandle);
+}
+
+std::string Producer::loadFromFile(const std::string *Path) {
+  std::ifstream File(*Path);
+  std::stringstream buffer;
+  buffer << File.rdbuf();
+  return buffer.str();
 }

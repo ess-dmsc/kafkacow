@@ -1,6 +1,9 @@
 #include "FlatbuffersTranslator.h"
 #include "CustomExceptions.h"
 #include <boost/filesystem.hpp>
+#include <flatbuffers/flatbuffers.h>
+#include <iostream>
+#include <json_json_generated.h>
 
 /// If schema is found, deserializes message and returns it as string.
 /// Otherwise assumes message is valid JSON and returns it.
@@ -16,6 +19,10 @@ FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
     FileID = MessageData.Payload.substr(4, 4);
   } else {
     FileID.clear();
+  }
+
+  if (FileID == "json") {
+    return GetJsonData(MessageData.Payload.c_str())->json()->str();
   }
 
   if (FileIDMap.find(FileID) ==
@@ -46,6 +53,8 @@ FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
 
     // put schema path and schema into the map
     FileIDMap.emplace(FileID, std::make_pair(SchemaFile.second, Schema));
+    auto before = DeserializedMessage;
+
     return DeserializedMessage;
   } else { // create a parser using schema loaded in the map
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
@@ -95,7 +104,6 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   // Make sure flatbuffers returns strict json. Otherwise messages give parsing
   // errors and break truncation.
   opts.strict_json = true;
-
   auto Parser = std::make_unique<flatbuffers::Parser>(opts);
   Parser->builder_.Clear();
   const char *include_directories[] = {SchemaPath.c_str(), nullptr};
@@ -106,4 +114,27 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   Parser->builder_.PushFlatBuffer(
       reinterpret_cast<const uint8_t *>(Message.c_str()), Message.length());
   return Parser;
+}
+
+/// Serializes message found in file \p JSONPath.
+/// \param JSONPath
+/// \return KafkaW::Message
+KafkaW::Message
+FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
+  flatbuffers::FlatBufferBuilder builder;
+  builder.Clear();
+  auto FBOffset = CreateJsonDataDirect(builder, getMessageFromFile(JSONPath));
+  FinishJsonDataBuffer(builder, FBOffset);
+  return KafkaW::Message(builder.Release());
+}
+
+/// Reads \p JSONPath file and returns message to serialize.
+/// \param JSONPath Path to file
+/// \return contents of file
+const char *
+FlatbuffersTranslator::getMessageFromFile(const std::string JSONPath) {
+  std::ifstream IfStream(JSONPath);
+  std::stringstream StringStream;
+  StringStream << IfStream.rdbuf();
+  return StringStream.str().c_str();
 }
