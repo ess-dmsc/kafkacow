@@ -5,3 +5,8 @@ comment:
   layout: "header, diff, tree, changes, sunburst"
   require_changes: no
 
+ignore:
+  - "src/KafkaW/Consumer.cpp"
+  - "src/KafkaW/Consumer.h"
+  - "src/KafkaW/Producer.cpp"
+  - "src/KafkaW/Producer.h"
