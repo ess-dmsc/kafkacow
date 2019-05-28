@@ -35,4 +35,5 @@ target_link_libraries(UnitTests
         CONAN_PKG::flatbuffers
         CONAN_PKG::spdlog
         CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::libgit2)
+        CONAN_PKG::libgit2
+        CONAN_PKG::streaming-data-types)
