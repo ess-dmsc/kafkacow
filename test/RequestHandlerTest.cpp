@@ -230,13 +230,12 @@ TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
   EXPECT_TRUE(OutputMessage.find("Key: MessageKey") != std::string::npos);
 }
 
-
 // PRODUCER
 
 TEST(RequestHandlerTest, run_producer) {
-    UserArgumentStruct UserArguments;
-    UserArguments.ProducerMode = true;
+  UserArgumentStruct UserArguments;
+  UserArguments.ProducerMode = true;
 
-    RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
-    EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
+  RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
+  EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }

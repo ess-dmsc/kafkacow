@@ -9,6 +9,5 @@ public:
   void produce(KafkaW::Message Message) override;
 
 private:
-    std::shared_ptr<spdlog::logger> Logger=spdlog::get("LOG");
-
+  std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
 };
