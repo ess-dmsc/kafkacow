@@ -3,7 +3,9 @@ file(GLOB SRC_FILES
         ../src/*.h)
 
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
-list(FILTER SRC_FILES EXCLUDE REGEX ".*Consumer.cpp$")
+list(FILTER SRC_FILES EXCLUDE REGEX ".*Consumer*.cpp$")
+list(FILTER SRC_FILES EXCLUDE REGEX ".*Producer*.cpp$")
+
 
 add_executable(UnitTests
         ${SRC_FILES}
