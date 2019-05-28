@@ -7,7 +7,7 @@
 
 class Producer : public ProducerInterface {
 public:
-  Producer(std::string Broker);
+  Producer(std::string Broker, std::string Topic);
   ~Producer() {
     if (KafkaProducer) {
       KafkaProducer->flush(500);
@@ -18,12 +18,11 @@ public:
 
 private:
   std::shared_ptr<RdKafka::Topic>
-  createTopicHandle(const std::string &topicPrefix,
-                    const std::string &topicSuffix,
-                    std::shared_ptr<RdKafka::Conf> topicConfig);
+  createTopicHandle(std::shared_ptr<RdKafka::Conf> topicConfig);
   void produceMessage(KafkaW::Message &Message,
                       std::shared_ptr<RdKafka::Topic> Topic);
 
+  std::string TopicToProduce;
   std::shared_ptr<RdKafka::Producer> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
 };

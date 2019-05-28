@@ -27,7 +27,8 @@ public:
       KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
     } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
                !UserArguments.MetadataMode) {
-      KafkaProducer = KafkaW::createProducer(UserArguments.Broker, Real);
+      KafkaProducer = KafkaW::createProducer(UserArguments.Broker,
+                                             UserArguments.TopicName, Real);
     }
     // no MetadataMode or ConsumerMode chosen
     else

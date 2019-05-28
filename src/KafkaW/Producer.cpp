@@ -3,7 +3,8 @@
 #include <memory>
 #include <sstream>
 
-Producer::Producer(std::string Broker) {
+Producer::Producer(std::string Broker, std::string Topic)
+    : TopicToProduce(Topic) {
   std::string ErrStr;
   this->KafkaProducer =
       std::shared_ptr<RdKafka::Producer>(RdKafka::Producer::create(
@@ -41,13 +42,10 @@ void Producer::produceMessage(KafkaW::Message &Message,
 }
 
 std::shared_ptr<RdKafka::Topic>
-Producer::createTopicHandle(const std::string &topicPrefix,
-                            const std::string &topicSuffix,
-                            std::shared_ptr<RdKafka::Conf> topicConfig) {
-  std::string topic_str = topicPrefix + topicSuffix;
+Producer::createTopicHandle(std::shared_ptr<RdKafka::Conf> topicConfig) {
   std::string error_str;
   auto topic_ptr = std::shared_ptr<RdKafka::Topic>(RdKafka::Topic::create(
-      KafkaProducer.get(), topic_str, topicConfig.get(), error_str));
+      KafkaProducer.get(), TopicToProduce, topicConfig.get(), error_str));
   if (topic_ptr == nullptr) {
     Logger->error("Failed to create topic: {}", error_str);
     throw std::runtime_error("Failed to create topic");
@@ -58,6 +56,6 @@ Producer::createTopicHandle(const std::string &topicPrefix,
 void Producer::produce(KafkaW::Message Message) {
   auto TopicConfiguration = std::shared_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
-  auto TopicHandle = createTopicHandle("TopicA", "TopicB", TopicConfiguration);
+  auto TopicHandle = createTopicHandle(TopicConfiguration);
   produceMessage(Message, TopicHandle);
 }
