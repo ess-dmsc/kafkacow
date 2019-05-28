@@ -1,6 +1,5 @@
 #include "Producer.h"
 #include "KafkaConfig.h"
-#include <fstream>
 #include <memory>
 #include <sstream>
 
@@ -61,11 +60,4 @@ void Producer::produce(KafkaW::Message Message) {
       RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
   auto TopicHandle = createTopicHandle("TopicA", "TopicB", TopicConfiguration);
   produceMessage(Message, TopicHandle);
-}
-
-std::string Producer::loadFromFile(const std::string *Path) {
-  std::ifstream File(*Path);
-  std::stringstream buffer;
-  buffer << File.rdbuf();
-  return buffer.str();
 }
