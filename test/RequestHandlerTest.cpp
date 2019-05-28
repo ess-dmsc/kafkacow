@@ -2,6 +2,7 @@
 #include "../src/FlatbuffersTranslator.h"
 #include "../src/KafkaW/ConsumerInterface.h"
 #include "../src/KafkaW/FakeConsumer.h"
+#include "../src/KafkaW/FakeProducer.h"
 #include "../src/RequestHandler.h"
 #include "../src/UpdateSchemas.h"
 #include <boost/filesystem.hpp>
@@ -227,4 +228,15 @@ TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
   NewRequestHandler.checkConsumerModeArguments(true);
   std::string OutputMessage = testing::internal::GetCapturedStdout();
   EXPECT_TRUE(OutputMessage.find("Key: MessageKey") != std::string::npos);
+}
+
+
+// PRODUCER
+
+TEST(RequestHandlerTest, run_producer) {
+    UserArgumentStruct UserArguments;
+    UserArguments.ProducerMode = true;
+
+    RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
+    EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }

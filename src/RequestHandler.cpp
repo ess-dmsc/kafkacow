@@ -82,7 +82,8 @@ void RequestHandler::checkMetadataModeArguments() {
 void RequestHandler::runProducer() {
   FlatbuffersTranslator FlatBuffers(SchemaPath);
 
-  KafkaProducer->produce(FlatBuffers.serializeMessage(UserArguments.JSONPath));
+  auto Message = FlatBuffers.serializeMessage(UserArguments.JSONPath);
+  KafkaProducer->produce(std::move(Message));
 }
 
 /// Ensures there are messages to read at offset provided by the user, otherwise
