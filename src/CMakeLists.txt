@@ -25,14 +25,6 @@ add_executable(kafkacow main.cpp
         KafkaW/ProducerFactory.cpp
         KafkaW/ProducerFactory.h KafkaW/FakeProducer.cpp KafkaW/FakeProducer.h KafkaW/Message.h)
 
-target_link_libraries(kafkacow CONAN_PKG::cli11
-        CONAN_PKG::librdkafka
-        CONAN_PKG::flatbuffers
-        CONAN_PKG::boost_system
-        CONAN_PKG::boost_filesystem
-        CONAN_PKG::boost_dll
-        CONAN_PKG::spdlog
-        CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::libgit2
-        CONAN_PKG::fmt
-        CONAN_PKG::streaming-data-types)
+target_link_libraries(kafkacow
+        ${CONAN_PACKAGES}
+        CONAN_PKG::fmt)

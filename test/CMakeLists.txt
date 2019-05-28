@@ -24,16 +24,6 @@ add_executable(UnitTests
         ../src/KafkaW/FakeProducer.cpp
         ../src/KafkaW/FakeProducer.h)
 
-
 target_link_libraries(UnitTests
-        CONAN_PKG::gtest
-        CONAN_PKG::cli11
-        CONAN_PKG::librdkafka
-        CONAN_PKG::boost_filesystem
-        CONAN_PKG::boost_system
-        CONAN_PKG::boost_dll
-        CONAN_PKG::flatbuffers
-        CONAN_PKG::spdlog
-        CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::libgit2
-        CONAN_PKG::streaming-data-types)
+        ${CONAN_PACKAGES}
+        CONAN_PKG::gtest)
