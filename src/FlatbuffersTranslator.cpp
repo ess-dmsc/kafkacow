@@ -115,7 +115,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   return Parser;
 }
 
-/// Serializes message found in file \p JSONPath.
+/// Serializes message found in file JSONPath.
 /// \param JSONPath
 /// \return KafkaW::Message
 KafkaW::Message
@@ -128,7 +128,7 @@ FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
   return KafkaW::Message(builder.Release());
 }
 
-/// Reads \p JSONPath file and returns message to serialize.
+/// Reads JSONPath file and returns message to serialize.
 /// \param JSONPath Path to file
 /// \return contents of file
 std::string
