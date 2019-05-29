@@ -241,19 +241,19 @@ TEST(RequestHandlerTest, run_producer) {
 }
 
 TEST(RequestHandlerTest, throw_error_if_file_specified_in_consumer_mode) {
-    UserArgumentStruct UserArguments;
-    UserArguments.ConsumerMode = true;
-    UserArguments.JSONPath = "Path/to.json";
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.JSONPath = "Path/to.json";
 
-    RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
-    EXPECT_THROW(NewRequestHandler.checkAndRun(),ArgumentException);
+  RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_if_file_specified_in_metadata_mode) {
-    UserArgumentStruct UserArguments;
-    UserArguments.MetadataMode = true;
-    UserArguments.JSONPath = "Path/to.json";
+  UserArgumentStruct UserArguments;
+  UserArguments.MetadataMode = true;
+  UserArguments.JSONPath = "Path/to.json";
 
-    RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
-    EXPECT_THROW(NewRequestHandler.checkAndRun(),ArgumentException);
+  RequestHandler NewRequestHandler(UserArguments, updateSchemas(false), false);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
