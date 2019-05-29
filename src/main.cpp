@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   App.add_option("-b,--broker", UserArguments.Broker,
                  "Hostname or IP of Kafka broker.");
   App.add_option("-t, --topic", UserArguments.TopicName,
-                 "Show records of specified topic.");
+                 "Topic to read from/produce to.");
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
                  "Partition to get messages from.");
   App.add_option("-g, --go", UserArguments.GoBack,

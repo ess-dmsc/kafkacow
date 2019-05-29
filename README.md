@@ -15,32 +15,41 @@ Options:
   -h,--help                   Print this help message and exit
   -C,--consumer               Run the program in the consumer mode.
   -L,--list                   Metadata mode. Show all topics and partitions. If "-t" specified, shows partition offsets.
+  -P,--producer               Run program in producer mode.
   -b,--broker TEXT            Hostname or IP of Kafka broker.
-  -t,--topic TEXT             Show records of specified topic.
+  -t,--topic TEXT             Topic to read from/produce to.
   -p,--partition INT          Partition to get messages from.
-  -g,--go INT                 How many records back to show from partition "-p". To display range of messages combine with "-o" as lower offset.
-  -o,--offset INT             Start consuming from an offset. Combine with "-g" to display range of messages with "-o" as lower offset.
-  -i,--indentation INT        Number of spaces used as indentation. Range 0 - 20. 4 by default.
+  -g,--go INT in              How many records back to show from partition "-p". To display range of messages combine with "-o" as lower offset.
+  -f,--file FILE              Path to JSON file.
+  -o,--offset INT in          Start consuming from an offset. Combine with "-g" to display range of messages with "-o" as lower offset.
+  -i,--indentation INT in [0 - 20]
+                              Number of spaces used as indentation. Range 0 - 20. 4 by default.
   -a,--all                    Show a list of topics. To be used in "-L" mode.
   -e,--entire                 Show all records of a message(truncated by default).
   -c,--config-file TEXT       Read configuration from an ini file.
   ```
   
   #### Usage example
-  Show last 10 messages of MULTIPART_EVENTS topic from broker hinata.isis.cclrc.ac.uk:9092:
+  Show last `10` messages of `MULTIPART_EVENTS` topic from broker `hinata.isis.cclrc.ac.uk:9092`:
   ```
 bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   ```
   
-  Show list of all topics from broker hinata.isis.cclrc.ac.uk:9092:
+  Show list of all topics from broker `hinata.isis.cclrc.ac.uk:9092`:
   ```
  bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -L -a
   ```
   
-  Starting at offset 1500 show 10 messages from topic MULTIPART_events from broker hinata.isis.cclrc.ac.uk:9092:
+  Starting at offset `1500` show `10` messages from topic `MULTIPART_events` from broker `hinata.isis.cclrc.ac.uk:9092:`
   ```
   bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -t MULTIPART_events -o 1500 -g 10
   ```
+  
+  Send data from `/home/user/SendMe.json` to topic `TopicToProduceTo`
+  ```
+  bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -P -t TopicToProduceTo -f /home/user/SendMe.json
+  ```
+  
   
   ## Install
   
