@@ -5,8 +5,8 @@
 
 ## Like kafkacat but understands flatbuffers.
 The aim of kafkacow is to retrieve messages from kafka and present them in human-readable form(JSON).
-Similarly to kafkacat application runs in either __metadata__ or __consumer__ mode.
-Client runs once and presents data as requested:
+Similarly to kafkacat application runs in either __metadata__, __producer__ or __consumer__ mode.
+Client runs once and presents/sends data as requested:
 
 ```
 bin/kafkacow -h
