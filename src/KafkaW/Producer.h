@@ -14,6 +14,9 @@ public:
       RdKafka::wait_destroyed(5000);
     }
   }
+
+  /// Sends message to Kafka.
+  /// \param Message Serialized message to be sent.
   void produce(KafkaW::Message Message) override;
 
 private:

@@ -16,20 +16,23 @@ Producer::Producer(std::string Broker, std::string Topic)
   }
 }
 
+/// Sends contents of Message to Topic.
+/// \param Message Object containing data to send.
+/// \param Topic Target topic.
 void Producer::produceMessage(KafkaW::Message &Message,
                               std::shared_ptr<RdKafka::Topic> Topic) {
-  RdKafka::ErrorCode resp;
+  RdKafka::ErrorCode ErrorCode;
   do {
-    resp =
+    ErrorCode =
         KafkaProducer->produce(Topic.get(), RdKafka::Topic::PARTITION_UA,
                                RdKafka::Producer::RK_MSG_COPY, Message.data(),
                                Message.size(), nullptr, nullptr);
 
-    if (resp != RdKafka::ERR_NO_ERROR) {
-      if (resp != RdKafka::ERR__QUEUE_FULL) {
+    if (ErrorCode != RdKafka::ERR_NO_ERROR) {
+      if (ErrorCode != RdKafka::ERR__QUEUE_FULL) {
         Logger->error("Produce failed: {}\n"
                       "Message size was: {}",
-                      RdKafka::err2str(resp), Message.size());
+                      RdKafka::err2str(ErrorCode), Message.size());
       }
       // This blocking poll call should give Kafka some time for the problem to
       // be resolved
@@ -38,19 +41,21 @@ void Producer::produceMessage(KafkaW::Message &Message,
     } else {
       KafkaProducer->poll(0);
     }
-  } while (resp == RdKafka::ERR__QUEUE_FULL);
+  } while (ErrorCode == RdKafka::ERR__QUEUE_FULL);
 }
 
+/// Creates an RdKafka::Topic handle of target topic.
+/// \param topicConfig target topic configuration.
 std::shared_ptr<RdKafka::Topic>
 Producer::createTopicHandle(std::shared_ptr<RdKafka::Conf> topicConfig) {
-  std::string error_str;
-  auto topic_ptr = std::shared_ptr<RdKafka::Topic>(RdKafka::Topic::create(
-      KafkaProducer.get(), TopicToProduce, topicConfig.get(), error_str));
-  if (topic_ptr == nullptr) {
-    Logger->error("Failed to create topic: {}", error_str);
+  std::string ErrorString;
+  auto KafkaTopic = std::shared_ptr<RdKafka::Topic>(RdKafka::Topic::create(
+      KafkaProducer.get(), TopicToProduce, topicConfig.get(), ErrorString));
+  if (KafkaTopic == nullptr) {
+    Logger->error("Failed to create topic: {}", ErrorString);
     throw std::runtime_error("Failed to create topic");
   }
-  return topic_ptr;
+  return KafkaTopic;
 }
 
 void Producer::produce(KafkaW::Message Message) {
