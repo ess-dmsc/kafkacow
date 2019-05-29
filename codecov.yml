@@ -10,3 +10,4 @@ ignore:
   - "src/KafkaW/Consumer.h"
   - "src/KafkaW/Producer.cpp"
   - "src/KafkaW/Producer.h"
+  - "src/KafkaW/KafkaConfig.h"
