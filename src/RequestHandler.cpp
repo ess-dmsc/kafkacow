@@ -13,7 +13,6 @@
 /// \param UserArguments
 void RequestHandler::checkAndRun() {
   if (UserArguments.ProducerMode) {
-
     runProducer();
   } else if (UserArguments.ConsumerMode) {
     checkConsumerModeArguments();
@@ -92,6 +91,7 @@ void RequestHandler::runProducer() {
 
   auto Message = FlatBuffers.serializeMessage(UserArguments.JSONPath);
   KafkaProducer->produce(std::move(Message));
+  Logger->info("Message produced!");
 }
 
 /// Ensures there are messages to read at offset provided by the user, otherwise
