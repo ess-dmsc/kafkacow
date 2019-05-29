@@ -28,6 +28,4 @@ boost_system:shared=True
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
 ., *.dll -> ./bin @ keep_path=False
 ., *.a* -> ./lib @ keep_path=False
-filesystem/lib, *.so* -> ./lib
-system/lib, *.so* -> ./lib
 ., *.lib -> ./bin @ keep_path=False
