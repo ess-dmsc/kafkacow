@@ -28,6 +28,10 @@ void RequestHandler::checkAndRun() {
 /// \param UserArguments
 /// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
 void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
+  if (!UserArguments.JSONPath.empty()) {
+    throw ArgumentException("Cannot run consumer mode with -f specified. Did "
+                            "you want to use -P mode?");
+  }
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
@@ -71,6 +75,10 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
 ///
 /// \param UserArguments
 void RequestHandler::checkMetadataModeArguments() {
+  if (!UserArguments.JSONPath.empty()) {
+    throw ArgumentException("Cannot run consumer mode with -f specified. Did "
+                            "you want to use -P mode?");
+  }
   if (UserArguments.ShowAllTopics)
     std::cout << KafkaConsumer->getAllTopics() << "\n";
   else if (!UserArguments.TopicName.empty())
