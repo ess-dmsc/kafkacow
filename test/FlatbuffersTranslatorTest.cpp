@@ -3,6 +3,7 @@
 #include "f142_logdata_generated.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
+#include <json_json_generated.h>
 
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
@@ -78,4 +79,21 @@ TEST(FlatbuffersTranslatorTest,
   MessageMetadata.Payload = "test";
   EXPECT_NO_THROW(
       FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID));
+}
+
+TEST(FlatbuffersTranslatorTest, successfully_return_json_schema_message) {
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
+  flatbuffers::FlatBufferBuilder Builder;
+  Builder.Clear();
+  std::string MessageToSerialize = "{\"SimpleJson\" : 42}";
+  auto FBOffset = CreateJsonDataDirect(Builder, MessageToSerialize.c_str());
+  FinishJsonDataBuffer(Builder, FBOffset);
+  auto KafkaMessage = Kafka::Message(Builder.Release());
+  std::string MessageString(KafkaMessage.data(),
+                            static_cast<int>(KafkaMessage.size()));
+  Kafka::MessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = MessageString;
+  std::string FileID;
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
+            MessageToSerialize);
 }
