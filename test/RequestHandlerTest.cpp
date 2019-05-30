@@ -1,8 +1,8 @@
 #include "../src/CustomExceptions.h"
 #include "../src/FlatbuffersTranslator.h"
-#include "../src/KafkaW/ConsumerInterface.h"
-#include "../src/KafkaW/FakeConsumer.h"
-#include "../src/KafkaW/FakeProducer.h"
+#include "../src/Kafka/ConsumerInterface.h"
+#include "../src/Kafka/FakeConsumer.h"
+#include "../src/Kafka/FakeProducer.h"
 #include "../src/RequestHandler.h"
 #include "../src/UpdateSchemas.h"
 #include <boost/filesystem.hpp>

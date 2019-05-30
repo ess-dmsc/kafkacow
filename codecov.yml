@@ -6,8 +6,8 @@ comment:
   require_changes: no
 
 ignore:
-  - "src/KafkaW/Consumer.cpp"
-  - "src/KafkaW/Consumer.h"
-  - "src/KafkaW/Producer.cpp"
-  - "src/KafkaW/Producer.h"
-  - "src/KafkaW/KafkaConfig.h"
+  - "src/Kafka/Consumer.cpp"
+  - "src/Kafka/Consumer.h"
+  - "src/Kafka/Producer.cpp"
+  - "src/Kafka/Producer.h"
+  - "src/Kafka/KafkaConfig.h"

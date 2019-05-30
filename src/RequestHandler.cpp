@@ -147,7 +147,7 @@ void RequestHandler::showTopicPartitionOffsets() {
 /// \param MessageAndEOF
 /// \param EOFPartitionCounter
 /// \param FlatBuffers
-void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
+void RequestHandler::printKafkaMessage(Kafka::MessageMetadataStruct &MessageData,
                                        int &EOFPartitionCounter,
                                        FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
@@ -172,7 +172,7 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
 ///
 /// \param MessageData
 void RequestHandler::printMessageMetadata(
-    KafkaMessageMetadataStruct &MessageData,
+    Kafka::MessageMetadataStruct &MessageData,
     const std::string &FileIdentifier) {
   std::cout << fmt::format(
       "\n{:_>93}{}{:>64}\n\nTimestamp: {:>11} || PartitionID: "
@@ -293,7 +293,7 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
 bool RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
                                           FlatbuffersTranslator &FlatBuffers) {
   try {
-    KafkaMessageMetadataStruct MessageData;
+    Kafka::MessageMetadataStruct MessageData;
     MessageData = KafkaConsumer->consume();
     MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
     printKafkaMessage(MessageData, EOFPartitionCounter, FlatBuffers);

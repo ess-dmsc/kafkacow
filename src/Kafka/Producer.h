@@ -5,9 +5,12 @@
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
+namespace Kafka {
+
 class Producer : public ProducerInterface {
 public:
   Producer(std::string Broker, std::string Topic);
+
   ~Producer() {
     if (KafkaProducer) {
       KafkaProducer->flush(500);
@@ -17,15 +20,17 @@ public:
 
   /// Sends message to Kafka.
   /// \param Message Serialized message to be sent.
-  void produce(KafkaW::Message Message) override;
+  void produce(Kafka::Message Message) override;
 
 private:
   std::shared_ptr<RdKafka::Topic>
   createTopicHandle(std::shared_ptr<RdKafka::Conf> topicConfig);
-  void produceMessage(KafkaW::Message &Message,
+
+  void produceMessage(Kafka::Message &Message,
                       std::shared_ptr<RdKafka::Topic> Topic);
 
   std::string TopicToProduce;
   std::shared_ptr<RdKafka::Producer> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
 };
+}

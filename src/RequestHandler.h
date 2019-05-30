@@ -2,10 +2,10 @@
 
 #include "CustomExceptions.h"
 #include "FlatbuffersTranslator.h"
-#include "KafkaW/ConsumerFactory.h"
-#include "KafkaW/ConsumerInterface.h"
-#include "KafkaW/ProducerFactory.h"
-#include "KafkaW/ProducerInterface.h"
+#include "Kafka/ConsumerFactory.h"
+#include "Kafka/ConsumerInterface.h"
+#include "Kafka/ProducerFactory.h"
+#include "Kafka/ProducerInterface.h"
 #include "UserArgumentsStruct.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
@@ -19,16 +19,16 @@ public:
     // check input if ConsumerMode chosen
     if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
         !UserArguments.ProducerMode) {
-      KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
+      KafkaConsumer = Kafka::createConsumer(UserArguments.Broker, Real);
     }
     // check input if MetadataMode chosen
     else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
              !UserArguments.ProducerMode) {
-      KafkaConsumer = KafkaW::createConsumer(UserArguments.Broker, Real);
+      KafkaConsumer = Kafka::createConsumer(UserArguments.Broker, Real);
     } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
                !UserArguments.MetadataMode) {
-      KafkaProducer = KafkaW::createProducer(UserArguments.Broker,
-                                             UserArguments.TopicName, Real);
+      KafkaProducer = Kafka::createProducer(UserArguments.Broker,
+                                            UserArguments.TopicName, Real);
     }
     // no MetadataMode or ConsumerMode chosen
     else
@@ -56,18 +56,18 @@ public:
                            int64_t Offset);
 
 private:
-  std::unique_ptr<ConsumerInterface> KafkaConsumer;
-  std::unique_ptr<ProducerInterface> KafkaProducer;
+  std::unique_ptr<Kafka::ConsumerInterface> KafkaConsumer;
+  std::unique_ptr<Kafka::ProducerInterface> KafkaProducer;
   std::shared_ptr<spdlog::logger> Logger;
   UserArgumentStruct UserArguments;
   const std::string SchemaPath;
-  void printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
+  void printKafkaMessage(Kafka::MessageMetadataStruct &MessageData,
                          int &EOFPartitionCounter,
                          FlatbuffersTranslator &FlatBuffers);
   bool verifyOffset(int64_t Offset, const std::string &TopicName);
   void verifyNLast(int64_t NLast, const std::string &TopicName,
                    int16_t Partition);
-  void printMessageMetadata(KafkaMessageMetadataStruct &MessageData,
+  void printMessageMetadata(Kafka::MessageMetadataStruct &MessageData,
                             const std::string &FileIdentifier);
   void printEntireTopic(const std::string &TopicName,
                         bool TerminateAtEndOfTopic = false);

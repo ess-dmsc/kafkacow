@@ -1,13 +1,15 @@
 #include "FakeConsumer.h"
 
+namespace Kafka {
+
 FakeConsumer::FakeConsumer() {}
 
 std::string FakeConsumer::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
 
-KafkaMessageMetadataStruct FakeConsumer::consume() {
-  KafkaMessageMetadataStruct DataToReturn;
+MessageMetadataStruct FakeConsumer::consume() {
+  MessageMetadataStruct DataToReturn;
   DataToReturn.Payload = "\"HiddenSecretMessageFromLovingNeutron\"";
   DataToReturn.PartitionEOF = true;
   DataToReturn.Timestamp = 1542;
@@ -54,4 +56,5 @@ FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
   OffsetsToReturn.LowOffset = 1;
   OffsetsToReturn.PartitionId = PartitionID;
   return OffsetsToReturn;
+}
 }

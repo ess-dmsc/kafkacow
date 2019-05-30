@@ -4,9 +4,12 @@
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
+namespace Kafka {
+
 class Consumer : public ConsumerInterface {
 public:
   Consumer(std::string Broker);
+
   ~Consumer() {
     if (KafkaConsumer) {
       KafkaConsumer->close();
@@ -23,7 +26,7 @@ public:
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consume() override;
+  MessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
@@ -37,6 +40,7 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
+
   std::string showAllMetadata() override;
 
 private:
@@ -50,3 +54,4 @@ private:
 
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
 };
+}

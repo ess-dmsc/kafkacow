@@ -3,6 +3,8 @@
 #include <memory>
 #include <sstream>
 
+namespace Kafka {
+
 Producer::Producer(std::string Broker, std::string Topic)
     : TopicToProduce(Topic) {
   std::string ErrStr;
@@ -10,8 +12,7 @@ Producer::Producer(std::string Broker, std::string Topic)
       std::shared_ptr<RdKafka::Producer>(RdKafka::Producer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
   if (!ErrStr.empty()) {
-    ErrStr.append(
-        "Error creating KafkaProducer in KafkaW::Producer::Producer.");
+    ErrStr.append("Error creating KafkaProducer in Kafka::Producer::Producer.");
     Logger->error(ErrStr);
   }
 }
@@ -19,7 +20,7 @@ Producer::Producer(std::string Broker, std::string Topic)
 /// Sends contents of Message to Topic.
 /// \param Message Object containing data to send.
 /// \param Topic Target topic.
-void Producer::produceMessage(KafkaW::Message &Message,
+void Producer::produceMessage(Kafka::Message &Message,
                               std::shared_ptr<RdKafka::Topic> Topic) {
   RdKafka::ErrorCode ErrorCode;
   do {
@@ -58,9 +59,10 @@ Producer::createTopicHandle(std::shared_ptr<RdKafka::Conf> topicConfig) {
   return KafkaTopic;
 }
 
-void Producer::produce(KafkaW::Message Message) {
+void Producer::produce(Kafka::Message Message) {
   auto TopicConfiguration = std::shared_ptr<RdKafka::Conf>(
       RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
   auto TopicHandle = createTopicHandle(TopicConfiguration);
   produceMessage(Message, TopicHandle);
+}
 }

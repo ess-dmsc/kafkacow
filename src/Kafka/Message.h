@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <flatbuffers/flatbuffers.h>
 
-namespace KafkaW {
+namespace Kafka {
 
 class Message {
 public:

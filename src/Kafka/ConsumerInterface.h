@@ -2,9 +2,11 @@
 
 #include "../OffsetsStruct.h"
 #include "../TopicMetadataStruct.h"
-#include "KafkaMessageMetadataStruct.h"
+#include "MessageMetadataStruct.h"
 #include <CLI/CLI.hpp>
 #include <librdkafka/rdkafkacpp.h>
+
+namespace Kafka {
 
 class ConsumerInterface {
 public:
@@ -12,7 +14,7 @@ public:
 
   virtual std::string getAllTopics() = 0;
 
-  virtual KafkaMessageMetadataStruct consume() = 0;
+  virtual MessageMetadataStruct consume() = 0;
 
   virtual std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) = 0;
@@ -30,3 +32,4 @@ public:
 
   virtual std::string showAllMetadata() = 0;
 };
+}

@@ -3,11 +3,14 @@
 #include "Message.h"
 #include <librdkafka/rdkafkacpp.h>
 
+namespace Kafka {
+
 class ProducerInterface {
 public:
   virtual ~ProducerInterface() = default;
 
-  virtual void produce(KafkaW::Message Message) = 0;
+  virtual void produce(Kafka::Message Message) = 0;
 
 private:
 };
+}

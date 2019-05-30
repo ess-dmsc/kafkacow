@@ -1,8 +1,8 @@
 file(GLOB SRC_FILES
         ../src/*.cpp
         ../src/*.h
-        ../src/KafkaW/*.cpp
-        ../src/KafkaW/*.h
+../src/Kafka/*.cpp
+../src/Kafka/*.h
 )
 
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")

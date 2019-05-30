@@ -11,7 +11,7 @@
 /// \param FileID : return value
 /// \return single string with JSON message.
 std::string
-FlatbuffersTranslator::deserializeToJSON(KafkaMessageMetadataStruct MessageData,
+FlatbuffersTranslator::deserializeToJSON(Kafka::MessageMetadataStruct MessageData,
                                          std::string &FileID) {
   // get the ID from a message
   if (MessageData.Payload.size() > 8) {
@@ -117,15 +117,15 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
 
 /// Serializes message found in file JSONPath.
 /// \param JSONPath
-/// \return KafkaW::Message
-KafkaW::Message
+/// \return Kafka::Message
+Kafka::Message
 FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
   flatbuffers::FlatBufferBuilder builder;
   builder.Clear();
   auto FBOffset =
       CreateJsonDataDirect(builder, getMessageFromFile(JSONPath).c_str());
   FinishJsonDataBuffer(builder, FBOffset);
-  return KafkaW::Message(builder.Release());
+  return Kafka::Message(builder.Release());
 }
 
 /// Reads JSONPath file and returns message to serialize.

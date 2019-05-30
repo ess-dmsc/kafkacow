@@ -6,13 +6,15 @@
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
+namespace Kafka {
+
 class FakeConsumer : public ConsumerInterface {
 public:
   FakeConsumer();
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consume() override;
+  MessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
@@ -26,5 +28,7 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;
+
   std::string showAllMetadata() override;
 };
+}

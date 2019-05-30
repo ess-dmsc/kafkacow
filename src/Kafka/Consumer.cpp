@@ -1,8 +1,10 @@
 #include "Consumer.h"
 #include "../CustomExceptions.h"
 #include "KafkaConfig.h"
-#include "KafkaMessageMetadataStruct.h"
+#include "MessageMetadataStruct.h"
 #include <iomanip>
+
+namespace Kafka {
 
 /// Gets Metadata object from Kafka.
 ///
@@ -52,9 +54,9 @@ std::string Consumer::getAllTopics() {
 /// Consumes Kafka messages starting from specified offset.
 ///
 /// \return struct containg serialized message and its metadata.
-KafkaMessageMetadataStruct Consumer::consume() {
+MessageMetadataStruct Consumer::consume() {
   using RdKafka::Message;
-  KafkaMessageMetadataStruct DataToReturn;
+  MessageMetadataStruct DataToReturn;
 
   auto KafkaMsg = std::unique_ptr<Message>(KafkaConsumer->consume(1000));
   switch (KafkaMsg->err()) {
@@ -252,4 +254,5 @@ std::string Consumer::showAllMetadata() {
     SS << "\n";
   }
   return SS.str();
+}
 }

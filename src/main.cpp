@@ -1,6 +1,6 @@
 #include "CustomExceptions.h"
-#include "KafkaW/Consumer.h"
-#include "KafkaW/Producer.h"
+#include "Kafka/Consumer.h"
+#include "Kafka/Producer.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
