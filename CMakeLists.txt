@@ -32,16 +32,16 @@ if(CMAKE_COMPILER_IS_GNUCXX AND COV)
 endif()
 
 set(CONAN_PACKAGES
-CONAN_PKG::cli11
-CONAN_PKG::librdkafka
-CONAN_PKG::boost_filesystem
-CONAN_PKG::boost_system
-CONAN_PKG::boost_dll
-CONAN_PKG::flatbuffers
-CONAN_PKG::spdlog
-CONAN_PKG::jsonformoderncpp
-CONAN_PKG::libgit2
-CONAN_PKG::streaming-data-types)
+    CONAN_PKG::cli11
+    CONAN_PKG::librdkafka
+    CONAN_PKG::boost_filesystem
+    CONAN_PKG::boost_system
+    CONAN_PKG::boost_dll
+    CONAN_PKG::flatbuffers
+    CONAN_PKG::spdlog
+    CONAN_PKG::jsonformoderncpp
+    CONAN_PKG::libgit2
+    CONAN_PKG::streaming-data-types)
 
 add_subdirectory(src)
 add_subdirectory(test)
