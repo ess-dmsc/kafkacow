@@ -147,9 +147,9 @@ void RequestHandler::showTopicPartitionOffsets() {
 /// \param MessageAndEOF
 /// \param EOFPartitionCounter
 /// \param FlatBuffers
-void RequestHandler::printKafkaMessage(Kafka::MessageMetadataStruct &MessageData,
-                                       int &EOFPartitionCounter,
-                                       FlatbuffersTranslator &FlatBuffers) {
+void RequestHandler::printKafkaMessage(
+    Kafka::MessageMetadataStruct &MessageData, int &EOFPartitionCounter,
+    FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
     std::string FileIdentifier;
     std::string JSONMessage =
