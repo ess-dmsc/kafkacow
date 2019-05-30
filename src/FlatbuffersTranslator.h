@@ -20,11 +20,11 @@ public:
                                                     const std::string &Message,
                                                     const std::string &Schema);
 
-  Kafka::Message serializeMessage(const std::string JSONPath);
+  Kafka::Message serializeMessage(const std::string &JSONPath);
 
 private:
   // for each FILEID store path to schema file and schema itself
-  std::string getMessageFromFile(const std::string JSONPath);
+  std::string getMessageFromFile(const std::string &JSONPath);
   std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
   const std::string SchemaPath;
   std::shared_ptr<spdlog::logger> Logger;

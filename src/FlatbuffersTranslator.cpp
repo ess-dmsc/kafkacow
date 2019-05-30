@@ -10,9 +10,8 @@
 /// \param MessageData
 /// \param FileID : return value
 /// \return single string with JSON message.
-std::string
-FlatbuffersTranslator::deserializeToJSON(Kafka::MessageMetadataStruct MessageData,
-                                         std::string &FileID) {
+std::string FlatbuffersTranslator::deserializeToJSON(
+    Kafka::MessageMetadataStruct MessageData, std::string &FileID) {
   // get the ID from a message
   if (MessageData.Payload.size() > 8) {
     FileID = MessageData.Payload.substr(4, 4);
@@ -119,7 +118,7 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
 /// \param JSONPath
 /// \return Kafka::Message
 Kafka::Message
-FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
+FlatbuffersTranslator::serializeMessage(const std::string &JSONPath) {
   flatbuffers::FlatBufferBuilder builder;
   builder.Clear();
   auto FBOffset =
@@ -132,7 +131,7 @@ FlatbuffersTranslator::serializeMessage(const std::string JSONPath) {
 /// \param JSONPath Path to file
 /// \return contents of file
 std::string
-FlatbuffersTranslator::getMessageFromFile(const std::string JSONPath) {
+FlatbuffersTranslator::getMessageFromFile(const std::string &JSONPath) {
   std::ifstream IfStream(JSONPath);
   std::stringstream StringStream;
   StringStream << IfStream.rdbuf();

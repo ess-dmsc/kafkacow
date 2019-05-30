@@ -5,7 +5,7 @@
 namespace Kafka {
 
 std::unique_ptr<ProducerInterface>
-createProducer(const std::string &Broker, const std::string Topic, bool Real) {
+createProducer(const std::string &Broker, const std::string &Topic, bool Real) {
   if (Real) {
     return std::make_unique<Producer>(Broker, Topic);
   } else {
