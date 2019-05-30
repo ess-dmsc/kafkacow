@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Kafka/MessageMetadataStruct.h"
 #include "Kafka/Message.h"
+#include "Kafka/MessageMetadataStruct.h"
 #include <flatbuffers/idl.h>
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>

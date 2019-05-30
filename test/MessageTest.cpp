@@ -2,8 +2,6 @@
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 #include <json_json_generated.h>
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
 
 class MessageTest : public ::testing::Test {};
 
