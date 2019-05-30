@@ -162,6 +162,20 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
 }
 
+TEST(RequestHandlerTest,
+     throw_error_if_requested_more_messages_to_display_than_is_available) {
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = -1234;
+  UserArguments.PartitionToConsume = 1;
+  UserArguments.GoBack = 40;
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(UserArguments,
+                                   updateSchemas(UpdateFromGithub), false);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
+               ArgumentException);
+}
+
 TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
