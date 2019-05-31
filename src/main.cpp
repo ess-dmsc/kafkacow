@@ -1,5 +1,6 @@
-#include "ConnectKafka.h"
 #include "CustomExceptions.h"
+#include "Kafka/Consumer.h"
+#include "Kafka/Producer.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
@@ -19,9 +20,12 @@ int main(int argc, char **argv) {
   App.add_flag("-L, --list", UserArguments.MetadataMode,
                "Metadata mode. Show all topics and partitions. If \"-t\" "
                "specified, shows partition offsets.");
-  App.add_option("-b,--broker", Broker, "Hostname or IP of Kafka broker.");
-  App.add_option("-t, --topic", UserArguments.Name,
-                 "Show records of specified topic.");
+  App.add_flag("-P, --producer", UserArguments.ProducerMode,
+               "Run program in producer mode.");
+  App.add_option("-b,--broker", UserArguments.Broker,
+                 "Hostname or IP of Kafka broker.");
+  App.add_option("-t, --topic", UserArguments.TopicName,
+                 "Topic to read from/produce to.");
   App.add_option("-p,--partition", UserArguments.PartitionToConsume,
                  "Partition to get messages from.");
   App.add_option("-g, --go", UserArguments.GoBack,
@@ -29,6 +33,8 @@ int main(int argc, char **argv) {
                  "display range of messages combine with \"-o\" as lower "
                  "offset.")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
+  App.add_option("-f,--file", UserArguments.JSONPath, "Path to JSON file.")
+      ->check(CLI::ExistingFile);
   App.add_option("-o,--offset", UserArguments.OffsetToStart,
                  "Start consuming from an offset. Combine with \"-g\" to "
                  "display range of messages with \"-o\" as lower offset.")
@@ -54,10 +60,8 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = updateSchemas();
     Logger->debug("Using schemas in: {}", SchemaPath);
-    auto KafkaConnection = std::make_unique<ConnectKafka>(Broker);
-    RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                     SchemaPath);
-    NewRequestHandler.checkAndRun();
+    RequestHandler MainRequestHandler(UserArguments, SchemaPath);
+    MainRequestHandler.checkAndRun();
   } catch (std::exception &E) {
     Logger->error(E.what());
   }

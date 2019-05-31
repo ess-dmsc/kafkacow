@@ -1,7 +1,8 @@
-#include "../src/ConnectKafkaFake.h"
-#include "../src/ConnectKafkaInterface.h"
 #include "../src/CustomExceptions.h"
 #include "../src/FlatbuffersTranslator.h"
+#include "../src/Kafka/ConsumerInterface.h"
+#include "../src/Kafka/FakeConsumer.h"
+#include "../src/Kafka/FakeProducer.h"
 #include "../src/RequestHandler.h"
 #include "../src/UpdateSchemas.h"
 #include <boost/filesystem.hpp>
@@ -9,28 +10,28 @@
 #include <gtest/gtest.h>
 
 namespace {
-const std::string SchemaPath = "schemas/";
+const bool UpdateFromGithub = false;
+const bool UseRealKafkaConnection = false;
 }
 
 class RequestHandlerTest : public ::testing::Test {};
 
 TEST(RequestHandlerTest,
      subscribe_consume_n_last_messages_throws_if_incorrect_arguments_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
-  EXPECT_THROW(
-      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100, 1),
-      ArgumentException);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1));
@@ -38,20 +39,22 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
 
 TEST(RequestHandlerTest,
      subscribe_at_an_offset_throws_if_incorrect_arguments_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_THROW(NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100),
                ArgumentException);
 }
 
 TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344, true));
@@ -69,71 +72,65 @@ TEST(RequestHandlerTest, topic_metadata_creation_test) {
 }
 
 TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
   UserArguments.OffsetToStart = 1235;
   UserArguments.GoBack = 1;
-  UserArguments.Name = "TestTopicName";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.TopicName = "TestTopicName";
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
 
 TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.MetadataMode = true;
   UserArguments.ShowAllTopics = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
 
 TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = false;
   UserArguments.MetadataMode = false;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
-  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
+
+  EXPECT_THROW(RequestHandler NewRequestHandler(UserArguments,
+                                                updateSchemas(UpdateFromGithub),
+                                                UseRealKafkaConnection),
+               ArgumentException);
 }
 
 // metadata mode arguments test
 TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "MULTIPART_events";
+  UserArguments.TopicName = "MULTIPART_events";
   UserArguments.ConsumerMode = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments());
 }
 TEST(RequestHandlerTest, show_all_topics_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.MetadataMode = true;
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments());
 }
 
 TEST(RequestHandlerTest, display_all_metadata) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = false;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.MetadataMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   testing::internal::CaptureStdout();
   NewRequestHandler.checkMetadataModeArguments();
@@ -145,114 +142,155 @@ TEST(RequestHandlerTest, display_all_metadata) {
 
 TEST(RequestHandlerTest,
      display_range_when_both_goback_and_offsettostart_specified) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1234;
   UserArguments.GoBack = 2;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
 }
 
 TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
   UserArguments.PartitionToConsume = 1;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
 }
 
-TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
+TEST(RequestHandlerTest,
+     throw_error_if_requested_more_messages_to_display_than_is_available) {
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = -1234;
+  UserArguments.PartitionToConsume = 1;
+  UserArguments.GoBack = 40;
+  UserArguments.ConsumerMode = true;
 
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
+               ArgumentException);
+}
+
+TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
   UserArguments.MetadataMode = true;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
 
   std::string message;
   try {
-    NewRequestHandler.checkAndRun();
+    RequestHandler NewRequestHandler(
+        UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   } catch (ArgumentException &exception) {
     message = exception.what();
   }
-  EXPECT_EQ(
-      message,
-      "Program can run in one and only one mode: --consumer or --metadata");
+  EXPECT_EQ(message, "Program can run in one and only one mode: --consumer, "
+                     "--metadata or --producer");
 }
 
 TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 1233;
   UserArguments.GoBack = 2;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = 22343;
   UserArguments.GoBack = 5;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
 
 TEST(RequestHandlerTest, throw_error_if_topic_empty) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "EmptyTopic";
+  UserArguments.TopicName = "EmptyTopic";
   UserArguments.GoBack = 5;
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
 
 TEST(RequestHandlerTest, print_entire_topic_success) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "TestTopic";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.TopicName = "TestTopic";
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
 
 TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
-  auto KafkaConnection = std::make_unique<ConnectKafkaFake>(ConnectKafkaFake());
-
   UserArgumentStruct UserArguments;
-  UserArguments.Name = "TestTopic";
-  RequestHandler NewRequestHandler(std::move(KafkaConnection), UserArguments,
-                                   updateSchemas(false));
+  UserArguments.TopicName = "TestTopic";
+  UserArguments.ConsumerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
   testing::internal::CaptureStdout();
   NewRequestHandler.checkConsumerModeArguments(true);
   std::string OutputMessage = testing::internal::GetCapturedStdout();
   EXPECT_TRUE(OutputMessage.find("Key: MessageKey") != std::string::npos);
+}
+
+// PRODUCER
+
+TEST(RequestHandlerTest, run_producer) {
+  UserArgumentStruct UserArguments;
+  UserArguments.ProducerMode = true;
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
+}
+
+TEST(RequestHandlerTest, throw_error_if_file_specified_in_consumer_mode) {
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.JSONPath = "Path/to.json";
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
+}
+
+TEST(RequestHandlerTest, throw_error_if_file_specified_in_metadata_mode) {
+  UserArgumentStruct UserArguments;
+  UserArguments.MetadataMode = true;
+  UserArguments.JSONPath = "Path/to.json";
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }

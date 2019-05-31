@@ -1,11 +1,11 @@
 add_executable(kafkacow main.cpp
         RequestHandler.cpp
         RequestHandler.h
-        ConnectKafka.cpp
-        ConnectKafka.h
-        ConnectKafkaInterface.h
-        ConnectKafkaFake.cpp
-        ConnectKafkaFake.h
+        Kafka/Consumer.cpp
+        Kafka/Consumer.h
+        Kafka/ConsumerInterface.h
+        Kafka/FakeConsumer.cpp
+        Kafka/FakeConsumer.h
         CustomExceptions.h
         UserArgumentsStruct.h
         OffsetsStruct.h
@@ -15,15 +15,19 @@ add_executable(kafkacow main.cpp
         JSONPrinting.cpp
         JSONPrinting.h
         UpdateSchemas.cpp
-        UpdateSchemas.h)
+        UpdateSchemas.h
+        Kafka/Producer.cpp
+        Kafka/Producer.h
+        Kafka/KafkaConfig.h
+        Kafka/ConsumerFactory.cpp
+        Kafka/ConsumerFactory.h
+        Kafka/ProducerInterface.h
+        Kafka/ProducerFactory.cpp
+        Kafka/ProducerFactory.h
+        Kafka/FakeProducer.cpp
+        Kafka/FakeProducer.h
+        Kafka/Message.h)
 
-target_link_libraries(kafkacow CONAN_PKG::cli11
-        CONAN_PKG::librdkafka
-        CONAN_PKG::flatbuffers
-        CONAN_PKG::boost_system
-        CONAN_PKG::boost_filesystem
-        CONAN_PKG::boost_dll
-        CONAN_PKG::spdlog
-        CONAN_PKG::jsonformoderncpp
-        CONAN_PKG::libgit2
+target_link_libraries(kafkacow
+        ${CONAN_PACKAGES}
         CONAN_PKG::fmt)

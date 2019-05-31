@@ -1,15 +1,18 @@
 #pragma once
 
-#include "ConnectKafkaInterface.h"
+#include "ConsumerInterface.h"
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
-class ConnectKafka : public ConnectKafkaInterface {
+namespace Kafka {
+
+class Consumer : public ConsumerInterface {
 public:
-  ConnectKafka(std::string Broker);
-  ~ConnectKafka() {
-    if (Consumer) {
-      Consumer->close();
+  Consumer(std::string Broker);
+
+  ~Consumer() {
+    if (KafkaConsumer) {
+      KafkaConsumer->close();
       /*
        * Wait for RdKafka to decommission.
        * This is not strictly needed (with check outq_len() above), but
@@ -23,7 +26,7 @@ public:
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consume() override;
+  MessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
@@ -37,10 +40,11 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
+
   std::string showAllMetadata() override;
 
 private:
-  std::shared_ptr<RdKafka::KafkaConsumer> Consumer;
+  std::shared_ptr<RdKafka::KafkaConsumer> KafkaConsumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
   std::shared_ptr<spdlog::logger> Logger;
 
@@ -50,3 +54,4 @@ private:
 
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
 };
+}

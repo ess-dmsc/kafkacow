@@ -1,25 +1,24 @@
 #include "RequestHandler.h"
 #include "CustomExceptions.h"
 #include "JSONPrinting.h"
+#include "json_json_generated.h"
 #include <chrono>
+#include <flatbuffers/flatbuffers.h>
 #include <fmt/format.h>
+#include <fstream>
 
-/// Analyzes user arguments, checks which mode(consumer/metadata) is chosen and
+/// Checks which mode(consumer/metadata/producer) is chosen and
 /// calls method responsible for handling one of the modes or throws
 /// ArgumentsException if arguments invalid.
 /// \param UserArguments
 void RequestHandler::checkAndRun() {
-  // check input if ConsumerMode chosen
-  if (UserArguments.ConsumerMode && !UserArguments.MetadataMode)
+  if (UserArguments.ProducerMode) {
+    runProducer();
+  } else if (UserArguments.ConsumerMode) {
     checkConsumerModeArguments();
-
-  // check input if MetadataMode chosen
-  else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode)
+  } else {
     checkMetadataModeArguments();
-  // no MetadataMode or ConsumerMode chosen
-  else
-    throw ArgumentException(
-        "Program can run in one and only one mode: --consumer or --metadata");
+  }
 }
 
 /// Analyzes user arguments to determine which consumer mode functionality to
@@ -28,24 +27,29 @@ void RequestHandler::checkAndRun() {
 /// \param UserArguments
 /// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
 void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
+  if (!UserArguments.JSONPath.empty()) {
+    throw ArgumentException("Cannot run consumer mode with -f specified. Did "
+                            "you want to use -P mode?");
+  }
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-      UserArguments.Name.empty()) {
+      UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
   }
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
-    printEntireTopic(UserArguments.Name, TerminateAtEndOfTopic);
+    printEntireTopic(UserArguments.TopicName, TerminateAtEndOfTopic);
   } else {
-    checkIfTopicEmpty(UserArguments.Name);
+    checkIfTopicEmpty(UserArguments.TopicName);
     if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
-      subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+      subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
                           UserArguments.PartitionToConsume,
                           UserArguments.OffsetToStart);
     } else {
       if (UserArguments.OffsetToStart > -2) {
-        subscribeAndConsume(UserArguments.Name, UserArguments.OffsetToStart);
+        subscribeAndConsume(UserArguments.TopicName,
+                            UserArguments.OffsetToStart);
       } else {
         (UserArguments.PartitionToConsume != -1)
-            ? subscribeAndConsume(UserArguments.Name, UserArguments.GoBack,
+            ? subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
                                   UserArguments.PartitionToConsume)
             : Logger->error("Please specify partition");
       }
@@ -55,7 +59,7 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
 
 void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
   std::vector<OffsetsStruct> HighAndLowOffsets =
-      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+      KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   bool EmptyTopic = true;
   for (auto Offsets : HighAndLowOffsets) {
     if (Offsets.LowOffset != Offsets.HighOffset)
@@ -70,12 +74,24 @@ void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
 ///
 /// \param UserArguments
 void RequestHandler::checkMetadataModeArguments() {
+  if (!UserArguments.JSONPath.empty()) {
+    throw ArgumentException("Cannot run consumer mode with -f specified. Did "
+                            "you want to use -P mode?");
+  }
   if (UserArguments.ShowAllTopics)
-    std::cout << KafkaConnection->getAllTopics() << "\n";
-  else if (!UserArguments.Name.empty())
+    std::cout << KafkaConsumer->getAllTopics() << "\n";
+  else if (!UserArguments.TopicName.empty())
     showTopicPartitionOffsets();
   else if (!UserArguments.ShowAllTopics)
-    std::cout << KafkaConnection->showAllMetadata();
+    std::cout << KafkaConsumer->showAllMetadata();
+}
+
+void RequestHandler::runProducer() {
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
+
+  auto Message = FlatBuffers.serializeMessage(UserArguments.JSONPath);
+  KafkaProducer->produce(std::move(Message));
+  Logger->info("Message produced!");
 }
 
 /// Ensures there are messages to read at offset provided by the user, otherwise
@@ -86,7 +102,7 @@ void RequestHandler::checkMetadataModeArguments() {
 bool RequestHandler::verifyOffset(const int64_t Offset,
                                   const std::string &TopicName) {
   std::vector<OffsetsStruct> Offsets =
-      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+      KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
   for (OffsetsStruct Struct : Offsets) {
     if (Offset <= Struct.HighOffset && Offset >= Struct.LowOffset) {
@@ -107,7 +123,7 @@ void RequestHandler::verifyNLast(const int64_t NLast,
                                  const std::string &TopicName,
                                  const int16_t Partition) {
   OffsetsStruct Struct =
-      KafkaConnection->getPartitionHighAndLowOffsets(TopicName, Partition);
+      KafkaConsumer->getPartitionHighAndLowOffsets(TopicName, Partition);
   if (Struct.HighOffset - Struct.LowOffset < NLast)
     throw ArgumentException("Cannot display that many messages!");
 }
@@ -116,9 +132,9 @@ void RequestHandler::verifyNLast(const int64_t NLast,
 ///
 /// \param UserArguments
 void RequestHandler::showTopicPartitionOffsets() {
-  std::cout << UserArguments.Name << "\n";
+  std::cout << UserArguments.TopicName << "\n";
   for (auto &SingleStruct :
-       KafkaConnection->getTopicsHighAndLowOffsets(UserArguments.Name)) {
+       KafkaConsumer->getTopicsHighAndLowOffsets(UserArguments.TopicName)) {
     fmt::print("Partition ID: {} || Low offset: {} || High offset: {}",
                SingleStruct.PartitionId, SingleStruct.LowOffset,
                SingleStruct.HighOffset);
@@ -131,9 +147,9 @@ void RequestHandler::showTopicPartitionOffsets() {
 /// \param MessageAndEOF
 /// \param EOFPartitionCounter
 /// \param FlatBuffers
-void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
-                                       int &EOFPartitionCounter,
-                                       FlatbuffersTranslator &FlatBuffers) {
+void RequestHandler::printKafkaMessage(
+    Kafka::MessageMetadataStruct &MessageData, int &EOFPartitionCounter,
+    FlatbuffersTranslator &FlatBuffers) {
   if (!MessageData.Payload.empty()) {
     std::string FileIdentifier;
     std::string JSONMessage =
@@ -156,7 +172,7 @@ void RequestHandler::printKafkaMessage(KafkaMessageMetadataStruct &MessageData,
 ///
 /// \param MessageData
 void RequestHandler::printMessageMetadata(
-    KafkaMessageMetadataStruct &MessageData,
+    Kafka::MessageMetadataStruct &MessageData,
     const std::string &FileIdentifier) {
   std::cout << fmt::format(
       "\n{:_>93}{}{:>64}\n\nTimestamp: {:>11} || PartitionID: "
@@ -177,7 +193,7 @@ void RequestHandler::printMessageMetadata(
 void RequestHandler::printEntireTopic(const std::string &TopicName,
                                       bool TerminateAtEndOfTopic) {
   std::vector<OffsetsStruct> OffsetsStruct =
-      KafkaConnection->getTopicsHighAndLowOffsets(TopicName);
+      KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   int64_t MinOffset = OffsetsStruct[0].LowOffset;
   for (auto OffsetStruct : OffsetsStruct) {
     if (OffsetStruct.LowOffset < MinOffset)
@@ -208,8 +224,8 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
                                          int Partition) {
   verifyNLast(NumberOfMessages, TopicName, Partition);
   int EOFPartitionCounter = 0;
-  KafkaConnection->subscribeToLastNMessages(NumberOfMessages, TopicName,
-                                            Partition);
+  KafkaConsumer->subscribeToLastNMessages(NumberOfMessages, TopicName,
+                                          Partition);
   FlatbuffersTranslator FlatBuffers(SchemaPath);
 
   while (EOFPartitionCounter < 1) {
@@ -230,10 +246,9 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
     throw ArgumentException("Offset not valid!");
 
   int EOFPartitionCounter = 0;
-  int NumberOfPartitions =
-      KafkaConnection->getNumberOfTopicPartitions(TopicName);
+  int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(TopicName);
 
-  KafkaConnection->subscribeAtOffset(Offset, TopicName);
+  KafkaConsumer->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers(SchemaPath);
   if (TerminateAtEndOfTopic) {
     while (EOFPartitionCounter < NumberOfPartitions) {
@@ -263,10 +278,9 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
     throw ArgumentException("Cannot show that many messages!");
 
   int EOFPartitionCounter = 0;
-  int NumberOfPartitions =
-      KafkaConnection->getNumberOfTopicPartitions(TopicName);
+  int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(TopicName);
 
-  KafkaConnection->subscribeAtOffset(Offset, TopicName);
+  KafkaConsumer->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers(SchemaPath);
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
@@ -279,8 +293,8 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
 bool RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
                                           FlatbuffersTranslator &FlatBuffers) {
   try {
-    KafkaMessageMetadataStruct MessageData;
-    MessageData = KafkaConnection->consume();
+    Kafka::MessageMetadataStruct MessageData;
+    MessageData = KafkaConsumer->consume();
     MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
     printKafkaMessage(MessageData, EOFPartitionCounter, FlatBuffers);
     return true; // got a message

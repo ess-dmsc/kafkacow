@@ -3,6 +3,11 @@
 #include "f142_logdata_generated.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
+#include <json_json_generated.h>
+
+namespace {
+const bool UpdateFromGithub = false;
+}
 
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
@@ -48,9 +53,9 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   std::string NewMessage(bufferpointer, bufferpointer + Builder.GetSize());
   auto FlatbufferPointer = Builder.ReleaseBufferPointer();
 
-  KafkaMessageMetadataStruct MessageMetadata;
+  Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
 
   // Run first time to populate schema map
   std::string FileID;
@@ -62,9 +67,9 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 }
 
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
-  KafkaMessageMetadataStruct MessageMetadata;
+  Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
   std::string FileID;
   EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             MessageMetadata.Payload);
@@ -72,10 +77,27 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
 
 TEST(FlatbuffersTranslatorTest,
      no_throw_for_short_messages_without_file_identifier) {
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(false));
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
   std::string FileID;
-  KafkaMessageMetadataStruct MessageMetadata;
+  Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "test";
   EXPECT_NO_THROW(
       FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID));
+}
+
+TEST(FlatbuffersTranslatorTest, successfully_return_json_schema_message) {
+  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
+  flatbuffers::FlatBufferBuilder Builder;
+  Builder.Clear();
+  std::string MessageToSerialize = "{\"SimpleJson\" : 42}";
+  auto FBOffset = CreateJsonDataDirect(Builder, MessageToSerialize.c_str());
+  FinishJsonDataBuffer(Builder, FBOffset);
+  auto KafkaMessage = Kafka::Message(Builder.Release());
+  std::string MessageString(KafkaMessage.data(),
+                            static_cast<int>(KafkaMessage.size()));
+  Kafka::MessageMetadataStruct MessageMetadata;
+  MessageMetadata.Payload = MessageString;
+  std::string FileID;
+  EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
+            MessageToSerialize);
 }
