@@ -37,7 +37,7 @@ builders = pipeline_builder.createBuilders { container ->
 
   pipeline_builder.stage("${container.key}: configure") {
     def coverage_on = ""
-    if (image_key == test_os) {
+    if (container.key == test_os) {
       coverage_on = "-DCOV=1"
     }
     container.sh """
