@@ -21,6 +21,7 @@ builders = pipeline_builder.createBuilders { container ->
   pipeline_builder.stage("${container.key}: checkout") {
     dir(pipeline_builder.project) {
       checkout scm
+      sh "git submodule update --init --recursive"
     }
     // Copy source code to container
     container.copyTo(pipeline_builder.project, pipeline_builder.project)
