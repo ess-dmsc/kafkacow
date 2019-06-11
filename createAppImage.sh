@@ -39,6 +39,7 @@ curl -L https://github.com/AppImage/AppImageKit/releases/download/12/AppRun-x86_
 chmod a+x AppRun
 cd ..
 curl -L https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage --output appimagetool.AppImage
+chmod a+x appimagetool.AppImage
 ./appimagetool.AppImage --appimage-extract
 
 cp ${build_dir}/kafkacow.desktop ${output_dir}/kafkacow.AppDir
