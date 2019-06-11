@@ -1,23 +1,23 @@
 #pragma once
 
-#include "ConnectKafkaInterface.h"
-#include "TopicMetadataStruct.h"
+#include "../TopicMetadataStruct.h"
+#include "ConsumerInterface.h"
 #include <CLI/CLI.hpp>
 #include <iostream>
 #include <librdkafka/rdkafkacpp.h>
 
-class ConnectKafkaFake : public ConnectKafkaInterface {
+namespace Kafka {
+
+class FakeConsumer : public ConsumerInterface {
 public:
-  ConnectKafkaFake();
+  FakeConsumer();
 
   std::string getAllTopics() override;
 
-  KafkaMessageMetadataStruct consumeFromOffset() override;
-
-  KafkaMessageMetadataStruct consumeLastNMessages() override;
+  MessageMetadataStruct consume() override;
 
   std::vector<OffsetsStruct>
-  getTopicsHighAndLowOffsets(std::string Topic) override;
+  getTopicsHighAndLowOffsets(const std::string &Topic) override;
 
   OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                               int32_t PartitionID) override;
@@ -28,5 +28,7 @@ public:
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;
+
   std::string showAllMetadata() override;
 };
+}

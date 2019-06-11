@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(kafkaCow)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall" )
 if (NOT WIN32)
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -pedantic" )
 endif()
@@ -27,11 +27,25 @@ if(NOT CONAN_DISABLE)
             BUILD_TYPE "None"
             BUILD outdated)
 endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX AND COV)
     include(CodeCoverage)
     setup_target_for_coverage(coverage UnitTests coverage)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_COVERAGE}")
 endif()
+
+set(CONAN_PACKAGES
+    CONAN_PKG::cli11
+    CONAN_PKG::librdkafka
+    CONAN_PKG::boost_filesystem
+    CONAN_PKG::boost_system
+    CONAN_PKG::boost_dll
+    CONAN_PKG::flatbuffers
+    CONAN_PKG::spdlog
+    CONAN_PKG::jsonformoderncpp
+    CONAN_PKG::libgit2
+    CONAN_PKG::streaming-data-types)
+
 add_subdirectory(src)
 add_subdirectory(test)
 

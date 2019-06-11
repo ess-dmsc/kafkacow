@@ -3,7 +3,9 @@
 #include <string>
 
 struct UserArgumentStruct {
-  std::string Name;
+  std::string TopicName;
+  std::string Broker;
+  std::string JSONPath;
 
   // value -2 signalises that the variable hasn't been set by a user and won't
   // be used
@@ -16,5 +18,6 @@ struct UserArgumentStruct {
   bool ShowAllTopics = false;
   bool ConsumerMode = false;
   bool MetadataMode = false;
+  bool ProducerMode = false;
   bool ShowEntireMessage = false;
 };
