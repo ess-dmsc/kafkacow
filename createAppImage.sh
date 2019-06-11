@@ -33,6 +33,8 @@ then
 fi
 mkdir -p "$DIR";
 
+start_dir=$(pwd)
+
 cp -r "${build_dir}/." "$DIR"
 cd ${output_dir}/kafkacow.AppDir
 curl -L https://github.com/AppImage/AppImageKit/releases/download/12/AppRun-x86_64 --output AppRun
@@ -42,13 +44,15 @@ curl -L https://github.com/AppImage/AppImageKit/releases/download/12/appimagetoo
 chmod a+x appimagetool.AppImage
 ./appimagetool.AppImage --appimage-extract
 
+cd ${start_dir}
 cp ${build_dir}/kafkacow.desktop ${output_dir}/kafkacow.AppDir
 cp ${build_dir}/icon.png ${output_dir}/kafkacow.AppDir
+cd ${output_dir}
 
-if [ -f "${output_dir}/kafkacow.AppImage" ];
+if [ -f "kafkacow.AppImage" ];
 then
     printf '%s\n' "Overwriting image..."
-    rm -rf "${output_dir}/kafkacow.AppImage"
+    rm -rf "kafkacow.AppImage"
 fi
 
-./squashfs-root/AppRun ${output_dir}/kafkacow.AppDir ${output_dir}/kafkacow.AppImage
+./squashfs-root/AppRun kafkacow.AppDir kafkacow.AppImage
