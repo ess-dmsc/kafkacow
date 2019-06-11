@@ -125,7 +125,8 @@ builders = pipeline_builder.createBuilders { container ->
   if (container.key == release_os) {
     try {
         container.sh """
-        ./createAppImage.sh -b build -o app-image-output
+        cd ${pipeline_builder.project}
+        ./createAppImage.sh -b ../build -o ../app-image-output
         """
     } catch (e) {
         failure_function(e, "Creating appimage on (${container.key}) failed")
