@@ -51,14 +51,16 @@ builders = pipeline_builder.createBuilders { container ->
   }  // stage
 
   pipeline_builder.stage("${container.key}: configure") {
-    def coverage_on = ""
+    def cmake_args = ""
     if (container.key == test_os) {
-      coverage_on = "-DCOV=1"
+      cmake_args = "-DCOV=1"
+    } else if (container.key == release_os){
+      cmake_args = "-DCMAKE_BUILD_TYPE=Release"
     }
     container.sh """
       cd build
       . ./activate_run.sh
-      cmake ../${pipeline_builder.project} ${coverage_on}
+      cmake ../${pipeline_builder.project} ${cmake_args} -DCONAN=MANUAL
     """
   }  // stage
 
