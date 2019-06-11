@@ -1,0 +1,5 @@
+fileignoreconfig:
+- filename: streaming-data-types
+  checksum: 033b836242a82d063f27f1af14c5aae4a121aae9b5ae39a1672f390972f54221
+  ignore_detectors: []
+

@@ -9,6 +9,18 @@ test_os = "centos7"
 archive_os = "centos7"
 release_os = "centos7-release"
 
+// Set number of old builds to keep.
+properties([[
+    $class: 'BuildDiscarderProperty',
+    strategy: [
+        $class: 'LogRotator',
+        artifactDaysToKeepStr: '',
+        artifactNumToKeepStr: '5',
+        daysToKeepStr: '',
+        numToKeepStr: ''
+    ]
+]]);
+
 container_build_nodes = [
   'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
   'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
@@ -111,20 +123,13 @@ builders = pipeline_builder.createBuilders { container ->
   if (container.key == release_os) {
     try {
         container.sh """
-        echo 'THIS IS ** docker_release'
-
-         echo 'current path:'
-         echo "$PWD"
-         ls
-         cd kafkacow
-         echo 'current path:'
-         echo "$PWD"
-         ls
-        ./createAppImage.sh "$project"
+        ./createAppImage.sh -b build -o app-image-output
         """
     } catch (e) {
-        failure_function(e, "Check formatting step for (${container.key}) failed")
+        failure_function(e, "Creating appimage on (${container.key}) failed")
     }
+    container.copyFrom("${pipeline_builder.project}/app-image-output/kafkacow.AppImage", '.')
+    archiveArtifacts "kafkacow.AppImage"
   }  // if
 }  // createBuilders
 
