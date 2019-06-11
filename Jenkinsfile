@@ -131,7 +131,7 @@ builders = pipeline_builder.createBuilders { container ->
     } catch (e) {
         failure_function(e, "Creating appimage on (${container.key}) failed")
     }
-    container.copyFrom("${pipeline_builder.project}/app-image-output/kafkacow.AppImage", '.')
+    container.copyFrom("app-image-output/kafkacow.AppImage", '.')
     archiveArtifacts "kafkacow.AppImage"
   }  // if
 }  // createBuilders
