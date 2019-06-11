@@ -35,11 +35,11 @@ mkdir -p "$DIR";
 
 cp -r "${build_dir}/." "$DIR"
 cd ${output_dir}/kafkacow.AppDir
-curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppRun --output AppRun
+curl -L https://github.com/AppImage/AppImageKit/releases/download/12/AppRun-x86_64 --output AppRun
 chmod a+x AppRun
 cd ..
-curl -L https://github.com/probonopd/AppImageKit/releases/download/5/AppImageAssistant --output AppImageAssistant
-chmod a+x AppImageAssistant
+curl -L https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage --output appimagetool.AppImage
+./appimagetool.AppImage --appimage-extract
 
 cp ${build_dir}/kafkacow.desktop ${output_dir}/kafkacow.AppDir
 cp ${build_dir}/icon.png ${output_dir}/kafkacow.AppDir
@@ -50,4 +50,4 @@ then
     rm -rf "${output_dir}/kafkacow.AppImage"
 fi
 
-./AppImageAssistant ${output_dir}/kafkacow.AppDir ${output_dir}/kafkacow.AppImage
+./squashfs-root/AppRun ${output_dir}/kafkacow.AppDir ${output_dir}/kafkacow.AppImage

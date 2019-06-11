@@ -1,21 +1,19 @@
 [Desktop Entry]
 Comment[en_GB]=
 Comment=
-Encoding=UTF-8
 Exec=./usr/bin/kafkacow
 GenericName[en_GB]=
 GenericName=
-Icon=icon.png
+Icon=icon
 MimeType=
-Name[en_GB]=Name of Application
-Name=kafkaaaaa
-Path=
+Name[en_GB]=kafkacow
+Name=kafkacow
 StartupNotify=true
 Terminal=true
-TerminalOptions=
 Type=Application
 Version=1.0
 X-DBUS-ServiceName=
 X-DBUS-StartupType=
 X-KDE-SubstituteUID=false
 X-KDE-Username=
+Categories=Development;
