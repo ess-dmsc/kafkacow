@@ -5,10 +5,6 @@
 #include <gtest/gtest.h>
 #include <json_json_generated.h>
 
-namespace {
-const bool UpdateFromGithub = false;
-}
-
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
 public:
