@@ -8,7 +8,7 @@ boost_system/1.69.0@bincrafters/stable
 boost_dll/1.69.0@bincrafters/stable
 spdlog/1.3.1@bincrafters/stable
 jsonformoderncpp/3.6.1@vthiery/stable
-fmt/5.2.0@bincrafters/stable
+fmt/5.3.0@bincrafters/stable
 streaming-data-types/fb4d847@ess-dmsc/stable
 
 [generators]
@@ -18,8 +18,8 @@ virtualrunenv
 [options]
 librdkafka:shared=True
 flatbuffers:shared=False
-boost_filesystem:shared=True
-boost_system:shared=True
+boost_filesystem:shared=False
+boost_system:shared=False
 
 [imports]
 ., *.dylib* -> ./lib @ keep_path=False
