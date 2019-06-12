@@ -1,5 +1,5 @@
 #include "../src/FlatbuffersTranslator.h"
-#include "../src/UpdateSchemas.h"
+#include "../src/GetSchemaPath.h"
 #include "f142_logdata_generated.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
@@ -55,7 +55,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 
   Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
+  FlatbuffersTranslator FlatBuffersTranslator(getSchemasPath());
 
   // Run first time to populate schema map
   std::string FileID;
@@ -69,7 +69,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
 TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
   Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "{\n  source_name: \"NeXus-Streamer\"}";
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
+  FlatbuffersTranslator FlatBuffersTranslator(getSchemasPath());
   std::string FileID;
   EXPECT_EQ(FlatBuffersTranslator.deserializeToJSON(MessageMetadata, FileID),
             MessageMetadata.Payload);
@@ -77,7 +77,7 @@ TEST(FlatbuffersTranslatorTest, message_already_in_json_test) {
 
 TEST(FlatbuffersTranslatorTest,
      no_throw_for_short_messages_without_file_identifier) {
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
+  FlatbuffersTranslator FlatBuffersTranslator(getSchemasPath());
   std::string FileID;
   Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = "test";
@@ -86,7 +86,7 @@ TEST(FlatbuffersTranslatorTest,
 }
 
 TEST(FlatbuffersTranslatorTest, successfully_return_json_schema_message) {
-  FlatbuffersTranslator FlatBuffersTranslator(updateSchemas(UpdateFromGithub));
+  FlatbuffersTranslator FlatBuffersTranslator(getSchemasPath());
   flatbuffers::FlatBufferBuilder Builder;
   Builder.Clear();
   std::string MessageToSerialize = "{\"SimpleJson\" : 42}";
