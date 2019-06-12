@@ -14,8 +14,8 @@ add_executable(kafkacow main.cpp
         FlatbuffersTranslator.h
         JSONPrinting.cpp
         JSONPrinting.h
-        GetSchemaPath.cpp
-        GetSchemaPath.h
+        UpdateSchemas.cpp
+        UpdateSchemas.h
         Kafka/Producer.cpp
         Kafka/Producer.h
         Kafka/KafkaConfig.h
