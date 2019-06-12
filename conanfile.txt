@@ -25,7 +25,10 @@ boost_system:shared=True
 [imports]
 ., *.dylib* -> ./lib @ keep_path=False
 ., *.so* -> ./lib @ keep_path=False
+., *.a* -> ./lib @ keep_path=False
+lib64, * -> ./lib @ keep_path=False
+filesystem/lib, *.so* -> ./lib @ keep_path=False
+system/lib, *.so* -> ./lib @ keep_path=False
 ., LICENSE* -> ./licenses @ folder=True, ignore_case=True
 ., *.dll -> ./bin @ keep_path=False
-., *.a* -> ./lib @ keep_path=False
 ., *.lib -> ./bin @ keep_path=False
