@@ -1,7 +1,7 @@
 [Desktop Entry]
 Comment[en_GB]=
 Comment=
-Exec=./usr/bin/kafkacow
+Exec=bin/kafkacow
 GenericName[en_GB]=
 GenericName=
 Icon=icon
