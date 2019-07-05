@@ -202,7 +202,8 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_error_too_many_messages) {
   RequestHandler NewRequestHandler(
       UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
-  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(true),
+               ArgumentException);
 }
 
 TEST(RequestHandlerTest,
