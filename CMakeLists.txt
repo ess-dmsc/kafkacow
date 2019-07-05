@@ -32,7 +32,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND COV)
 endif()
 
 set(CONAN_PACKAGES
-    CONAN_PKG::cli11
+    CONAN_PKG::CLI11
     CONAN_PKG::librdkafka
     CONAN_PKG::boost_filesystem
     CONAN_PKG::boost_system
