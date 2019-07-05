@@ -34,14 +34,14 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
-  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-             !UserArguments.TopicName.empty() &&
-             !UserArguments.ISODate.empty()) {
+  }
+  checkIfTopicEmpty(UserArguments.TopicName);
+  if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
+      !UserArguments.TopicName.empty() && !UserArguments.ISODate.empty()) {
     subscribeAndConsume(UserArguments.ISODate, UserArguments.TopicName, false);
   } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
     printEntireTopic(UserArguments.TopicName, TerminateAtEndOfTopic);
   } else {
-    checkIfTopicEmpty(UserArguments.TopicName);
     if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
       subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
                           UserArguments.PartitionToConsume,
