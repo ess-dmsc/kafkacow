@@ -154,12 +154,49 @@ TEST(RequestHandlerTest,
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
 }
 
+TEST(RequestHandlerTest, consume_from_date_success) {
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.ISODate = "2019-07-05T15:18:14";
+  UserArguments.TopicName = "MULTIPART_events";
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
+}
+
+TEST(RequestHandlerTest, throw_error_if_date_and_offset_specified) {
+  UserArgumentStruct UserArguments;
+  UserArguments.ConsumerMode = true;
+  UserArguments.ISODate = "2019-07-05T15:18:14";
+  UserArguments.TopicName = "MULTIPART_events";
+  UserArguments.OffsetToStart = 2;
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(true),
+               ArgumentException);
+}
+
 TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   UserArgumentStruct UserArguments;
   UserArguments.OffsetToStart = -1234;
   UserArguments.PartitionToConsume = 1;
   UserArguments.ConsumerMode = true;
   UserArguments.GoBack = 2;
+  UserArguments.TopicName = "MULTIPART_events";
+
+  RequestHandler NewRequestHandler(
+      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
+}
+
+TEST(RequestHandlerTest, subscribe_to_nlastmessages_error_too_many_messages) {
+  UserArgumentStruct UserArguments;
+  UserArguments.OffsetToStart = -1234;
+  UserArguments.PartitionToConsume = 1;
+  UserArguments.ConsumerMode = true;
+  UserArguments.GoBack = 100;
   UserArguments.TopicName = "MULTIPART_events";
 
   RequestHandler NewRequestHandler(

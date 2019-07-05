@@ -60,7 +60,7 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
       // consume from offset/date
       else if (UserArguments.OffsetToStart > -2) {
         subscribeAndConsume(UserArguments.TopicName,
-                            UserArguments.OffsetToStart);
+                            UserArguments.OffsetToStart, TerminateAtEndOfTopic);
       } else {
         // consume last N
         if (UserArguments.PartitionToConsume != -1) {
