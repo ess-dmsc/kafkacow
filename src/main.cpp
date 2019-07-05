@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
                  "Start consuming from an offset. Combine with \"-g\" to "
                  "display range of messages with \"-o\" as lower offset.")
       ->check(CLI::Range(int64_t(0), std::numeric_limits<int64_t>::max()));
+  App.add_option("-d, --date",UserArguments.ISODate,"date");
   App.add_option(
          "-i,--indentation", UserArguments.Indentation,
          "Number of spaces used as indentation. Range 0 - 20. 4 by default.")
