@@ -206,7 +206,7 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
   using namespace std;
   time_t Seconds = Timestamp / 1000;
   ctime(&Seconds);
-  istringstream iss(asctime(localtime(&Seconds)));
+  istringstream iss(asctime(gmtime(&Seconds)));
   vector<string> tokens{istream_iterator<string>{iss},
                         istream_iterator<string>{}};
   return fmt::format("{} {}-{}-{} {}.{}", tokens[0], tokens[2], tokens[1],
