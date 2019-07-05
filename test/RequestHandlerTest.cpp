@@ -34,7 +34,7 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
       UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
   EXPECT_NO_THROW(
-      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1));
+      NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1, true));
 }
 
 TEST(RequestHandlerTest,

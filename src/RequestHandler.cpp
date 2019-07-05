@@ -53,7 +53,7 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
       } else {
         (UserArguments.PartitionToConsume != -1)
             ? subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
-                                  UserArguments.PartitionToConsume)
+                                  UserArguments.PartitionToConsume, false)
             : Logger->error("Please specify partition");
       }
     }
@@ -224,16 +224,12 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
 /// \param Partition
 void RequestHandler::subscribeAndConsume(const std::string &TopicName,
                                          int64_t NumberOfMessages,
-                                         int Partition) {
+                                         int Partition,
+                                         bool TerminateAtEndOfTopic) {
   verifyNLast(NumberOfMessages, TopicName, Partition);
-  int EOFPartitionCounter = 0;
   KafkaConsumer->subscribeToLastNMessages(NumberOfMessages, TopicName,
                                           Partition);
-  FlatbuffersTranslator FlatBuffers(SchemaPath);
-
-  while (EOFPartitionCounter < 1) {
-    consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
-  }
+  consumeSubscribed(TopicName, TerminateAtEndOfTopic);
 }
 
 /// Subscribes at an offset on a specified topic and consumes data until
@@ -247,21 +243,8 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
                                          bool TerminateAtEndOfTopic) {
   if (verifyOffset(Offset, TopicName))
     throw ArgumentException("Offset not valid!");
-
-  int EOFPartitionCounter = 0;
-  int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(TopicName);
-
   KafkaConsumer->subscribeAtOffset(Offset, TopicName);
-  FlatbuffersTranslator FlatBuffers(SchemaPath);
-  if (TerminateAtEndOfTopic) {
-    while (EOFPartitionCounter < NumberOfPartitions) {
-      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
-    }
-  } else {
-    while (true) {
-      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
-    }
-  }
+  consumeSubscribed(TopicName, TerminateAtEndOfTopic);
 }
 
 /// Subscribes to a TopicName and consumes NumberOfMessages from Offset from
@@ -318,8 +301,13 @@ void RequestHandler::subscribeAndConsume(const std::string &isoDate,
                                          const std::string &Topic,
                                          bool TerminateAtEndOfTopic) {
   KafkaConsumer->subscribeToDate(Topic, isoDate);
-  FlatbuffersTranslator FlatBuffers(SchemaPath);
+  consumeSubscribed(Topic, TerminateAtEndOfTopic);
+}
+
+void RequestHandler::consumeSubscribed(const std::string &Topic,
+                                       bool TerminateAtEndOfTopic) {
   int EOFPartitionCounter = 0;
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
   int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(Topic);
   if (TerminateAtEndOfTopic) {
     while (EOFPartitionCounter < NumberOfPartitions) {

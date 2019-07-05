@@ -49,7 +49,8 @@ public:
   void subscribeAndConsume(const std::string &TopicName, int64_t Offset,
                            bool TerminateAtEndOfTopic = false);
   void subscribeAndConsume(const std::string &TopicName,
-                           int64_t NumberOfMessages, int Partition);
+                           int64_t NumberOfMessages, int Partition,
+                           bool TerminateAtEndOfTopic);
 
   void subscribeAndConsume(const std::string &TopicName,
                            int64_t NumberOfMessages, int Partition,
@@ -77,4 +78,5 @@ private:
                             FlatbuffersTranslator &FlatBuffers);
   void subscribeAndConsume(const std::string &isoDate, const std::string &Topic,
                            bool TerminateAtEndOfTopic);
+  void consumeSubscribed(const std::string &Topic, bool TerminateAtEndOfTopic);
 };
