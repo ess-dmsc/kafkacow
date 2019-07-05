@@ -146,6 +146,7 @@ TEST(RequestHandlerTest,
   UserArguments.OffsetToStart = 1234;
   UserArguments.GoBack = 2;
   UserArguments.ConsumerMode = true;
+  UserArguments.TopicName = "MULTIPART_events";
 
   RequestHandler NewRequestHandler(
       UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
@@ -158,11 +159,13 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   UserArguments.OffsetToStart = -1234;
   UserArguments.PartitionToConsume = 1;
   UserArguments.ConsumerMode = true;
+  UserArguments.GoBack = 2;
+  UserArguments.TopicName = "MULTIPART_events";
 
   RequestHandler NewRequestHandler(
       UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
 
-  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
+  EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
 
 TEST(RequestHandlerTest,
