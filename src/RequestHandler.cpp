@@ -270,7 +270,7 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
   FlatbuffersTranslator FlatBuffers(SchemaPath);
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
-         MessagesCounter <= NumberOfMessages) {
+         MessagesCounter <= NumberOfMessages - 1) {
     if (consumeSingleMessage(EOFPartitionCounter, FlatBuffers))
       MessagesCounter++;
   }
