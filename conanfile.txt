@@ -1,5 +1,5 @@
 [requires]
-cli11/1.6.0@bincrafters/stable
+CLI11/1.6.0@bincrafters/stable
 flatbuffers/1.10.0@google/stable
 librdkafka/0.11.5-dm2@ess-dmsc/stable
 gtest/1.8.0@bincrafters/stable
