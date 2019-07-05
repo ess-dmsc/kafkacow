@@ -257,22 +257,6 @@ std::string Consumer::showAllMetadata() {
   return SS.str();
 }
 
-void Consumer::subscribeToDate(const std::string &Topic,
-                               const std::string &isoDate) {
-  long Timestamp = isoDateToTimestamp(isoDate) / 1000000;
-  std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
-  for (int i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
-    auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
-    TopicPartition->set_offset(Timestamp);
-    TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
-  }
-  KafkaConsumer->offsetsForTimes(TopicPartitionsWithOffsetsSet, 1000);
-  KafkaConsumer->assign(TopicPartitionsWithOffsetsSet);
-  std::for_each(TopicPartitionsWithOffsetsSet.cbegin(),
-                TopicPartitionsWithOffsetsSet.cend(),
-                [](RdKafka::TopicPartition *Partition) { delete Partition; });
-}
-
 long Consumer::isoDateToTimestamp(const std::string &Date) {
   std::istringstream ss(Date);
   std::chrono::system_clock::time_point tp;
@@ -281,5 +265,26 @@ long Consumer::isoDateToTimestamp(const std::string &Date) {
     throw ArgumentException("Date not valid. Please use ISO8601 format, "
                             "e.g.[2019-07-05T08:18:14.366].");
   return tp.time_since_epoch().count();
+}
+
+int64_t Consumer::getOffsetForDate(const std::string &Date,
+                                   const std::string &Topic) {
+  int64_t Timestamp = isoDateToTimestamp(Date) / 1000000;
+  std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
+  for (int i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
+    auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
+    TopicPartition->set_offset(Timestamp);
+    TopicPartitionsWithOffsetsSet.push_back(TopicPartition);
+  }
+  KafkaConsumer->offsetsForTimes(TopicPartitionsWithOffsetsSet, 1000);
+  return std::min_element(TopicPartitionsWithOffsetsSet.begin(),
+                          TopicPartitionsWithOffsetsSet.end(),
+                          [](RdKafka::TopicPartition *First,
+                             RdKafka::TopicPartition *Second) {
+                            return First->offset() > Second->offset();
+                          })
+      .
+      operator*()
+      ->offset();
 }
 }

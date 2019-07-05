@@ -31,7 +31,7 @@ public:
 
   std::string showAllMetadata() override;
 
-  void subscribeToDate(const std::string &Topic,
-                       const std::string &isoDate) override;
+  int64_t getOffsetForDate(const std::string &Date,
+                           const std::string &Topic) override;
 };
 }

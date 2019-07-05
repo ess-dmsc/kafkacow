@@ -76,7 +76,9 @@ private:
   std::string timestampToReadable(const int64_t &Timestamp);
   bool consumeSingleMessage(int &EOFPartitionCounter,
                             FlatbuffersTranslator &FlatBuffers);
-  void subscribeAndConsume(const std::string &isoDate, const std::string &Topic,
-                           bool TerminateAtEndOfTopic);
-  void consumeSubscribed(const std::string &Topic, bool TerminateAtEndOfTopic);
+
+  void consumeAllSubscribed(const std::string &Topic,
+                            bool TerminateAtEndOfTopic);
+  void consumeNSubscribed(const std::string &Topic, int64_t NumberOfMessages);
+  int64_t getOffsetForDate(const std::string &Date, const std::string &Topic);
 };

@@ -58,6 +58,8 @@ FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
   return OffsetsToReturn;
 }
 
-void FakeConsumer::subscribeToDate(const std::string &Topic,
-                                   const std::string &isoDate) {}
+int64_t FakeConsumer::getOffsetForDate(const std::string &Date,
+                                       const std::string &Topic) {
+  return 0;
+}
 }
