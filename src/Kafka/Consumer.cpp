@@ -277,6 +277,9 @@ long Consumer::isoDateToTimestamp(const std::string &Date) {
   std::istringstream ss(Date);
   std::chrono::system_clock::time_point tp;
   ss >> date::parse("%Y-%m-%dT%H:%M:%S", tp);
+  if (tp.time_since_epoch().count() == 0)
+    throw ArgumentException("Date not valid. Please use ISO8601 format, "
+                            "e.g.[2019-07-05T08:18:14.366].");
   return tp.time_since_epoch().count();
 }
 }
