@@ -43,8 +43,8 @@ public:
 
   std::string showAllMetadata() override;
 
-  int subscribeToDate(const std::string &Topic,
-                      const std::string &isoDate) override;
+  void subscribeToDate(const std::string &Topic,
+                       const std::string &isoDate) override;
 
 private:
   std::shared_ptr<RdKafka::KafkaConsumer> KafkaConsumer;

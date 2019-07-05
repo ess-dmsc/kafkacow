@@ -257,8 +257,8 @@ std::string Consumer::showAllMetadata() {
   return SS.str();
 }
 
-int Consumer::subscribeToDate(const std::string &Topic,
-                              const std::string &isoDate) {
+void Consumer::subscribeToDate(const std::string &Topic,
+                               const std::string &isoDate) {
   long Timestamp = isoDateToTimestamp(isoDate) / 1000000;
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsetsSet;
   for (int i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
@@ -271,7 +271,6 @@ int Consumer::subscribeToDate(const std::string &Topic,
   std::for_each(TopicPartitionsWithOffsetsSet.cbegin(),
                 TopicPartitionsWithOffsetsSet.cend(),
                 [](RdKafka::TopicPartition *Partition) { delete Partition; });
-  return 666;
 }
 
 long Consumer::isoDateToTimestamp(const std::string &Date) {

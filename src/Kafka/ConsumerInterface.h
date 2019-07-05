@@ -32,7 +32,7 @@ public:
 
   virtual std::string showAllMetadata() = 0;
 
-  virtual int subscribeToDate(const std::string &Topic,
-                              const std::string &isoDate) = 0;
+  virtual void subscribeToDate(const std::string &Topic,
+                               const std::string &isoDate) = 0;
 };
 }
