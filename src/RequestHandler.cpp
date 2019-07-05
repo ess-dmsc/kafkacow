@@ -34,8 +34,11 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
       UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
-  }
-  if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
+             !UserArguments.TopicName.empty() &&
+             !UserArguments.ISODate.empty()) {
+    subscribeAndConsume(UserArguments.ISODate, UserArguments.TopicName, false);
+  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
     printEntireTopic(UserArguments.TopicName, TerminateAtEndOfTopic);
   } else {
     checkIfTopicEmpty(UserArguments.TopicName);
@@ -302,4 +305,29 @@ bool RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
     Logger->debug(Exception.what());
   }
   return false; // didn't get a message
+}
+
+/// Subscribes to Topic from time specified in ISO8601 isoDate and consumes data
+/// until
+/// manually terminated, or optionally, until reaches end of all partitions.
+///
+/// \param Topic
+/// \param isoDate ISO8061 date. For example 2019-07-05T08:18:14.366
+/// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
+void RequestHandler::subscribeAndConsume(const std::string &isoDate,
+                                         const std::string &Topic,
+                                         bool TerminateAtEndOfTopic) {
+  KafkaConsumer->subscribeToDate(Topic, isoDate);
+  FlatbuffersTranslator FlatBuffers(SchemaPath);
+  int EOFPartitionCounter = 0;
+  int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(Topic);
+  if (TerminateAtEndOfTopic) {
+    while (EOFPartitionCounter < NumberOfPartitions) {
+      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+    }
+  } else {
+    while (true) {
+      consumeSingleMessage(EOFPartitionCounter, FlatBuffers);
+    }
+  }
 }

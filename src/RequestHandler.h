@@ -75,4 +75,6 @@ private:
   std::string timestampToReadable(const int64_t &Timestamp);
   bool consumeSingleMessage(int &EOFPartitionCounter,
                             FlatbuffersTranslator &FlatBuffers);
+  void subscribeAndConsume(const std::string &isoDate, const std::string &Topic,
+                           bool TerminateAtEndOfTopic);
 };

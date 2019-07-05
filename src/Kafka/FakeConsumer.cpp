@@ -57,4 +57,9 @@ FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
   OffsetsToReturn.PartitionId = PartitionID;
   return OffsetsToReturn;
 }
+
+int FakeConsumer::subscribeToDate(const std::string &Topic,
+                                  const std::string &isoDate) {
+  return 0;
+}
 }

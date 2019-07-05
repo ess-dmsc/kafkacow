@@ -31,5 +31,8 @@ public:
                                         int Partition) = 0;
 
   virtual std::string showAllMetadata() = 0;
+
+  virtual int subscribeToDate(const std::string &Topic,
+                              const std::string &isoDate) = 0;
 };
 }
