@@ -31,30 +31,49 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
     throw ArgumentException("Cannot run consumer mode with -f specified. Did "
                             "you want to use -P mode?");
   }
-  if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-      UserArguments.TopicName.empty()) {
+  if (UserArguments.TopicName.empty()) {
     throw ArgumentException("Please specify topic!");
   }
   checkIfTopicEmpty(UserArguments.TopicName);
+
+  // consume everything
   if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2 &&
-      !UserArguments.TopicName.empty() && !UserArguments.ISODate.empty()) {
-    subscribeAndConsume(UserArguments.ISODate, UserArguments.TopicName, false);
-  } else if (UserArguments.GoBack == -2 && UserArguments.OffsetToStart == -2) {
+      UserArguments.ISODate.empty()) {
     printEntireTopic(UserArguments.TopicName, TerminateAtEndOfTopic);
   } else {
-    if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
-      subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
-                          UserArguments.PartitionToConsume,
-                          UserArguments.OffsetToStart);
+    // consume from date
+    if (!UserArguments.ISODate.empty()) {
+      // consume range from date
+      if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart == -2) {
+        // TODO
+      }
+      // consume from date
+      else if (UserArguments.GoBack == -2 &&
+               UserArguments.OffsetToStart == -2) {
+        subscribeAndConsume(UserArguments.ISODate, UserArguments.TopicName,
+                            TerminateAtEndOfTopic);
+      } else {
+        throw ArgumentException("Could not understand arguments.");
+      }
     } else {
+      // consume range
+      if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
+        subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
+                            UserArguments.PartitionToConsume,
+                            UserArguments.OffsetToStart);
+      }
+      // consume from offset
       if (UserArguments.OffsetToStart > -2) {
         subscribeAndConsume(UserArguments.TopicName,
                             UserArguments.OffsetToStart);
       } else {
-        (UserArguments.PartitionToConsume != -1)
-            ? subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
-                                  UserArguments.PartitionToConsume, false)
-            : Logger->error("Please specify partition");
+        // consume last N
+        if (UserArguments.PartitionToConsume != -1) {
+          subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
+                              UserArguments.PartitionToConsume, false);
+        } else {
+          Logger->error("Please specify partition");
+        }
       }
     }
   }
@@ -263,10 +282,10 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
   if (verifyOffset(Offset + NumberOfMessages, TopicName))
     throw ArgumentException("Cannot show that many messages!");
 
+  KafkaConsumer->subscribeAtOffset(Offset, TopicName);
+
   int EOFPartitionCounter = 0;
   int NumberOfPartitions = KafkaConsumer->getNumberOfTopicPartitions(TopicName);
-
-  KafkaConsumer->subscribeAtOffset(Offset, TopicName);
   FlatbuffersTranslator FlatBuffers(SchemaPath);
   int MessagesCounter = 0;
   while (EOFPartitionCounter < NumberOfPartitions &&
