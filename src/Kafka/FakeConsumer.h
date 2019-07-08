@@ -30,5 +30,8 @@ public:
                                 int Partition) override;
 
   std::string showAllMetadata() override;
+
+  int64_t getOffsetForDate(const std::string &Date,
+                           const std::string &Topic) override;
 };
 }

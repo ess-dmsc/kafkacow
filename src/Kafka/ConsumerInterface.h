@@ -31,5 +31,8 @@ public:
                                         int Partition) = 0;
 
   virtual std::string showAllMetadata() = 0;
+
+  virtual int64_t getOffsetForDate(const std::string &Date,
+                                   const std::string &Topic) = 0;
 };
 }
