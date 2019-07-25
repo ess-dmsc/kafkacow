@@ -193,10 +193,11 @@ void RequestHandler::printMessageMetadata(
     Kafka::MessageMetadataStruct &MessageData,
     const std::string &FileIdentifier) {
   std::cout << fmt::format(
-      "\n{:_>93}{}{:>64}\n\nTimestamp: {:>11} || PartitionID: "
+      "\n{:_>93}{}  ||  {}{:>36}\n\nTimestamp: {:>11} || PartitionID: "
       "{:>5} || Offset: {:>7} || File Identifier: {} ||",
-      "\n", MessageData.TimestampISO, "||", MessageData.Timestamp,
-      MessageData.Partition, MessageData.Offset, FileIdentifier);
+      "\n", MessageData.TimestampISO, MessageData.TimestampISO8601, "||",
+      MessageData.Timestamp, MessageData.Partition, MessageData.Offset,
+      FileIdentifier);
   if (MessageData.KeyPresent) {
     std::cout << fmt::format(" Key: {}", MessageData.Key);
   }
@@ -229,6 +230,13 @@ std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
                         istream_iterator<string>{}};
   return fmt::format("{} {}-{}-{} {}.{}", tokens[0], tokens[2], tokens[1],
                      tokens[4], tokens[3], Timestamp % 1000);
+}
+
+std::string RequestHandler::timestampToISO8601(const int64_t &Timestamp) {
+  char DateString[25];
+  time_t Seconds = Timestamp / 1000;
+  strftime(DateString, 25, "%FT%T", gmtime(&Seconds));
+  return fmt::format("{}.{}", DateString, Timestamp % 1000);
 }
 
 /// Subscribes to NumberOfMessages from Partition of specified TopicName and
@@ -301,6 +309,7 @@ bool RequestHandler::consumeSingleMessage(int &EOFPartitionCounter,
     Kafka::MessageMetadataStruct MessageData;
     MessageData = KafkaConsumer->consume();
     MessageData.TimestampISO = timestampToReadable(MessageData.Timestamp);
+    MessageData.TimestampISO8601 = timestampToISO8601(MessageData.Timestamp);
     printKafkaMessage(MessageData, EOFPartitionCounter, FlatBuffers);
     return true; // got a message
   } catch (TimeoutException &Exception) {
