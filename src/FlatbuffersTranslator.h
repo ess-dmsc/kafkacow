@@ -28,4 +28,5 @@ private:
   std::map<std::string, std::pair<std::string, std::string>> FileIDMap;
   const std::string SchemaPath;
   std::shared_ptr<spdlog::logger> Logger;
+  bool verify(const std::string &Message);
 };

@@ -39,6 +39,9 @@ std::string FlatbuffersTranslator::deserializeToJSON(
     if (!ok) {
       Logger->error("Couldn't load schema files!\n");
     }
+    if (verify(MessageData.Payload)) {
+      Logger->critical("works");
+    }
 
     std::unique_ptr<flatbuffers::Parser> Parser =
         createParser(SchemaFile.second, MessageData.Payload, Schema);
@@ -55,6 +58,9 @@ std::string FlatbuffersTranslator::deserializeToJSON(
 
     return DeserializedMessage;
   } else { // create a parser using schema loaded in the map
+    if (verify(MessageData.Payload)) {
+      Logger->critical("works");
+    }
     std::unique_ptr<flatbuffers::Parser> Parser = createParser(
         FileIDMap[FileID].first, MessageData.Payload, FileIDMap[FileID].second);
     std::string DeserializedMessage;
@@ -136,4 +142,10 @@ FlatbuffersTranslator::getMessageFromFile(const std::string &JSONPath) {
   std::stringstream StringStream;
   StringStream << IfStream.rdbuf();
   return StringStream.str();
+}
+
+bool FlatbuffersTranslator::verify(const std::string &Message) {
+  auto Verifier = flatbuffers::Verifier(
+      reinterpret_cast<const uint8_t *>(Message.c_str()), Message.size());
+  return reflection::VerifySchemaBuffer(Verifier);
 }
