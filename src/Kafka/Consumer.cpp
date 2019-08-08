@@ -112,7 +112,7 @@ Consumer::getTopicPartitionNumbers(const std::string &Topic) {
                                  return tpc->topic() == Topic;
                                });
   auto MatchedTopic = *Iterator;
-  if (MatchedTopic == nullptr)
+  if (MatchedTopic == *Topics->cend())
     throw ArgumentException(fmt::format("No such topic: {}", Topic));
 
   std::vector<int32_t> TopicPartitionNumbers;
