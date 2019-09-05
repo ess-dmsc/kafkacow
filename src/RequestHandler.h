@@ -49,7 +49,8 @@ public:
   void subscribeAndConsume(const std::string &TopicName, int64_t Offset,
                            bool TerminateAtEndOfTopic = false);
   void subscribeAndConsume(const std::string &TopicName,
-                           int64_t NumberOfMessages, int Partition);
+                           int64_t NumberOfMessages, int Partition,
+                           bool TerminateAtEndOfTopic);
 
   void subscribeAndConsume(const std::string &TopicName,
                            int64_t NumberOfMessages, int Partition,
@@ -75,4 +76,9 @@ private:
   std::string timestampToReadable(const int64_t &Timestamp);
   bool consumeSingleMessage(int &EOFPartitionCounter,
                             FlatbuffersTranslator &FlatBuffers);
+  std::string timestampToISO8601(const int64_t &Timestamp);
+  void consumeAllSubscribed(const std::string &Topic,
+                            bool TerminateAtEndOfTopic);
+  void consumeNSubscribed(const std::string &Topic, int64_t NumberOfMessages);
+  int64_t getOffsetForDate(const std::string &Date, const std::string &Topic);
 };

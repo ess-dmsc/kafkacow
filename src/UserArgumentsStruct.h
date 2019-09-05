@@ -15,6 +15,7 @@ struct UserArgumentStruct {
   int PartitionToConsume = -1;
   int Indentation = 4;
 
+  std::string ISODate;
   bool ShowAllTopics = false;
   bool ConsumerMode = false;
   bool MetadataMode = false;

@@ -12,6 +12,7 @@ struct MessageMetadataStruct {
   std::string Payload;
   bool PartitionEOF = false;
   std::string TimestampISO;
+  std::string TimestampISO8601;
   std::string Key;
   bool KeyPresent = false;
 };

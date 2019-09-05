@@ -43,6 +43,9 @@ public:
 
   std::string showAllMetadata() override;
 
+  int64_t getOffsetForDate(const std::string &Date,
+                           const std::string &Topic) override;
+
 private:
   std::shared_ptr<RdKafka::KafkaConsumer> KafkaConsumer;
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
@@ -53,5 +56,7 @@ private:
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
 
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
+
+  long isoDateToTimestamp(const std::string &Date);
 };
 }

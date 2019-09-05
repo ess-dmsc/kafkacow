@@ -43,7 +43,9 @@ set(CONAN_PACKAGES
     CONAN_PKG::flatbuffers
     CONAN_PKG::spdlog
     CONAN_PKG::jsonformoderncpp
-    CONAN_PKG::streaming-data-types)
+    CONAN_PKG::libgit2
+    CONAN_PKG::streaming-data-types
+    CONAN_PKG::date)
 
 add_subdirectory(src)
 add_subdirectory(test)

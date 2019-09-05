@@ -8,9 +8,11 @@ boost_system/1.69.0@bincrafters/stable
 boost_dll/1.69.0@bincrafters/stable
 spdlog/1.3.1@bincrafters/stable
 jsonformoderncpp/3.6.1@vthiery/stable
+libgit2/0.27.4-dm1@ess-dmsc/stable
 fmt/5.3.0@bincrafters/stable
-streaming-data-types/fb4d847@ess-dmsc/stable
-OpenSSL/1.0.2n@conan/stable  # Ensures we end up with libcrypto.so lib directory
+streaming-data-types/c45d2ec@ess-dmsc/stable
+date/2.4.1@bincrafters/stable
+OpenSSL/1.0.2n@conan/stable  # Ensures we end up with libcrypto.so in lib directory
 
 [generators]
 cmake
