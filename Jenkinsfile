@@ -6,13 +6,33 @@ project = "kafkacow"
 
 clangformat_os = "debian9"
 test_os = "centos7"
-archive_os = "centos7"
+archive_os = "centos7-release"
 
 container_build_nodes = [
   'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
+  'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
   'debian9': ContainerBuildNode.getDefaultContainerBuildNode('debian9'),
   'ubuntu1804': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804')
 ]
+
+def num_artifacts_to_keep
+if (env.BRANCH_NAME == 'master') {
+  num_artifacts_to_keep = '5'
+} else {
+  num_artifacts_to_keep = '1'
+}
+
+// Set number of old builds to keep.
+properties([[
+  $class: 'BuildDiscarderProperty',
+  strategy: [
+    $class: 'LogRotator',
+    artifactDaysToKeepStr: '',
+    artifactNumToKeepStr: num_artifacts_to_keep,
+    daysToKeepStr: '',
+    numToKeepStr: num_artifacts_to_keep
+  ]
+]]);
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
 pipeline_builder.activateEmailFailureNotifications()
@@ -37,14 +57,16 @@ builders = pipeline_builder.createBuilders { container ->
   }  // stage
 
   pipeline_builder.stage("${container.key}: configure") {
-    def coverage_on = ""
+    def extra_cmake_options = ""
     if (container.key == test_os) {
-      coverage_on = "-DCOV=1"
+      extra_cmake_options = "-DCOV=1"
+    } else if (container.key == archive_os) {
+      extra_cmake_options = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_SKIP_RPATH=FALSE -DCMAKE_INSTALL_RPATH='\\\\\\\$ORIGIN/../lib' -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE"
     }
     container.sh """
       cd build
       . ./activate_run.sh
-      cmake ../${pipeline_builder.project} ${coverage_on}
+      cmake ../${pipeline_builder.project} ${extra_cmake_options}
     """
   }  // stage
 
@@ -103,6 +125,30 @@ builders = pipeline_builder.createBuilders { container ->
           pattern: 'cppcheck.txt'
         ]]
       ])
+    }  // stage
+  }  // if
+  
+    if (container.key == archive_os) {
+    pipeline_builder.stage("${container.key}: Archive build") {
+      def archive_output = "${pipeline_builder.project}-${container.key}.tar.gz"
+      container.sh """
+        cd build
+        rm -rf ${pipeline_builder.project}; mkdir ${pipeline_builder.project}
+        mkdir ${pipeline_builder.project}/bin
+        cp ./bin/kafka-to-nexus ${pipeline_builder.project}/bin/
+        cp -r ./lib ${pipeline_builder.project}/
+        cp -r ./licenses ${pipeline_builder.project}/
+        tar czf ${archive_output} ${pipeline_builder.project}
+        # Create file with build information
+        touch BUILD_INFO
+        echo 'Repository: ${pipeline_builder.project}/${env.BRANCH_NAME}' >> BUILD_INFO
+        echo 'Commit: ${scm_vars.GIT_COMMIT}' >> BUILD_INFO
+        echo 'Jenkins build: ${env.BUILD_NUMBER}' >> BUILD_INFO
+      """
+
+      container.copyFrom("build/${archive_output}", '.')
+      container.copyFrom('build/BUILD_INFO', '.')
+      archiveArtifacts "${archive_output},BUILD_INFO"
     }  // stage
   }  // if
 }  // createBuilders
