@@ -135,7 +135,7 @@ builders = pipeline_builder.createBuilders { container ->
         cd build
         rm -rf ${pipeline_builder.project}; mkdir ${pipeline_builder.project}
         mkdir ${pipeline_builder.project}/bin
-        cp ./bin/kafka-to-nexus ${pipeline_builder.project}/bin/
+        cp ./bin/${pipeline_builder.project} ${pipeline_builder.project}/bin/
         cp -r ./lib ${pipeline_builder.project}/
         cp -r ./licenses ${pipeline_builder.project}/
         tar czf ${archive_output} ${pipeline_builder.project}
