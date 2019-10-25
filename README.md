@@ -19,10 +19,13 @@ Options:
   -b,--broker TEXT            Hostname or IP of Kafka broker.
   -t,--topic TEXT             Topic to read from/produce to.
   -p,--partition INT          Partition to get messages from.
-  -g,--go INT in              How many records back to show from partition "-p". To display range of messages combine with "-o" as lower offset.
-  -f,--file FILE              Path to JSON file.
-  -o,--offset INT in          Start consuming from an offset. Combine with "-g" to display range of messages with "-o" as lower offset.
-  -i,--indentation INT in [0 - 20]
+  -g,--go INT:INT in [0 - 9223372036854775807]
+                              How many records back to show from partition "-p". To display range of messages combine with "-o" as lower offset.
+  -f,--file TEXT:FILE         Path to JSON file.
+  -o,--offset INT:INT in [0 - 9223372036854775807]
+                              Start consuming from an offset. Combine with "-g" to display range of messages with "-o" as lower offset.
+  -d,--date TEXT              Start consuming from a ISO8601 date, e.g. [2019-07-05T08:18:14.366].
+  -i,--indentation INT:INT in [0 - 20]
                               Number of spaces used as indentation. Range 0 - 20. 4 by default.
   -a,--all                    Show a list of topics. To be used in "-L" mode.
   -e,--entire                 Show all records of a message(truncated by default).
