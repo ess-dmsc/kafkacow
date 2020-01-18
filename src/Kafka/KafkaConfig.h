@@ -28,7 +28,6 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
   setConfig(*conf, "fetch.message.max.bytes", "10000000");
   setConfig(*conf, "enable.auto.commit", "false");
   setConfig(*conf, "enable.auto.offset.store", "false");
-  setConfig(*conf, "offset.store.method", "none");
   setConfig(*conf, "api.version.request", "true");
   setConfig(*conf, "auto.offset.reset", "largest");
   // kafkacow uses assign not subscribe, so group id is not used for consumer
