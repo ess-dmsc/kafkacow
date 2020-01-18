@@ -22,7 +22,7 @@ std::string getEntireMessage(const std::string &JSONMessage,
                                           MessageWithNoQuotes.end(), ','),
                               MessageWithNoQuotes.end());
     return MessageWithNoQuotes;
-  } catch (nlohmann::json::exception) {
+  } catch (nlohmann::json::exception &) {
     return JSONMessage;
   }
 }
@@ -52,7 +52,7 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
                               MessageWithNoQuotes.end());
     return MessageWithNoQuotes;
 
-  } catch (nlohmann::json::exception) {
+  } catch (nlohmann::json::exception &) {
     return truncateNONJSON(JSONMessage);
   }
 }
