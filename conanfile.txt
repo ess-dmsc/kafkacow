@@ -11,7 +11,7 @@ jsonformoderncpp/3.6.1@vthiery/stable
 libgit2/0.27.4-dm1@ess-dmsc/stable
 fmt/5.3.0@bincrafters/stable
 streaming-data-types/358b661@ess-dmsc/stable
-date/4b46deb@ess-dmsc/stable
+date/2.4.1@bincrafters/stable
 OpenSSL/1.1.1c@conan/stable
 
 [generators]
