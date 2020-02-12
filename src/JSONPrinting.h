@@ -9,8 +9,8 @@ std::string getEntireMessage(const std::string &JSONMessage, const int &Indent);
 std::string getTruncatedMessage(const std::string &JSONMessage,
                                 const int &Indent);
 
+void recursiveTruncate(nlohmann::json &JSONMessage);
+
 void recursiveTruncateJSONMap(nlohmann::json &JSONMessage);
 
-void recursiveTruncateJSONSequence(nlohmann::json &JSONMessage);
-
-std::string truncateNONJSON(const std::string &Message);
+void recursiveTruncateJSONArray(nlohmann::json &JSONMessage);

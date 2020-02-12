@@ -1,11 +1,47 @@
 #include "RequestHandler.h"
 #include "CustomExceptions.h"
 #include "JSONPrinting.h"
-#include "json_json_generated.h"
 #include <chrono>
 #include <flatbuffers/flatbuffers.h>
 #include <fmt/format.h>
 #include <fstream>
+
+namespace {
+/// Prints and formats message Metadata.
+///
+/// \param MessageData
+void printMessageMetadata(Kafka::MessageMetadataStruct &MessageData,
+                          const std::string &FileIdentifier) {
+  std::cout << fmt::format(
+      "\n{:_>93}{}  ||  {}{:>36}\n\nTimestamp: {:>11} || PartitionID: "
+      "{:>5} || Offset: {:>7} || File Identifier: {} ||",
+      "\n", MessageData.TimestampISO, MessageData.TimestampISO8601, "||",
+      MessageData.Timestamp, MessageData.Partition, MessageData.Offset,
+      FileIdentifier);
+  if (MessageData.KeyPresent) {
+    std::cout << fmt::format(" Key: {}", MessageData.Key);
+  }
+  std::cout << "\n";
+}
+
+std::string timestampToReadable(const int64_t &Timestamp) {
+  using namespace std;
+  time_t Seconds = Timestamp / 1000;
+  ctime(&Seconds);
+  istringstream iss(asctime(gmtime(&Seconds)));
+  vector<string> tokens{istream_iterator<string>{iss},
+                        istream_iterator<string>{}};
+  return fmt::format("{} {}-{}-{} {}.{}", tokens[0], tokens[2], tokens[1],
+                     tokens[4], tokens[3], Timestamp % 1000);
+}
+
+std::string timestampToISO8601(const int64_t &Timestamp) {
+  char DateString[25];
+  time_t Seconds = Timestamp / 1000;
+  strftime(DateString, 25, "%FT%T", gmtime(&Seconds));
+  return fmt::format("{}.{}", DateString, Timestamp % 1000);
+}
+}
 
 /// Checks which mode(consumer/metadata/producer) is chosen and
 /// calls method responsible for handling one of the modes or throws
@@ -54,7 +90,6 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
       // consume range
       if (UserArguments.GoBack > -2 && UserArguments.OffsetToStart > -2) {
         subscribeAndConsume(UserArguments.TopicName, UserArguments.GoBack,
-                            UserArguments.PartitionToConsume,
                             UserArguments.OffsetToStart);
       }
       // consume from offset/date
@@ -107,7 +142,7 @@ void RequestHandler::checkMetadataModeArguments() {
 void RequestHandler::runProducer() {
   FlatbuffersTranslator FlatBuffers(SchemaPath);
 
-  auto Message = FlatBuffers.serializeMessage(UserArguments.JSONPath);
+  auto Message = serializeMessage(UserArguments.JSONPath);
   KafkaProducer->produce(std::move(Message));
   Logger->info("Message produced!");
 }
@@ -186,24 +221,6 @@ void RequestHandler::printKafkaMessage(
     EOFPartitionCounter++;
 }
 
-/// Prints and formats message Metadata.
-///
-/// \param MessageData
-void RequestHandler::printMessageMetadata(
-    Kafka::MessageMetadataStruct &MessageData,
-    const std::string &FileIdentifier) {
-  std::cout << fmt::format(
-      "\n{:_>93}{}  ||  {}{:>36}\n\nTimestamp: {:>11} || PartitionID: "
-      "{:>5} || Offset: {:>7} || File Identifier: {} ||",
-      "\n", MessageData.TimestampISO, MessageData.TimestampISO8601, "||",
-      MessageData.Timestamp, MessageData.Partition, MessageData.Offset,
-      FileIdentifier);
-  if (MessageData.KeyPresent) {
-    std::cout << fmt::format(" Key: {}", MessageData.Key);
-  }
-  std::cout << "\n";
-}
-
 /// Calculates topic's lowest offset and subscribes to it to print the entire
 /// topic.
 ///
@@ -219,24 +236,6 @@ void RequestHandler::printEntireTopic(const std::string &TopicName,
       MinOffset = OffsetStruct.LowOffset;
   }
   subscribeAndConsume(TopicName, MinOffset, TerminateAtEndOfTopic);
-}
-
-std::string RequestHandler::timestampToReadable(const int64_t &Timestamp) {
-  using namespace std;
-  time_t Seconds = Timestamp / 1000;
-  ctime(&Seconds);
-  istringstream iss(asctime(gmtime(&Seconds)));
-  vector<string> tokens{istream_iterator<string>{iss},
-                        istream_iterator<string>{}};
-  return fmt::format("{} {}-{}-{} {}.{}", tokens[0], tokens[2], tokens[1],
-                     tokens[4], tokens[3], Timestamp % 1000);
-}
-
-std::string RequestHandler::timestampToISO8601(const int64_t &Timestamp) {
-  char DateString[25];
-  time_t Seconds = Timestamp / 1000;
-  strftime(DateString, 25, "%FT%T", gmtime(&Seconds));
-  return fmt::format("{}.{}", DateString, Timestamp % 1000);
 }
 
 /// Subscribes to NumberOfMessages from Partition of specified TopicName and
@@ -275,11 +274,9 @@ void RequestHandler::subscribeAndConsume(const std::string &TopicName,
 ///
 /// \param TopicName
 /// \param NumberOfMessages
-/// \param Partition
 /// \param Offset
 void RequestHandler::subscribeAndConsume(const std::string &TopicName,
                                          const int64_t NumberOfMessages,
-                                         const int Partition,
                                          const int64_t Offset) {
   if (verifyOffset(Offset, TopicName))
     throw ArgumentException("Lower offset not valid!");

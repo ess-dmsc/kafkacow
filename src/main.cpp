@@ -1,6 +1,6 @@
 #include "CustomExceptions.h"
+#include "GetSchemaPath.h"
 #include "RequestHandler.h"
-#include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -9,7 +9,6 @@ int main(int argc, char **argv) {
   CLI::App App{"From Kafka with love"};
 
   UserArgumentStruct UserArguments;
-  std::string Broker;
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode.");
   App.add_flag("-L, --list", UserArguments.MetadataMode,
@@ -45,11 +44,12 @@ int main(int argc, char **argv) {
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics. To be used in \"-L\" mode.");
   App.add_flag("-e, --entire", UserArguments.ShowEntireMessage,
-               "Show all records of a message(truncated by default).");
+               "Show all elements of array and entire string fields of a "
+               "message (truncated by default).");
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 
-  CLI11_PARSE(App, argc, argv);
+  CLI11_PARSE(App, argc, argv)
 
   // setup logger
   auto Logger = spdlog::stderr_color_mt("LOG");

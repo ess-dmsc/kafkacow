@@ -1,5 +1,5 @@
 #include "../src/FlatbuffersTranslator.h"
-#include "../src/UpdateSchemas.h"
+#include "../src/GetSchemaPath.h"
 #include "f142_logdata_generated.h"
 #include <gtest/gtest.h>
 #include <json_json_generated.h>

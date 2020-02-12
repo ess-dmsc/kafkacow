@@ -1,7 +1,5 @@
-#include "../src/FlatbuffersTranslator.h"
 #include "../src/JSONPrinting.h"
 #include "f142_logdata_generated.h"
-#include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 
 class JSONPrintingTest : public ::testing::Test {};
@@ -12,7 +10,7 @@ TEST(JSONPrintingTest, print_entire_message_test) {
                                                "NeXus-Streamer\n}");
 }
 
-TEST(JSONPrintingTest, print_truncated_message_test) {
+TEST(JSONPrintingTest, print_truncated_array_message_test) {
   std::string InputMessage =
       "{\"time_of_flight\": [\n    15579,\n    91072,\n    "
       "32972,\n    79344,\n    22827,\n    32972,\n    79344,\n    22827,\n    "
@@ -24,6 +22,14 @@ TEST(JSONPrintingTest, print_truncated_message_test) {
             "79344\n        22827\n        32972\n        79344\n        "
             "...\n        Truncated 5 elements.\n    "
             "]\n}");
+}
+
+TEST(JSONPrintingTest, print_truncated_string_message_test) {
+  std::string InputMessage =
+      R"({"long_string": "This is a long string which should be truncated by kafkacow"})";
+  EXPECT_EQ(getTruncatedMessage(InputMessage, 4),
+            "{\n    long_string: This is a long string which should be "
+            "truncated by ... Truncated 9 characters.\n}");
 }
 
 TEST(JSONPrintingTest, print_nested_maps_and_sequences_test) {

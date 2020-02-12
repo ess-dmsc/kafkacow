@@ -53,8 +53,7 @@ public:
                            bool TerminateAtEndOfTopic);
 
   void subscribeAndConsume(const std::string &TopicName,
-                           int64_t NumberOfMessages, int Partition,
-                           int64_t Offset);
+                           int64_t NumberOfMessages, int64_t Offset);
 
 private:
   std::unique_ptr<Kafka::ConsumerInterface> KafkaConsumer;
@@ -68,15 +67,11 @@ private:
   bool verifyOffset(int64_t Offset, const std::string &TopicName);
   void verifyNLast(int64_t NLast, const std::string &TopicName,
                    int16_t Partition);
-  void printMessageMetadata(Kafka::MessageMetadataStruct &MessageData,
-                            const std::string &FileIdentifier);
   void printEntireTopic(const std::string &TopicName,
                         bool TerminateAtEndOfTopic = false);
   void checkIfTopicEmpty(const std::string &TopicName);
-  std::string timestampToReadable(const int64_t &Timestamp);
   bool consumeSingleMessage(int &EOFPartitionCounter,
                             FlatbuffersTranslator &FlatBuffers);
-  std::string timestampToISO8601(const int64_t &Timestamp);
   void consumeAllSubscribed(const std::string &Topic,
                             bool TerminateAtEndOfTopic);
   void consumeNSubscribed(const std::string &Topic, int64_t NumberOfMessages);

@@ -8,9 +8,9 @@ namespace Kafka {
 
 class Consumer : public ConsumerInterface {
 public:
-  Consumer(std::string Broker);
+  explicit Consumer(std::string Broker);
 
-  ~Consumer() {
+  ~Consumer() override {
     if (KafkaConsumer) {
       KafkaConsumer->close();
       /*
@@ -34,9 +34,9 @@ public:
   OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                               int32_t PartitionID) override;
 
-  int getNumberOfTopicPartitions(std::string Topic) override;
+  int getNumberOfTopicPartitions(const std::string &Topic) override;
 
-  void subscribeAtOffset(int64_t Offset, std::string Topic) override;
+  void subscribeAtOffset(int64_t Offset, const std::string &Topic) override;
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &Topic,
                                 int Partition) override;
@@ -51,12 +51,7 @@ private:
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
   std::shared_ptr<spdlog::logger> Logger;
 
-  const RdKafka::TopicMetadata *getTopicMetadata(const std::string &Topic);
-
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
-
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
-
-  long isoDateToTimestamp(const std::string &Date);
 };
 }
