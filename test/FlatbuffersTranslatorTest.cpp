@@ -1,13 +1,8 @@
 #include "../src/FlatbuffersTranslator.h"
 #include "../src/UpdateSchemas.h"
 #include "f142_logdata_generated.h"
-#include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 #include <json_json_generated.h>
-
-namespace {
-const bool UpdateFromGithub = false;
-}
 
 class FlatbuffersTranslatorTest : public ::testing::Test {
 
