@@ -4,6 +4,30 @@
 #include <flatbuffers/flatbuffers.h>
 #include <json_json_generated.h>
 
+namespace {
+/// Reads JSONPath file and returns message to serialize.
+/// \param JSONPath Path to file
+/// \return contents of file
+std::string getMessageFromFile(const std::string &JSONPath) {
+  std::ifstream IfStream(JSONPath);
+  std::stringstream StringStream;
+  StringStream << IfStream.rdbuf();
+  return StringStream.str();
+}
+}
+
+/// Serializes message found in file JSONPath.
+/// \param JSONPath
+/// \return Kafka::Message
+Kafka::Message serializeMessage(const std::string &JSONPath) {
+  flatbuffers::FlatBufferBuilder builder;
+  builder.Clear();
+  auto FBOffset =
+      CreateJsonDataDirect(builder, getMessageFromFile(JSONPath).c_str());
+  FinishJsonDataBuffer(builder, FBOffset);
+  return Kafka::Message(builder.Release());
+}
+
 /// If schema is found, deserializes message and returns it as string.
 /// Otherwise assumes message is valid JSON and returns it.
 ///
@@ -11,7 +35,7 @@
 /// \param FileID : return value
 /// \return single string with JSON message.
 std::string FlatbuffersTranslator::deserializeToJSON(
-    Kafka::MessageMetadataStruct MessageData, std::string &FileID) {
+    const Kafka::MessageMetadataStruct &MessageData, std::string &FileID) {
   // get the ID from a message
   if (MessageData.Payload.size() > 8) {
     FileID = MessageData.Payload.substr(4, 4);
@@ -112,28 +136,4 @@ FlatbuffersTranslator::createParser(const std::string &FullName,
   Parser->builder_.PushFlatBuffer(
       reinterpret_cast<const uint8_t *>(Message.c_str()), Message.length());
   return Parser;
-}
-
-/// Serializes message found in file JSONPath.
-/// \param JSONPath
-/// \return Kafka::Message
-Kafka::Message
-FlatbuffersTranslator::serializeMessage(const std::string &JSONPath) {
-  flatbuffers::FlatBufferBuilder builder;
-  builder.Clear();
-  auto FBOffset =
-      CreateJsonDataDirect(builder, getMessageFromFile(JSONPath).c_str());
-  FinishJsonDataBuffer(builder, FBOffset);
-  return Kafka::Message(builder.Release());
-}
-
-/// Reads JSONPath file and returns message to serialize.
-/// \param JSONPath Path to file
-/// \return contents of file
-std::string
-FlatbuffersTranslator::getMessageFromFile(const std::string &JSONPath) {
-  std::ifstream IfStream(JSONPath);
-  std::stringstream StringStream;
-  StringStream << IfStream.rdbuf();
-  return StringStream.str();
 }
