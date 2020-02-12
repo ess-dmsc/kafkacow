@@ -14,9 +14,13 @@ std::string truncateNONJSON(const std::string &Message) {
 
 void truncateJSONString(nlohmann::json &JSONMessage) {
   auto StringValue = JSONMessage.get<std::string>();
-  const auto TruncatedStringValue =
-      StringValue.substr(0, TRUNCATE_STRING_TO_LENGTH);
-  JSONMessage = TruncatedStringValue;
+  if (StringValue.size() > TRUNCATE_STRING_TO_LENGTH) {
+    const auto TruncatedStringValue =
+        StringValue.substr(0, TRUNCATE_STRING_TO_LENGTH);
+    JSONMessage = TruncatedStringValue +
+                  fmt::format(" ... Truncated {} characters.",
+                              StringValue.size() - TRUNCATE_STRING_TO_LENGTH);
+  }
 }
 }
 
