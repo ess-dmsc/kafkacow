@@ -4,6 +4,7 @@
 
 namespace {
 size_t TRUNCATE_STRING_TO_LENGTH{50};
+size_t TRUNCATE_ARRAYS_TO_LENGTH{10};
 
 std::string truncateNONJSON(const std::string &Message) {
   if (Message.size() > TRUNCATE_STRING_TO_LENGTH)
@@ -70,10 +71,6 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
   }
 }
 
-/// Recursive method that receives JSON and truncates long arrays that it
-/// contains.
-///
-/// \param JSONMessage
 void recursiveTruncateJSONMap(nlohmann::json &JSONMessage) {
   for (nlohmann::json::iterator it = JSONMessage.begin();
        it != JSONMessage.end(); ++it) {
@@ -93,30 +90,17 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
   }
 }
 
-/// Recursive method that receives JSON and truncates long arrays that it
-/// contains.
-///
-/// \param JSONMessage
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
-  size_t OriginalSize = JSONMessage.size();
-  for (nlohmann::json::iterator it = JSONMessage.end() - 1;
-       it != JSONMessage.begin(); --it) {
-    auto childNode = *it;
+  size_t MessageSize = JSONMessage.size();
+  if (MessageSize > TRUNCATE_ARRAYS_TO_LENGTH) {
+    JSONMessage.erase(JSONMessage.begin() + TRUNCATE_ARRAYS_TO_LENGTH,
+                      JSONMessage.end());
+    JSONMessage.push_back("...");
+    JSONMessage.push_back(fmt::format("Truncated {} elements.",
+                                      MessageSize - TRUNCATE_ARRAYS_TO_LENGTH));
+  }
 
-    if (childNode.is_object() && !childNode.empty()) {
-      recursiveTruncateJSONMap(it.value());
-    } else if (childNode.is_array() && !childNode.empty()) {
-      recursiveTruncateJSONArray(it.value());
-    } else {
-      size_t MessageSize = JSONMessage.size();
-      if (MessageSize > 10) {
-        JSONMessage.erase(MessageSize - 1);
-      } else if (MessageSize == 10 && OriginalSize > 10) {
-        JSONMessage.push_back("...");
-        JSONMessage.push_back(
-            fmt::format("Truncated {} elements.", OriginalSize - 10));
-        return;
-      }
-    }
+  for (auto &element : JSONMessage) {
+    recursiveTruncate(element);
   }
 }
