@@ -1,11 +1,8 @@
-#include "../src/RequestHandler.h"
 #include "../src/CustomExceptions.h"
-#include "../src/FlatbuffersTranslator.h"
 #include "../src/GetSchemaPath.h"
 #include "../src/Kafka/ConsumerInterface.h"
-#include "../src/Kafka/FakeConsumer.h"
 #include "../src/Kafka/FakeProducer.h"
-#include <boost/filesystem.hpp>
+#include "../src/RequestHandler.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 
