@@ -1,6 +1,6 @@
 #include "CustomExceptions.h"
+#include "GetSchemaPath.h"
 #include "RequestHandler.h"
-#include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
