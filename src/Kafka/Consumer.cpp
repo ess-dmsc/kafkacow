@@ -5,6 +5,18 @@
 #include <date/date.h>
 #include <iomanip>
 
+namespace {
+long isoDateToTimestamp(const std::string &Date) {
+  std::istringstream ss(Date);
+  std::chrono::system_clock::time_point tp;
+  ss >> date::parse("%Y-%m-%dT%H:%M:%S", tp);
+  if (tp.time_since_epoch().count() == 0)
+    throw ArgumentException("Date not valid. Please use ISO8601 format, "
+                            "e.g.[2019-07-05T08:18:14.366].");
+  return tp.time_since_epoch().count();
+}
+}
+
 namespace Kafka {
 
 /// Gets Metadata object from Kafka.
@@ -29,14 +41,14 @@ std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
 
 Consumer::Consumer(std::string Broker) : Logger(spdlog::get("LOG")) {
   std::string ErrStr;
-  this->KafkaConsumer =
+  KafkaConsumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
           createGlobalConfiguration(Broker).get(), ErrStr));
   if (!ErrStr.empty()) {
     ErrStr.append("Error creating KafkaConsumer in Consumer::Consumer.");
     Logger->error(ErrStr);
   }
-  this->MetadataPointer = this->queryMetadata();
+  MetadataPointer = queryMetadata();
 }
 
 /// Returns a list of topics stored by the broker.
@@ -159,7 +171,7 @@ OffsetsStruct Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
 ///
 /// \param Topic
 /// \return
-int Consumer::getNumberOfTopicPartitions(std::string Topic) {
+int Consumer::getNumberOfTopicPartitions(const std::string &Topic) {
   return getTopicPartitionNumbers(Topic).size();
 }
 
@@ -167,7 +179,7 @@ int Consumer::getNumberOfTopicPartitions(std::string Topic) {
 ///
 /// \param Offset
 /// \param Topic
-void Consumer::subscribeAtOffset(int64_t Offset, std::string Topic) {
+void Consumer::subscribeAtOffset(int64_t Offset, const std::string &Topic) {
   std::vector<RdKafka::TopicPartition *> TopicPartitionsWithOffsets;
   for (auto i = 0; i < getNumberOfTopicPartitions(Topic); i++) {
     auto TopicPartition = RdKafka::TopicPartition::create(Topic, i);
@@ -252,16 +264,6 @@ std::string Consumer::showAllMetadata() {
     SS << "\n";
   }
   return SS.str();
-}
-
-long Consumer::isoDateToTimestamp(const std::string &Date) {
-  std::istringstream ss(Date);
-  std::chrono::system_clock::time_point tp;
-  ss >> date::parse("%Y-%m-%dT%H:%M:%S", tp);
-  if (tp.time_since_epoch().count() == 0)
-    throw ArgumentException("Date not valid. Please use ISO8601 format, "
-                            "e.g.[2019-07-05T08:18:14.366].");
-  return tp.time_since_epoch().count();
 }
 
 int64_t Consumer::getOffsetForDate(const std::string &Date,

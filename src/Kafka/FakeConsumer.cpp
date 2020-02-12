@@ -2,8 +2,6 @@
 
 namespace Kafka {
 
-FakeConsumer::FakeConsumer() {}
-
 std::string FakeConsumer::getAllTopics() {
   return "Successful test 1\nSuccessful test 2";
 }
@@ -36,11 +34,12 @@ FakeConsumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
   return VectorOfPartitions;
 }
 
-int FakeConsumer::getNumberOfTopicPartitions(std::string TopicName) {
+int FakeConsumer::getNumberOfTopicPartitions(const std::string &TopicName) {
   return 1;
 }
 
-void FakeConsumer::subscribeAtOffset(int64_t Offset, std::string TopicName) {}
+void FakeConsumer::subscribeAtOffset(int64_t Offset, const std::string &Topic) {
+}
 
 void FakeConsumer::subscribeToLastNMessages(int64_t NMessages,
                                             const std::string &TopicName,

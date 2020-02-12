@@ -10,7 +10,7 @@ namespace Kafka {
 
 class FakeConsumer : public ConsumerInterface {
 public:
-  FakeConsumer();
+  FakeConsumer() = default;
 
   std::string getAllTopics() override;
 
@@ -22,9 +22,9 @@ public:
   OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                               int32_t PartitionID) override;
 
-  int getNumberOfTopicPartitions(std::string TopicName) override;
+  int getNumberOfTopicPartitions(const std::string &TopicName) override;
 
-  void subscribeAtOffset(int64_t Offset, std::string TopicName) override;
+  void subscribeAtOffset(int64_t Offset, const std::string &TopicName) override;
 
   void subscribeToLastNMessages(int64_t NMessages, const std::string &TopicName,
                                 int Partition) override;

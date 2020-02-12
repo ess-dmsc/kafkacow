@@ -22,9 +22,10 @@ public:
   virtual OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
                                                       int32_t PartitionID) = 0;
 
-  virtual int getNumberOfTopicPartitions(std::string TopicName) = 0;
+  virtual int getNumberOfTopicPartitions(const std::string &TopicName) = 0;
 
-  virtual void subscribeAtOffset(int64_t Offset, std::string TopicName) = 0;
+  virtual void subscribeAtOffset(int64_t Offset,
+                                 const std::string &TopicName) = 0;
 
   virtual void subscribeToLastNMessages(int64_t NMessages,
                                         const std::string &TopicName,
