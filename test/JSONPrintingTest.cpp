@@ -1,7 +1,5 @@
-#include "../src/FlatbuffersTranslator.h"
 #include "../src/JSONPrinting.h"
 #include "f142_logdata_generated.h"
-#include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 
 class JSONPrintingTest : public ::testing::Test {};
