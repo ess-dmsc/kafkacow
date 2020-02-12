@@ -10,7 +10,6 @@
 #include <gtest/gtest.h>
 
 namespace {
-const bool UpdateFromGithub = false;
 const bool UseRealKafkaConnection = false;
 }
 
