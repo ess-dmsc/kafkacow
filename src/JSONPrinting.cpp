@@ -13,7 +13,7 @@ std::string truncateNONJSON(const std::string &Message) {
 }
 
 void truncateJSONString(nlohmann::json &JSONMessage) {
-  auto StringValue = JSONMessage.get<std::string>();
+  const auto StringValue = JSONMessage.get<std::string>();
   if (StringValue.size() > STRING_TRUNCATION_LENGTH) {
     const auto TruncatedStringValue =
         StringValue.substr(0, STRING_TRUNCATION_LENGTH);
@@ -95,7 +95,7 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
 }
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
-  size_t MessageSize = JSONMessage.size();
+  const size_t MessageSize = JSONMessage.size();
   if (MessageSize > ARRAY_TRUNCATION_LENGTH) {
     JSONMessage.erase(JSONMessage.begin() + ARRAY_TRUNCATION_LENGTH,
                       JSONMessage.end());
