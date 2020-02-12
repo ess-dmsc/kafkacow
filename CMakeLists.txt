@@ -22,7 +22,8 @@ if(NOT CONAN_DISABLE)
             PROFILE default
             BASIC_SETUP CMAKE_TARGETS SKIP_RPATH
             BUILD_TYPE "None"
-            BUILD outdated)
+            BUILD outdated
+            KEEP_RPATHS)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX AND COV)

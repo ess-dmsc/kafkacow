@@ -9,7 +9,6 @@ int main(int argc, char **argv) {
   CLI::App App{"From Kafka with love"};
 
   UserArgumentStruct UserArguments;
-  std::string Broker;
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode.");
   App.add_flag("-L, --list", UserArguments.MetadataMode,
@@ -49,7 +48,7 @@ int main(int argc, char **argv) {
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 
-  CLI11_PARSE(App, argc, argv);
+  CLI11_PARSE(App, argc, argv)
 
   // setup logger
   auto Logger = spdlog::stderr_color_mt("LOG");
