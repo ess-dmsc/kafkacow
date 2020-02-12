@@ -10,7 +10,6 @@
 #include <gtest/gtest.h>
 
 namespace {
-const bool UpdateFromGithub = false;
 const bool UseRealKafkaConnection = false;
 }
 
@@ -20,8 +19,8 @@ TEST(RequestHandlerTest,
      subscribe_consume_n_last_messages_throws_if_incorrect_arguments_test) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
@@ -30,8 +29,8 @@ TEST(RequestHandlerTest, subscribe_consume_n_last_messages_successful_test) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 1, 1, true));
@@ -42,8 +41,8 @@ TEST(RequestHandlerTest,
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_THROW(NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 100),
                ArgumentException);
@@ -53,8 +52,8 @@ TEST(RequestHandlerTest, subscribe_at_an_offset_successful_test) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(
       NewRequestHandler.subscribeAndConsume("ExampleTestTopic", 12344, true));
@@ -77,8 +76,8 @@ TEST(RequestHandlerTest, checkandrun_consumer_mode_chosen_test) {
   UserArguments.OffsetToStart = 1235;
   UserArguments.GoBack = 1;
   UserArguments.TopicName = "TestTopicName";
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
@@ -88,8 +87,8 @@ TEST(RequestHandlerTest, checkandrun_metadata_mode_chosen_test) {
   UserArguments.MetadataMode = true;
   UserArguments.ShowAllTopics = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
@@ -99,8 +98,7 @@ TEST(RequestHandlerTest, error_thrown_if_no_mode_specified) {
   UserArguments.ConsumerMode = false;
   UserArguments.MetadataMode = false;
 
-  EXPECT_THROW(RequestHandler NewRequestHandler(UserArguments,
-                                                updateSchemas(UpdateFromGithub),
+  EXPECT_THROW(RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
                                                 UseRealKafkaConnection),
                ArgumentException);
 }
@@ -110,16 +108,16 @@ TEST(RequestHandlerTest, show_topic_partition_offsets_no_error) {
   UserArgumentStruct UserArguments;
   UserArguments.TopicName = "MULTIPART_events";
   UserArguments.ConsumerMode = true;
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments());
 }
 TEST(RequestHandlerTest, show_all_topics_no_error) {
   UserArgumentStruct UserArguments;
   UserArguments.ShowAllTopics = true;
   UserArguments.MetadataMode = true;
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkMetadataModeArguments());
 }
@@ -129,8 +127,8 @@ TEST(RequestHandlerTest, display_all_metadata) {
   UserArguments.ShowAllTopics = false;
   UserArguments.MetadataMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   testing::internal::CaptureStdout();
   NewRequestHandler.checkMetadataModeArguments();
@@ -148,8 +146,8 @@ TEST(RequestHandlerTest,
   UserArguments.ConsumerMode = true;
   UserArguments.TopicName = "MULTIPART_events";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments());
 }
@@ -160,8 +158,8 @@ TEST(RequestHandlerTest, consume_from_date_success) {
   UserArguments.ISODate = "2019-07-05T15:18:14";
   UserArguments.TopicName = "MULTIPART_events";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
 
@@ -171,8 +169,8 @@ TEST(RequestHandlerTest, throw_error_if_date_and_offset_specified) {
   UserArguments.ISODate = "2019-07-05T15:18:14";
   UserArguments.TopicName = "MULTIPART_events";
   UserArguments.OffsetToStart = 2;
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(true),
                ArgumentException);
 }
@@ -185,8 +183,8 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_no_error) {
   UserArguments.GoBack = 2;
   UserArguments.TopicName = "MULTIPART_events";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
@@ -199,8 +197,8 @@ TEST(RequestHandlerTest, subscribe_to_nlastmessages_error_too_many_messages) {
   UserArguments.GoBack = 100;
   UserArguments.TopicName = "MULTIPART_events";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
 
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(true),
                ArgumentException);
@@ -214,8 +212,8 @@ TEST(RequestHandlerTest,
   UserArguments.GoBack = 40;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
@@ -227,8 +225,8 @@ TEST(RequestHandlerTest, use_what_message_of_arguments_exception) {
 
   std::string message;
   try {
-    RequestHandler NewRequestHandler(
-        UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+    RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                     UseRealKafkaConnection);
   } catch (ArgumentException &exception) {
     message = exception.what();
   }
@@ -242,8 +240,8 @@ TEST(RequestHandlerTest, throw_error_when_lower_range_bound_incorrect) {
   UserArguments.GoBack = 2;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
@@ -254,8 +252,8 @@ TEST(RequestHandlerTest, throw_error_when_upper_range_bound_incorrect) {
   UserArguments.GoBack = 5;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
@@ -264,8 +262,8 @@ TEST(RequestHandlerTest, throw_error_no_topic_specified_in_consumer_mode) {
   UserArgumentStruct UserArguments;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
@@ -276,8 +274,8 @@ TEST(RequestHandlerTest, throw_error_if_topic_empty) {
   UserArguments.GoBack = 5;
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkConsumerModeArguments(),
                ArgumentException);
 }
@@ -287,8 +285,8 @@ TEST(RequestHandlerTest, print_entire_topic_success) {
   UserArguments.TopicName = "TestTopic";
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkConsumerModeArguments(true));
 }
 
@@ -297,8 +295,8 @@ TEST(RequestHandlerTest, display_message_metadata_with_message_key) {
   UserArguments.TopicName = "TestTopic";
   UserArguments.ConsumerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   testing::internal::CaptureStdout();
   NewRequestHandler.checkConsumerModeArguments(true);
   std::string OutputMessage = testing::internal::GetCapturedStdout();
@@ -311,8 +309,8 @@ TEST(RequestHandlerTest, run_producer) {
   UserArgumentStruct UserArguments;
   UserArguments.ProducerMode = true;
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_NO_THROW(NewRequestHandler.checkAndRun());
 }
 
@@ -321,8 +319,8 @@ TEST(RequestHandlerTest, throw_error_if_file_specified_in_consumer_mode) {
   UserArguments.ConsumerMode = true;
   UserArguments.JSONPath = "Path/to.json";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }
 
@@ -331,7 +329,7 @@ TEST(RequestHandlerTest, throw_error_if_file_specified_in_metadata_mode) {
   UserArguments.MetadataMode = true;
   UserArguments.JSONPath = "Path/to.json";
 
-  RequestHandler NewRequestHandler(
-      UserArguments, updateSchemas(UpdateFromGithub), UseRealKafkaConnection);
+  RequestHandler NewRequestHandler(UserArguments, getSchemaPath(),
+                                   UseRealKafkaConnection);
   EXPECT_THROW(NewRequestHandler.checkAndRun(), ArgumentException);
 }

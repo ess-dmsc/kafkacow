@@ -2,5 +2,5 @@
 
 #include <string>
 
-/// Update schemas from github if possible, return path to schema directory
-std::string updateSchemas(bool PullUpdates = true);
+/// Return path to schema directory
+std::string getSchemaPath();

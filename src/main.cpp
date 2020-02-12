@@ -1,13 +1,8 @@
 #include "CustomExceptions.h"
-#include "Kafka/Consumer.h"
-#include "Kafka/Producer.h"
 #include "RequestHandler.h"
 #include "UpdateSchemas.h"
 #include <CLI/CLI.hpp>
-#include <iostream>
-#include <librdkafka/rdkafkacpp.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 
 int main(int argc, char **argv) {
 
@@ -61,8 +56,7 @@ int main(int argc, char **argv) {
   Logger->info("Welcome to kafkacow!");
 
   try {
-    std::string SchemaPath = updateSchemas();
-    Logger->debug("Using schemas in: {}", SchemaPath);
+    std::string SchemaPath = getSchemaPath();
     RequestHandler MainRequestHandler(UserArguments, SchemaPath);
     MainRequestHandler.checkAndRun();
   } catch (std::exception &E) {
