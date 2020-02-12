@@ -3,23 +3,23 @@
 #include <nlohmann/json.hpp>
 
 namespace {
-size_t TRUNCATE_STRING_TO_LENGTH{50};
-size_t TRUNCATE_ARRAYS_TO_LENGTH{10};
+size_t STRING_TRUNCATION_LENGTH{50};
+size_t ARRAY_TRUNCATION_LENGTH{10};
 
 std::string truncateNONJSON(const std::string &Message) {
-  if (Message.size() > TRUNCATE_STRING_TO_LENGTH)
-    return Message.substr(0, TRUNCATE_STRING_TO_LENGTH);
+  if (Message.size() > STRING_TRUNCATION_LENGTH)
+    return Message.substr(0, STRING_TRUNCATION_LENGTH);
   return Message;
 }
 
 void truncateJSONString(nlohmann::json &JSONMessage) {
   auto StringValue = JSONMessage.get<std::string>();
-  if (StringValue.size() > TRUNCATE_STRING_TO_LENGTH) {
+  if (StringValue.size() > STRING_TRUNCATION_LENGTH) {
     const auto TruncatedStringValue =
-        StringValue.substr(0, TRUNCATE_STRING_TO_LENGTH);
+        StringValue.substr(0, STRING_TRUNCATION_LENGTH);
     JSONMessage = TruncatedStringValue +
                   fmt::format(" ... Truncated {} characters.",
-                              StringValue.size() - TRUNCATE_STRING_TO_LENGTH);
+                              StringValue.size() - STRING_TRUNCATION_LENGTH);
   }
 }
 }
@@ -96,12 +96,12 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
   size_t MessageSize = JSONMessage.size();
-  if (MessageSize > TRUNCATE_ARRAYS_TO_LENGTH) {
-    JSONMessage.erase(JSONMessage.begin() + TRUNCATE_ARRAYS_TO_LENGTH,
+  if (MessageSize > ARRAY_TRUNCATION_LENGTH) {
+    JSONMessage.erase(JSONMessage.begin() + ARRAY_TRUNCATION_LENGTH,
                       JSONMessage.end());
     JSONMessage.push_back("...");
     JSONMessage.push_back(fmt::format("Truncated {} elements.",
-                                      MessageSize - TRUNCATE_ARRAYS_TO_LENGTH));
+                                      MessageSize - ARRAY_TRUNCATION_LENGTH));
   }
 
   for (auto &element : JSONMessage) {
