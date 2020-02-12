@@ -151,10 +151,7 @@ OffsetsStruct Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
                                                       int32_t PartitionID) {
   int64_t Low, High;
   KafkaConsumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
-  OffsetsStruct OffsetsToSave;
-  OffsetsToSave.HighOffset = High;
-  OffsetsToSave.LowOffset = Low;
-  OffsetsToSave.PartitionId = PartitionID;
+  OffsetsStruct OffsetsToSave{Low, High, PartitionID};
   return OffsetsToSave;
 }
 

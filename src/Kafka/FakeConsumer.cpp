@@ -51,10 +51,7 @@ std::string FakeConsumer::showAllMetadata() { return "Test return"; }
 OffsetsStruct
 FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
                                             int32_t PartitionID) {
-  OffsetsStruct OffsetsToReturn;
-  OffsetsToReturn.HighOffset = 5;
-  OffsetsToReturn.LowOffset = 1;
-  OffsetsToReturn.PartitionId = PartitionID;
+  OffsetsStruct OffsetsToReturn{1, 5, PartitionID};
   return OffsetsToReturn;
 }
 
