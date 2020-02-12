@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
   App.add_flag("-a, --all", UserArguments.ShowAllTopics,
                "Show a list of topics. To be used in \"-L\" mode.");
   App.add_flag("-e, --entire", UserArguments.ShowEntireMessage,
-               "Show all elements of array and entire string fields of a message (truncated by default).");
+               "Show all elements of array and entire string fields of a "
+               "message (truncated by default).");
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 
