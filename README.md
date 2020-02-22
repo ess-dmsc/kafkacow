@@ -53,6 +53,11 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   
   ## Install
   
+  Kafkacow requires a compiler with std::filesystem or std::experimental::filesystem, such as
+  gcc 8,
+  clang 7, or
+  MSVC 2017.
+  
   Kafkacow uses __conan__ to manage dependencies. __Conan__ is recommended to be installed 
   using ```pip``` by running ```sudo pip install conan```. 
   
