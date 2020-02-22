@@ -15,6 +15,9 @@ add_executable(UnitTests
         UnitTests.cpp
         MessageTest.cpp)
 
-target_link_libraries(UnitTests
+target_link_libraries(UnitTests PRIVATE
         ${CONAN_PACKAGES}
         CONAN_PKG::gtest)
+
+# Link stdc++fs to get std::experimental::filesystem when necessary
+target_link_libraries(UnitTests PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,10.0>>:stdc++fs>)

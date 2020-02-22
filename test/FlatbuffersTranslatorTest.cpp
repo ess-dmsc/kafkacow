@@ -46,7 +46,7 @@ TEST(FlatbuffersTranslatorTest, translate_flatbuffers_test) {
   auto bufferpointer =
       reinterpret_cast<const char *>(Builder.GetBufferPointer());
   std::string NewMessage(bufferpointer, bufferpointer + Builder.GetSize());
-  auto FlatbufferPointer = Builder.ReleaseBufferPointer();
+  auto FlatbufferPointer = Builder.Release();
 
   Kafka::MessageMetadataStruct MessageMetadata;
   MessageMetadata.Payload = NewMessage;

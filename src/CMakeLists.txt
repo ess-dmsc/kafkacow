@@ -16,6 +16,7 @@ add_executable(kafkacow main.cpp
         JSONPrinting.h
         GetSchemaPath.cpp
         GetSchemaPath.h
+        Filesystem.h
         Kafka/Producer.cpp
         Kafka/Producer.h
         Kafka/KafkaConfig.h
@@ -28,6 +29,9 @@ add_executable(kafkacow main.cpp
         Kafka/FakeProducer.h
         Kafka/Message.h)
 
-target_link_libraries(kafkacow
+target_link_libraries(kafkacow PRIVATE
         ${CONAN_PACKAGES}
         CONAN_PKG::fmt)
+
+# Link stdc++fs to get std::experimental::filesystem when necessary
+target_link_libraries(kafkacow PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,10.0>>:stdc++fs>)

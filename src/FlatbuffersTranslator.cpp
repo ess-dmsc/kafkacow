@@ -1,8 +1,10 @@
-#include "FlatbuffersTranslator.h"
-#include "CustomExceptions.h"
-#include <boost/filesystem.hpp>
 #include <flatbuffers/flatbuffers.h>
 #include <json_json_generated.h>
+#include <fstream>
+
+#include "FlatbuffersTranslator.h"
+#include "CustomExceptions.h"
+#include "Filesystem.h"
 
 namespace {
 /// Reads JSONPath file and returns message to serialize.
@@ -99,8 +101,8 @@ FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   if (FileID.empty())
     return std::make_pair(false, "");
 
-  boost::filesystem::directory_iterator DirectoryIterator(SchemaPath), e;
-  std::vector<boost::filesystem::path> Paths(DirectoryIterator, e);
+  fs::directory_iterator DirectoryIterator(SchemaPath), e;
+  std::vector<fs::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
     if (DirectoryEntry.filename().string().find(FileID) != std::string::npos) {
       // if schema found, return TRUE and path
