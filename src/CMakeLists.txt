@@ -34,4 +34,4 @@ target_link_libraries(kafkacow PRIVATE
         CONAN_PKG::fmt)
 
 # Link stdc++fs to get std::experimental::filesystem when necessary
-target_link_libraries(kafkacow PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,10.0>>:stdc++fs>)
+target_link_libraries(kafkacow PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
