@@ -19,7 +19,6 @@ builders = pipeline_builder.createBuilders { container ->
   pipeline_builder.stage("${container.key}: checkout") {
     dir(pipeline_builder.project) {
       checkout scm
-      sh "git submodule update --init --recursive"
     }
     // Copy source code to container
     container.copyTo(pipeline_builder.project, pipeline_builder.project)
@@ -113,7 +112,6 @@ node {
     dir("${project}") {
       try {
         scm_vars = checkout scm
-        sh "git submodule update --init --recursive"
       } catch (e) {
         failure_function(e, 'Checkout failed')
       }
@@ -149,7 +147,6 @@ def get_macos_pipeline()
                         // Conan remove is temporary until all projects have moved to lowercase package name
                         sh "conan remove -f FlatBuffers/*"
                         checkout scm
-                        sh "git submodule update --init --recursive"
                     } catch (e) {
                         failure_function(e, 'MacOSX / Checkout failed')
                     }
@@ -186,7 +183,6 @@ def get_win10_pipeline() {
                 dir("${project}") {
                     stage("win10: Checkout") {
                       checkout scm
-                      bat "git submodule update --init --recursive"
                     }  // stage
 
                     stage("win10: Setup") {
