@@ -1,6 +1,7 @@
 #include "CustomExceptions.h"
 #include "GetSchemaPath.h"
 #include "RequestHandler.h"
+#include "GraphicalInterface.h"
 #include <CLI/CLI.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -8,9 +9,12 @@ int main(int argc, char **argv) {
 
   CLI::App App{"From Kafka with love"};
 
+  bool GUIMode;
   UserArgumentStruct UserArguments;
   App.add_flag("-C, --consumer", UserArguments.ConsumerMode,
                "Run the program in the consumer mode.");
+  App.add_flag("-G, --gui", GUIMode,
+               "Run the program in the graphical interface mode.");
   App.add_flag("-L, --list", UserArguments.MetadataMode,
                "Metadata mode. Show all topics and partitions. If \"-t\" "
                "specified, shows partition offsets.");
@@ -57,8 +61,12 @@ int main(int argc, char **argv) {
 
   try {
     std::string SchemaPath = getSchemaPath();
-    RequestHandler MainRequestHandler(UserArguments, SchemaPath);
-    MainRequestHandler.checkAndRun();
+    if (GUIMode) {
+        initGUI(UserArguments.Broker);
+    } else {
+        RequestHandler MainRequestHandler(UserArguments, SchemaPath);
+        MainRequestHandler.checkAndRun();
+    }
   } catch (std::exception &E) {
     Logger->error(E.what());
   }

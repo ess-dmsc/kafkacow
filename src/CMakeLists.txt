@@ -26,8 +26,12 @@ add_executable(kafkacow main.cpp
         Kafka/ProducerFactory.h
         Kafka/FakeProducer.cpp
         Kafka/FakeProducer.h
-        Kafka/Message.h)
+        Kafka/Message.h
+        GraphicalInterface.cpp
+        GraphicalInterface.h
+        imgui/imgui_demo.cpp)
 
-target_link_libraries(kafkacow
+target_link_libraries(kafkacow PRIVATE
         ${CONAN_PACKAGES}
-        CONAN_PKG::fmt)
+        CONAN_PKG::fmt
+        CONAN_PKG::imgui-sfml)

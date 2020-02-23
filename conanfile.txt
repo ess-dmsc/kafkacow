@@ -11,6 +11,9 @@ jsonformoderncpp/3.6.1@vthiery/stable
 streaming-data-types/c670575@ess-dmsc/stable
 date/2.4.1@bincrafters/stable
 OpenSSL/1.1.1c@conan/stable
+imgui-sfml/2.1@bincrafters/stable
+zlib/1.2.11
+bzip2/1.0.8
 
 [generators]
 cmake

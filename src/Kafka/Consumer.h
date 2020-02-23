@@ -43,6 +43,8 @@ public:
 
   std::string showAllMetadata() override;
 
+  void updateMetadata() {MetadataPointer = queryMetadata();};
+
   int64_t getOffsetForDate(const std::string &Date,
                            const std::string &Topic) override;
 
