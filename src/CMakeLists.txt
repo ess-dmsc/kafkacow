@@ -33,5 +33,4 @@ add_executable(kafkacow main.cpp
 
 target_link_libraries(kafkacow PRIVATE
         ${CONAN_PACKAGES}
-        CONAN_PKG::fmt
-        CONAN_PKG::imgui-sfml)
+        CONAN_PKG::fmt)

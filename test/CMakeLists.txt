@@ -3,6 +3,7 @@ file(GLOB SRC_FILES
         ../src/*.h
         ../src/Kafka/*.cpp
         ../src/Kafka/*.h
+        ../src/imgui/*.cpp
 )
 
 list(FILTER SRC_FILES EXCLUDE REGEX ".*main.cpp$")
