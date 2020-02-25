@@ -39,34 +39,39 @@ void topicsTable(Metadata::Cluster const &Metadata) {
   ImGui::SetNextItemOpen(true);
   if (ImGui::CollapsingHeader("Topics")) {
 
+    static ImGuiTextFilter filter;
+    filter.Draw();
+
     for (auto const &Topic : Metadata.Topics) {
-      ImGui::Text("%s", Topic.Name.c_str());
-      ImGui::Columns(6);
-      ImGui::Separator();
-      // clang-format off
+      if (filter.PassFilter(Topic.Name.c_str())) {
+        ImGui::Text("%s", Topic.Name.c_str());
+        ImGui::Columns(6);
+        ImGui::Separator();
+        // clang-format off
       ImGui::Text("Partition"); ImGui::NextColumn();
       ImGui::Text("Low Offset"); ImGui::NextColumn();
       ImGui::Text("High Offset"); ImGui::NextColumn();
       ImGui::Text("Leader"); ImGui::NextColumn();
       ImGui::Text("Replicas"); ImGui::NextColumn();
       ImGui::Text("ISRS"); ImGui::NextColumn();
-      // clang-format on
-      ImGui::Separator();
-      for (auto const &Partition : Topic.Partitions) {
-        // clang-format off
-        ImGui::Text("%d", Partition.ID); ImGui::NextColumn();
-        ImGui::Text("%ld", Partition.LowOffset); ImGui::NextColumn();
-        ImGui::Text("%ld", Partition.HighOffset); ImGui::NextColumn();
-        ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn();
-//      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
-//      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
-//      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
         // clang-format on
         ImGui::Separator();
-      }
+        for (auto const &Partition : Topic.Partitions) {
+          // clang-format off
+          ImGui::Text("%d", Partition.ID); ImGui::NextColumn();
+          ImGui::Text("%ld", Partition.LowOffset); ImGui::NextColumn();
+          ImGui::Text("%ld", Partition.HighOffset); ImGui::NextColumn();
+          ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn();
+  //      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
+  //      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
+  //      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
+          // clang-format on
+          ImGui::Separator();
+        }
 
-      ImGui::Columns(1);
-      ImGui::Separator();
+        ImGui::Columns(1);
+        ImGui::Separator();
+      }
     }
   }
 }
