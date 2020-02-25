@@ -1,8 +1,6 @@
 # kafkacow
 [![codecov](https://codecov.io/gh/ess-dmsc/kafkacow/branch/master/graph/badge.svg)](https://codecov.io/gh/ess-dmsc/kafkacow)  [![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/kafkacow/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/kafkacow/job/master/) [![License (2-Clause BSD)](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)](https://github.com/ess-dmsc/kafkacow/blob/master/LICENSE)
 
-### Project relying on a submodule. Please clone using ```--recurse-submodules```.
-
 ## Like kafkacat but understands flatbuffers.
 The aim of kafkacow is to retrieve messages from kafka and present them in human-readable form(JSON).
 Similarly to kafkacat application runs in either __metadata__, __producer__ or __consumer__ mode.
@@ -77,7 +75,9 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
  ```make```
  
  ## Message schemas
- Kafkacow uses messages schemas from a project imported as a git submodule
-https://github.com/ess-dmsc/streaming-data-types 
-
+Kafkacow uses messages schemas from a repository included as a git subtree.
+To update the schemas from the remote repository run
+```
+git subtree pull --prefix streaming-data-types git@github.com:ess-dmsc/streaming-data-types.git master --squash 
+```
  
