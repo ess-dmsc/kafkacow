@@ -43,7 +43,7 @@ public:
 
   std::string showAllMetadata() override;
 
-  void updateMetadata() {MetadataPointer = queryMetadata();};
+  std::unique_ptr<RdKafka::Metadata> queryMetadata();
 
   int64_t getOffsetForDate(const std::string &Date,
                            const std::string &Topic) override;
@@ -53,7 +53,6 @@ private:
   std::unique_ptr<RdKafka::Metadata> MetadataPointer;
   std::shared_ptr<spdlog::logger> Logger;
 
-  std::unique_ptr<RdKafka::Metadata> queryMetadata();
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
 };
 }

@@ -66,7 +66,7 @@ std::string Consumer::getAllTopics() {
 
 /// Consumes Kafka messages starting from specified offset.
 ///
-/// \return struct containg serialized message and its metadata.
+/// \return struct containing serialized message and its metadata.
 MessageMetadataStruct Consumer::consume() {
   using RdKafka::Message;
   MessageMetadataStruct DataToReturn;
