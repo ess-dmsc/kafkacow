@@ -24,20 +24,20 @@ class Consumer;
 
 namespace Metadata {
 struct Broker {
-  int32_t const ID;
-  std::string const Host;
-  int32_t const Port;
+  int32_t ID;
+  std::string Host;
+  int32_t Port;
 };
 
 struct Partition {
-  int64_t const LowOffset;
-  int64_t const HighOffset;
-  int32_t const ID;
+  int64_t LowOffset;
+  int64_t HighOffset;
+  int32_t ID;
 };
 
 struct Topic {
-  std::string const Name;
-  std::vector<Partition> const Partitions;
+  std::string Name;
+  std::vector<Partition> Partitions;
 };
 
 class Cluster {
