@@ -8,7 +8,7 @@ namespace Kafka {
 
 class Consumer : public ConsumerInterface {
 public:
-  explicit Consumer(std::string Broker);
+  explicit Consumer(std::string const &Broker);
 
   ~Consumer() override {
     if (KafkaConsumer) {
@@ -28,11 +28,12 @@ public:
 
   MessageMetadataStruct consume() override;
 
-  std::vector<OffsetsStruct>
+  std::vector<Metadata::Partition>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
 
-  OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
-                                              int32_t PartitionID) override;
+  Metadata::Partition
+  getPartitionHighAndLowOffsets(const std::string &Topic,
+                                int32_t PartitionID) override;
 
   int getNumberOfTopicPartitions(const std::string &Topic) override;
 

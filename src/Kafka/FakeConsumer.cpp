@@ -18,15 +18,16 @@ MessageMetadataStruct FakeConsumer::consume() {
   return DataToReturn;
 }
 
-std::vector<OffsetsStruct>
+std::vector<Metadata::Partition>
 FakeConsumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
 
-  std::vector<OffsetsStruct> VectorOfPartitions;
+  std::vector<Metadata::Partition> VectorOfPartitions;
 
   if (Topic != "EmptyTopic") {
-    OffsetsStruct FirstPartition = {1234, 12345, 0};
-    OffsetsStruct SecondPartition{2234, 22345, 1};
-    OffsetsStruct ThirdPartition = getPartitionHighAndLowOffsets(Topic, 3);
+    Metadata::Partition FirstPartition = {1234, 12345, 0};
+    Metadata::Partition SecondPartition{2234, 22345, 1};
+    Metadata::Partition ThirdPartition =
+        getPartitionHighAndLowOffsets(Topic, 3);
     VectorOfPartitions.push_back(FirstPartition);
     VectorOfPartitions.push_back(SecondPartition);
     VectorOfPartitions.push_back(ThirdPartition);
@@ -47,10 +48,10 @@ void FakeConsumer::subscribeToLastNMessages(int64_t NMessages,
 
 std::string FakeConsumer::showAllMetadata() { return "Test return"; }
 
-OffsetsStruct
+Metadata::Partition
 FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
                                             int32_t PartitionID) {
-  OffsetsStruct OffsetsToReturn{1, 5, PartitionID};
+  Metadata::Partition OffsetsToReturn{1, 5, PartitionID};
   return OffsetsToReturn;
 }
 

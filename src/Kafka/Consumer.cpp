@@ -1,9 +1,11 @@
-#include "Consumer.h"
-#include "../CustomExceptions.h"
-#include "KafkaConfig.h"
-#include "MessageMetadataStruct.h"
 #include <date/date.h>
 #include <iomanip>
+
+#include "../CustomExceptions.h"
+#include "../Metadata.h"
+#include "Consumer.h"
+#include "KafkaConfig.h"
+#include "MessageMetadataStruct.h"
 
 namespace {
 long isoDateToTimestamp(const std::string &Date) {
@@ -39,7 +41,7 @@ std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
   return metadata;
 }
 
-Consumer::Consumer(std::string Broker) : Logger(spdlog::get("LOG")) {
+Consumer::Consumer(std::string const &Broker) : Logger(spdlog::get("LOG")) {
   std::string ErrStr;
   KafkaConsumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
@@ -142,12 +144,12 @@ Consumer::getTopicPartitionNumbers(const std::string &Topic) {
 ///
 /// \param Topic
 /// \return
-std::vector<OffsetsStruct>
+std::vector<Metadata::Partition>
 Consumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
   auto TopicPartitions = getTopicPartitionNumbers(Topic);
-  std::vector<OffsetsStruct> HighAndLowOffsets;
+  std::vector<Metadata::Partition> HighAndLowOffsets;
   for (auto &PartitionID : TopicPartitions) {
-    OffsetsStruct OffsetsToSave =
+    Metadata::Partition OffsetsToSave =
         getPartitionHighAndLowOffsets(Topic, PartitionID);
     HighAndLowOffsets.push_back(OffsetsToSave);
   }
@@ -158,12 +160,13 @@ Consumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
 ///
 /// \param Topic
 /// \param PartitionID
-/// \return OffsetsStruct containing PartitionID and High- and LowOffset.
-OffsetsStruct Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
-                                                      int32_t PartitionID) {
+/// \return Partition containing PartitionID and High- and LowOffset.
+Metadata::Partition
+Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
+                                        int32_t PartitionID) {
   int64_t Low, High;
   KafkaConsumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
-  OffsetsStruct OffsetsToSave{Low, High, PartitionID};
+  Metadata::Partition OffsetsToSave{Low, High, PartitionID};
   return OffsetsToSave;
 }
 
@@ -201,7 +204,7 @@ void Consumer::subscribeAtOffset(int64_t Offset, const std::string &Topic) {
 void Consumer::subscribeToLastNMessages(int64_t NMessages,
                                         const std::string &Topic,
                                         int Partition) {
-  std::vector<OffsetsStruct> HighAndLowOffsets =
+  std::vector<Metadata::Partition> HighAndLowOffsets =
       getTopicsHighAndLowOffsets(Topic);
 
   // get highest offset of all partitions
@@ -246,7 +249,7 @@ std::string Consumer::showAllMetadata() {
     SS << fmt::format("   \"{}\" with {} partitions:\n", Topic->topic(),
                       Topic->partitions()->size());
     for (auto Partition : *Topic->partitions()) {
-      OffsetsStruct PartitionOffsets =
+      Metadata::Partition PartitionOffsets =
           getPartitionHighAndLowOffsets(Topic->topic(), Partition->id());
       std::stringstream Replicas;
       std::copy(Partition->replicas()->begin(), Partition->replicas()->end(),

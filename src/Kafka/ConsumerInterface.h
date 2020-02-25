@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../OffsetsStruct.h"
+#include "../Metadata.h"
 #include "../TopicMetadataStruct.h"
 #include "MessageMetadataStruct.h"
 #include <CLI/CLI.hpp>
@@ -16,11 +16,12 @@ public:
 
   virtual MessageMetadataStruct consume() = 0;
 
-  virtual std::vector<OffsetsStruct>
+  virtual std::vector<Metadata::Partition>
   getTopicsHighAndLowOffsets(const std::string &Topic) = 0;
 
-  virtual OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
-                                                      int32_t PartitionID) = 0;
+  virtual Metadata::Partition
+  getPartitionHighAndLowOffsets(const std::string &Topic,
+                                int32_t PartitionID) = 0;
 
   virtual int getNumberOfTopicPartitions(const std::string &TopicName) = 0;
 

@@ -8,7 +8,8 @@ add_executable(kafkacow main.cpp
         Kafka/FakeConsumer.h
         CustomExceptions.h
         UserArgumentsStruct.h
-        OffsetsStruct.h
+        Metadata.h
+        Metadata.cpp
         TopicMetadataStruct.h
         FlatbuffersTranslator.cpp
         FlatbuffersTranslator.h

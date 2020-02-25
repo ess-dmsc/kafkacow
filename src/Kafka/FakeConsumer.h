@@ -16,11 +16,12 @@ public:
 
   MessageMetadataStruct consume() override;
 
-  std::vector<OffsetsStruct>
+  std::vector<Metadata::Partition>
   getTopicsHighAndLowOffsets(const std::string &Topic) override;
 
-  OffsetsStruct getPartitionHighAndLowOffsets(const std::string &Topic,
-                                              int32_t PartitionID) override;
+  Metadata::Partition
+  getPartitionHighAndLowOffsets(const std::string &Topic,
+                                int32_t PartitionID) override;
 
   int getNumberOfTopicPartitions(const std::string &TopicName) override;
 
