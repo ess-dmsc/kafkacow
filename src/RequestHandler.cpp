@@ -111,8 +111,7 @@ void RequestHandler::checkConsumerModeArguments(bool TerminateAtEndOfTopic) {
 }
 
 void RequestHandler::checkIfTopicEmpty(const std::string &TopicName) {
-  std::vector<OffsetsStruct> HighAndLowOffsets =
-      KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
+  auto HighAndLowOffsets = KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   bool EmptyTopic = true;
   for (auto Offsets : HighAndLowOffsets) {
     if (Offsets.LowOffset != Offsets.HighOffset)
@@ -154,10 +153,9 @@ void RequestHandler::runProducer() {
 /// \param TopicName
 bool RequestHandler::verifyOffset(const int64_t Offset,
                                   const std::string &TopicName) {
-  std::vector<OffsetsStruct> Offsets =
-      KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
+  auto Offsets = KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   bool InvalidOffset = true;
-  for (OffsetsStruct Struct : Offsets) {
+  for (auto const &Struct : Offsets) {
     if (Offset <= Struct.HighOffset && Offset >= Struct.LowOffset) {
       InvalidOffset = false;
       break;
@@ -175,7 +173,7 @@ bool RequestHandler::verifyOffset(const int64_t Offset,
 void RequestHandler::verifyNLast(const int64_t NLast,
                                  const std::string &TopicName,
                                  const int16_t Partition) {
-  OffsetsStruct Struct =
+  auto Struct =
       KafkaConsumer->getPartitionHighAndLowOffsets(TopicName, Partition);
   if (Struct.HighOffset - Struct.LowOffset < NLast)
     throw ArgumentException("Cannot display that many messages!");
@@ -189,7 +187,7 @@ void RequestHandler::showTopicPartitionOffsets() {
   for (auto &SingleStruct :
        KafkaConsumer->getTopicsHighAndLowOffsets(UserArguments.TopicName)) {
     fmt::print("Partition ID: {} || Low offset: {} || High offset: {}",
-               SingleStruct.PartitionId, SingleStruct.LowOffset,
+               SingleStruct.ID, SingleStruct.LowOffset,
                SingleStruct.HighOffset);
   }
 }
@@ -228,7 +226,7 @@ void RequestHandler::printKafkaMessage(
 /// \param TerminateAtEndOfTopic terminate at end of topic. For unit tests.
 void RequestHandler::printEntireTopic(const std::string &TopicName,
                                       bool TerminateAtEndOfTopic) {
-  std::vector<OffsetsStruct> OffsetsStruct =
+  std::vector<Metadata::Partition> OffsetsStruct =
       KafkaConsumer->getTopicsHighAndLowOffsets(TopicName);
   int64_t MinOffset = OffsetsStruct[0].LowOffset;
   for (auto OffsetStruct : OffsetsStruct) {

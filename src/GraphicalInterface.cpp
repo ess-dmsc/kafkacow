@@ -1,5 +1,6 @@
 #include "GraphicalInterface.h"
 #include "Kafka/Consumer.h"
+#include "Metadata.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -10,7 +11,7 @@
 #include <memory>
 
 namespace {
-void brokerTable(std::unique_ptr<RdKafka::Metadata> const &Metadata) {
+void brokerTable(Metadata::Cluster const &Metadata) {
   ImGui::TreeNode("Brokers");
   ImGui::Columns(3, "brokers_table");
   ImGui::Separator();
@@ -20,11 +21,11 @@ void brokerTable(std::unique_ptr<RdKafka::Metadata> const &Metadata) {
   ImGui::Text("Port"); ImGui::NextColumn();
   // clang-format on
   ImGui::Separator();
-  for (auto Broker : *Metadata->brokers()) {
+  for (auto const &Broker : Metadata.Brokers) {
     // clang-format off
-    ImGui::Text("%d", Broker->id()); ImGui::NextColumn();
-    ImGui::Text("%s", Broker->host().c_str()); ImGui::NextColumn();
-    ImGui::Text("%d", Broker->port()); ImGui::NextColumn();
+    ImGui::Text("%d", Broker.ID); ImGui::NextColumn();
+    ImGui::Text("%s", Broker.Host.c_str()); ImGui::NextColumn();
+    ImGui::Text("%d", Broker.Port); ImGui::NextColumn();
     // clang-format on
     ImGui::Separator();
   }
@@ -32,12 +33,11 @@ void brokerTable(std::unique_ptr<RdKafka::Metadata> const &Metadata) {
   ImGui::Separator();
 }
 
-void topicsTable(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
-                 std::unique_ptr<RdKafka::Metadata> const &Metadata) {
+void topicsTable(Metadata::Cluster const &Metadata) {
   ImGui::TreeNode("Topics");
 
-  for (auto Topic : *Metadata->topics()) {
-    ImGui::TreeNode(Topic->topic().c_str());
+  for (auto const &Topic : Metadata.Topics) {
+    ImGui::TreeNode(Topic.Name.c_str());
     ImGui::Columns(6);
     ImGui::Separator();
     // clang-format off
@@ -49,24 +49,15 @@ void topicsTable(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
     ImGui::Text("ISRS"); ImGui::NextColumn();
     // clang-format on
     ImGui::Separator();
-    for (auto Partition : *Topic->partitions()) {
-      // TODO MUST CACHE OFFSETS, can't look them up on every redraw!!
-      OffsetsStruct PartitionOffsets =
-          KafkaConsumer->getPartitionHighAndLowOffsets(Topic->topic(),
-                                                       Partition->id());
-      std::stringstream Replicas;
-      std::copy(Partition->replicas()->begin(), Partition->replicas()->end(),
-                std::ostream_iterator<int32_t>(Replicas, ", "));
-      std::stringstream ISRSs;
-      std::copy(Partition->isrs()->begin(), Partition->isrs()->end(),
-                std::ostream_iterator<int32_t>(ISRSs, ", "));
+    for (auto const &Partition : Topic.Partitions) {
       // clang-format off
-      ImGui::Text("%d", Partition->id()); ImGui::NextColumn();
-      ImGui::Text("%ld", PartitionOffsets.LowOffset); ImGui::NextColumn();
-      ImGui::Text("%ld", PartitionOffsets.HighOffset); ImGui::NextColumn();
-      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
-      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
-      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
+      ImGui::Text("%d", Partition.ID); ImGui::NextColumn();
+      ImGui::Text("%ld", Partition.LowOffset); ImGui::NextColumn();
+      ImGui::Text("%ld", Partition.HighOffset); ImGui::NextColumn();
+      ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn();
+//      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
+//      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
+//      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
       // clang-format on
       ImGui::Separator();
     }
@@ -77,16 +68,18 @@ void topicsTable(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
 }
 
 void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
-                    std::unique_ptr<RdKafka::Metadata> &Metadata) {
+                    std::unique_ptr<RdKafka::Metadata> &KafkaMetadata) {
   ImGui::Begin("Metadata");
 
+  Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
   auto Refresh = ImGui::Button("Refresh");
   if (Refresh) {
-    Metadata = KafkaConsumer->queryMetadata();
+    KafkaMetadata = KafkaConsumer->queryMetadata();
+    ClusterMetadata = {KafkaConsumer, KafkaMetadata};
   }
 
-  brokerTable(Metadata);
-  topicsTable(KafkaConsumer, Metadata);
+  brokerTable(ClusterMetadata);
+  topicsTable(ClusterMetadata);
 
   ImGui::End();
 }
