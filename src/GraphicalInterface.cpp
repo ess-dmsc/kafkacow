@@ -12,58 +12,62 @@
 
 namespace {
 void brokerTable(Metadata::Cluster const &Metadata) {
-  ImGui::TreeNode("Brokers");
-  ImGui::Columns(3, "brokers_table");
-  ImGui::Separator();
-  // clang-format off
-  ImGui::Text("Broker"); ImGui::NextColumn();
-  ImGui::Text("Host"); ImGui::NextColumn();
-  ImGui::Text("Port"); ImGui::NextColumn();
-  // clang-format on
-  ImGui::Separator();
-  for (auto const &Broker : Metadata.Brokers) {
-    // clang-format off
-    ImGui::Text("%d", Broker.ID); ImGui::NextColumn();
-    ImGui::Text("%s", Broker.Host.c_str()); ImGui::NextColumn();
-    ImGui::Text("%d", Broker.Port); ImGui::NextColumn();
-    // clang-format on
-    ImGui::Separator();
-  }
-  ImGui::Columns(1);
-  ImGui::Separator();
-}
-
-void topicsTable(Metadata::Cluster const &Metadata) {
-  ImGui::TreeNode("Topics");
-
-  for (auto const &Topic : Metadata.Topics) {
-    ImGui::TreeNode(Topic.Name.c_str());
-    ImGui::Columns(6);
+  ImGui::SetNextItemOpen(true);
+  if (ImGui::CollapsingHeader("Brokers")) {
+    ImGui::Columns(3, "brokers_table");
     ImGui::Separator();
     // clang-format off
-    ImGui::Text("Partition"); ImGui::NextColumn();
-    ImGui::Text("Low Offset"); ImGui::NextColumn();
-    ImGui::Text("High Offset"); ImGui::NextColumn();
-    ImGui::Text("Leader"); ImGui::NextColumn();
-    ImGui::Text("Replicas"); ImGui::NextColumn();
-    ImGui::Text("ISRS"); ImGui::NextColumn();
+    ImGui::Text("Broker"); ImGui::NextColumn();
+    ImGui::Text("Host"); ImGui::NextColumn();
+    ImGui::Text("Port"); ImGui::NextColumn();
     // clang-format on
     ImGui::Separator();
-    for (auto const &Partition : Topic.Partitions) {
+    for (auto const &Broker : Metadata.Brokers) {
       // clang-format off
-      ImGui::Text("%d", Partition.ID); ImGui::NextColumn();
-      ImGui::Text("%ld", Partition.LowOffset); ImGui::NextColumn();
-      ImGui::Text("%ld", Partition.HighOffset); ImGui::NextColumn();
-      ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn();
-//      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
-//      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
-//      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
+      ImGui::Text("%d", Broker.ID); ImGui::NextColumn();
+      ImGui::Text("%s", Broker.Host.c_str()); ImGui::NextColumn();
+      ImGui::Text("%d", Broker.Port); ImGui::NextColumn();
       // clang-format on
       ImGui::Separator();
     }
-
     ImGui::Columns(1);
     ImGui::Separator();
+  }
+}
+
+void topicsTable(Metadata::Cluster const &Metadata) {
+  ImGui::SetNextItemOpen(true);
+  if (ImGui::CollapsingHeader("Topics")) {
+
+    for (auto const &Topic : Metadata.Topics) {
+      ImGui::Text("%s", Topic.Name.c_str());
+      ImGui::Columns(6);
+      ImGui::Separator();
+      // clang-format off
+      ImGui::Text("Partition"); ImGui::NextColumn();
+      ImGui::Text("Low Offset"); ImGui::NextColumn();
+      ImGui::Text("High Offset"); ImGui::NextColumn();
+      ImGui::Text("Leader"); ImGui::NextColumn();
+      ImGui::Text("Replicas"); ImGui::NextColumn();
+      ImGui::Text("ISRS"); ImGui::NextColumn();
+      // clang-format on
+      ImGui::Separator();
+      for (auto const &Partition : Topic.Partitions) {
+        // clang-format off
+        ImGui::Text("%d", Partition.ID); ImGui::NextColumn();
+        ImGui::Text("%ld", Partition.LowOffset); ImGui::NextColumn();
+        ImGui::Text("%ld", Partition.HighOffset); ImGui::NextColumn();
+        ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn();
+//      ImGui::Text("%d", Partition->leader()); ImGui::NextColumn();
+//      ImGui::Text("%s", Replicas.str().c_str()); ImGui::NextColumn();
+//      ImGui::Text("%s", ISRSs.str().c_str()); ImGui::NextColumn();
+        // clang-format on
+        ImGui::Separator();
+      }
+
+      ImGui::Columns(1);
+      ImGui::Separator();
+    }
   }
 }
 
