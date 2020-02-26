@@ -48,12 +48,12 @@ void topicsTable(Metadata::Cluster const &Metadata) {
         ImGui::Columns(6);
         ImGui::Separator();
         // clang-format off
-      ImGui::Text("Partition"); ImGui::NextColumn();
-      ImGui::Text("Low Offset"); ImGui::NextColumn();
-      ImGui::Text("High Offset"); ImGui::NextColumn();
-      ImGui::Text("Leader"); ImGui::NextColumn();
-      ImGui::Text("Replicas"); ImGui::NextColumn();
-      ImGui::Text("ISRS"); ImGui::NextColumn();
+        ImGui::Text("Partition"); ImGui::NextColumn();
+        ImGui::Text("Low Offset"); ImGui::NextColumn();
+        ImGui::Text("High Offset"); ImGui::NextColumn();
+        ImGui::Text("Leader"); ImGui::NextColumn();
+        ImGui::Text("Replicas"); ImGui::NextColumn();
+        ImGui::Text("ISRS"); ImGui::NextColumn();
         // clang-format on
         ImGui::Separator();
         for (auto const &Partition : Topic.Partitions) {
@@ -78,6 +78,9 @@ void topicsTable(Metadata::Cluster const &Metadata) {
 
 void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
                     std::unique_ptr<RdKafka::Metadata> &KafkaMetadata) {
+  ImVec2 window_pos = ImVec2(10, 10);
+  ImGui::SetNextWindowPos(window_pos);
+
   ImGui::Begin("Metadata");
 
   Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
