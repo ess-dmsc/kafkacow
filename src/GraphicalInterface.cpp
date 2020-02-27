@@ -76,7 +76,7 @@ void topicsTable(Metadata::Cluster const &Metadata) {
   }
 }
 
-void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
+void metadataWindow(Kafka::Consumer const &KafkaConsumer,
                     std::unique_ptr<RdKafka::Metadata> &KafkaMetadata,
                     Metadata::Cluster &ClusterMetadata) {
   ImVec2 window_pos = ImVec2(10, 10);
@@ -86,7 +86,7 @@ void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
 
   auto Refresh = ImGui::Button("Refresh");
   if (Refresh) {
-    KafkaMetadata = KafkaConsumer->queryMetadata();
+    KafkaMetadata = KafkaConsumer.queryMetadata();
     ClusterMetadata = {KafkaConsumer, KafkaMetadata};
   }
 
@@ -98,8 +98,8 @@ void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
 } // namespace
 
 void initGUI(std::string const &Broker) {
-  auto KafkaConsumer = std::make_unique<Kafka::Consumer>(Broker);
-  auto KafkaMetadata = KafkaConsumer->queryMetadata();
+  Kafka::Consumer KafkaConsumer{Broker};
+  auto KafkaMetadata = KafkaConsumer.queryMetadata();
   Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
 
   sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "kafkacow");

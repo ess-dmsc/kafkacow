@@ -21,7 +21,7 @@ public:
 
   virtual Metadata::Partition
   getPartitionHighAndLowOffsets(const std::string &Topic,
-                                int32_t PartitionID) = 0;
+                                int32_t PartitionID) const = 0;
 
   virtual int getNumberOfTopicPartitions(const std::string &TopicName) = 0;
 

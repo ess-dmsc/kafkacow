@@ -42,7 +42,7 @@ struct Topic {
 
 class Cluster {
 public:
-  Cluster(std::unique_ptr<Kafka::Consumer> const &Consumer,
+  Cluster(Kafka::Consumer const &Consumer,
           std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata);
   std::vector<Broker> Brokers;
   std::vector<Topic> Topics;

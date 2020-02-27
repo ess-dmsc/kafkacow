@@ -50,7 +50,7 @@ std::string FakeConsumer::showAllMetadata() { return "Test return"; }
 
 Metadata::Partition
 FakeConsumer::getPartitionHighAndLowOffsets(const std::string &Topic,
-                                            int32_t PartitionID) {
+                                            int32_t PartitionID) const {
   Metadata::Partition OffsetsToReturn{1, 5, PartitionID};
   return OffsetsToReturn;
 }

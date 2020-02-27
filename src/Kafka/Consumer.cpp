@@ -24,7 +24,7 @@ namespace Kafka {
 /// Gets Metadata object from Kafka.
 ///
 /// \return unique_ptr to RdKafka::Metadata
-std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
+std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() const {
   RdKafka::Metadata *metadataRawPtr(nullptr);
   RdKafka::ErrorCode ErrorCode =
       KafkaConsumer->metadata(true, nullptr, &metadataRawPtr, 1000);
@@ -163,7 +163,7 @@ Consumer::getTopicsHighAndLowOffsets(const std::string &Topic) {
 /// \return Partition containing PartitionID and High- and LowOffset.
 Metadata::Partition
 Consumer::getPartitionHighAndLowOffsets(const std::string &Topic,
-                                        int32_t PartitionID) {
+                                        int32_t PartitionID) const {
   int64_t Low, High;
   KafkaConsumer->query_watermark_offsets(Topic, PartitionID, &Low, &High, 100);
   Metadata::Partition OffsetsToSave{Low, High, PartitionID};

@@ -4,10 +4,11 @@
 #include <librdkafka/rdkafkacpp.h>
 
 namespace Metadata {
-Cluster::Cluster(std::unique_ptr<Kafka::Consumer> const &Consumer,
+Cluster::Cluster(Kafka::Consumer const &Consumer,
                  std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata) {
   for (auto KafkaBroker : *KafkaMetadata->brokers()) {
-    Brokers.push_back({KafkaBroker->id(), KafkaBroker->host(), KafkaBroker->port()});
+    Brokers.push_back(
+        {KafkaBroker->id(), KafkaBroker->host(), KafkaBroker->port()});
   }
 
   Topics.reserve(KafkaMetadata->topics()->size());
@@ -17,8 +18,8 @@ Cluster::Cluster(std::unique_ptr<Kafka::Consumer> const &Consumer,
     for (auto Partition : *KafkaTopic->partitions()) {
       PartitionsList.insert(
           PartitionsList.cbegin() + static_cast<size_t>(Partition->id()),
-          Consumer->getPartitionHighAndLowOffsets(KafkaTopic->topic(),
-                                                  Partition->id()));
+          Consumer.getPartitionHighAndLowOffsets(KafkaTopic->topic(),
+                                                 Partition->id()));
     }
 
     Topics.push_back({KafkaTopic->topic(), PartitionsList});

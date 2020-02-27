@@ -21,7 +21,7 @@ public:
 
   Metadata::Partition
   getPartitionHighAndLowOffsets(const std::string &Topic,
-                                int32_t PartitionID) override;
+                                int32_t PartitionID) const override;
 
   int getNumberOfTopicPartitions(const std::string &TopicName) override;
 

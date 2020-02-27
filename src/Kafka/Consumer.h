@@ -33,7 +33,7 @@ public:
 
   Metadata::Partition
   getPartitionHighAndLowOffsets(const std::string &Topic,
-                                int32_t PartitionID) override;
+                                int32_t PartitionID) const override;
 
   int getNumberOfTopicPartitions(const std::string &Topic) override;
 
@@ -44,7 +44,7 @@ public:
 
   std::string showAllMetadata() override;
 
-  std::unique_ptr<RdKafka::Metadata> queryMetadata();
+  std::unique_ptr<RdKafka::Metadata> queryMetadata() const;
 
   int64_t getOffsetForDate(const std::string &Date,
                            const std::string &Topic) override;
