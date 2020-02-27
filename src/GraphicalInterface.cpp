@@ -77,13 +77,13 @@ void topicsTable(Metadata::Cluster const &Metadata) {
 }
 
 void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
-                    std::unique_ptr<RdKafka::Metadata> &KafkaMetadata) {
+                    std::unique_ptr<RdKafka::Metadata> &KafkaMetadata,
+                    Metadata::Cluster &ClusterMetadata) {
   ImVec2 window_pos = ImVec2(10, 10);
   ImGui::SetNextWindowPos(window_pos);
 
   ImGui::Begin("Metadata");
 
-  Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
   auto Refresh = ImGui::Button("Refresh");
   if (Refresh) {
     KafkaMetadata = KafkaConsumer->queryMetadata();
@@ -99,7 +99,8 @@ void metadataWindow(std::unique_ptr<Kafka::Consumer> &KafkaConsumer,
 
 void initGUI(std::string const &Broker) {
   auto KafkaConsumer = std::make_unique<Kafka::Consumer>(Broker);
-  auto Metadata = KafkaConsumer->queryMetadata();
+  auto KafkaMetadata = KafkaConsumer->queryMetadata();
+  Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
 
   sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "kafkacow");
   window.setFramerateLimit(60);
@@ -121,7 +122,7 @@ void initGUI(std::string const &Broker) {
     bool ShowDemoWindow = true;
     ImGui::ShowDemoWindow(&ShowDemoWindow);
 
-    metadataWindow(KafkaConsumer, Metadata);
+    metadataWindow(KafkaConsumer, KafkaMetadata, ClusterMetadata);
 
     window.clear(sf::Color(100, 200, 255, 255));
     ImGui::SFML::Render(window);
