@@ -10,7 +10,6 @@ add_executable(kafkacow main.cpp
         UserArgumentsStruct.h
         Metadata.h
         Metadata.cpp
-        tictoc.h
         TopicMetadataStruct.h
         FlatbuffersTranslator.cpp
         FlatbuffersTranslator.h

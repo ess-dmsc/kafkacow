@@ -103,10 +103,15 @@ void metadataWindow(Kafka::Consumer const &KafkaConsumer,
   ImGui::End();
 }
 
+void viewDataWindow(std::string const &Topic) {
+  ImGui::Begin(Topic.c_str());
+  ImGui::End();
+}
+
 void viewDataWindows(std::map<std::string, bool> &TopicViewsEnabled) {
   for (auto const &TopicAndViewEnabled : TopicViewsEnabled) {
     if (TopicAndViewEnabled.second) {
-      std::cout << TopicAndViewEnabled.first << "\n";
+      viewDataWindow(TopicAndViewEnabled.first);
     }
   }
 }
