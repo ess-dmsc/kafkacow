@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -43,7 +44,8 @@ struct Topic {
 class Cluster {
 public:
   Cluster(Kafka::Consumer const &Consumer,
-          std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata);
+          std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata,
+          std::map<std::string, bool> &TopicViewsEnabled);
   std::vector<Broker> Brokers;
   std::vector<Topic> Topics;
 };

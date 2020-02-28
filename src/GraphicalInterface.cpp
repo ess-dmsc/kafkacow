@@ -35,7 +35,8 @@ void brokerTable(Metadata::Cluster const &Metadata) {
   }
 }
 
-void topicsTable(Metadata::Cluster const &Metadata) {
+void topicsTable(Metadata::Cluster const &Metadata,
+                 std::map<std::string, bool> &TopicViewsEnabled) {
   ImGui::SetNextItemOpen(true);
   if (ImGui::CollapsingHeader("Topics")) {
 
@@ -45,6 +46,11 @@ void topicsTable(Metadata::Cluster const &Metadata) {
     for (auto const &Topic : Metadata.Topics) {
       if (filter.PassFilter(Topic.Name.c_str())) {
         ImGui::Text("%s", Topic.Name.c_str());
+        ImGui::SameLine();
+        auto ToggleViewData = ImGui::Button("Toggle view data");
+        if (ToggleViewData) {
+          TopicViewsEnabled[Topic.Name] = !TopicViewsEnabled[Topic.Name];
+        }
         ImGui::Columns(6);
         ImGui::Separator();
         // clang-format off
@@ -78,7 +84,8 @@ void topicsTable(Metadata::Cluster const &Metadata) {
 
 void metadataWindow(Kafka::Consumer const &KafkaConsumer,
                     std::unique_ptr<RdKafka::Metadata> &KafkaMetadata,
-                    Metadata::Cluster &ClusterMetadata) {
+                    Metadata::Cluster &ClusterMetadata,
+                    std::map<std::string, bool> &TopicViewsEnabled) {
   ImVec2 window_pos = ImVec2(10, 10);
   ImGui::SetNextWindowPos(window_pos);
 
@@ -87,20 +94,30 @@ void metadataWindow(Kafka::Consumer const &KafkaConsumer,
   auto Refresh = ImGui::Button("Refresh");
   if (Refresh) {
     KafkaMetadata = KafkaConsumer.queryMetadata();
-    ClusterMetadata = {KafkaConsumer, KafkaMetadata};
+    ClusterMetadata = {KafkaConsumer, KafkaMetadata, TopicViewsEnabled};
   }
 
   brokerTable(ClusterMetadata);
-  topicsTable(ClusterMetadata);
+  topicsTable(ClusterMetadata, TopicViewsEnabled);
 
   ImGui::End();
+}
+
+void viewDataWindows(std::map<std::string, bool> &TopicViewsEnabled) {
+  for (auto const &TopicAndViewEnabled : TopicViewsEnabled) {
+    if (TopicAndViewEnabled.second) {
+      std::cout << TopicAndViewEnabled.first << "\n";
+    }
+  }
 }
 } // namespace
 
 void initGUI(std::string const &Broker) {
+  std::map<std::string, bool> TopicViewsEnabled;
   Kafka::Consumer KafkaConsumer{Broker};
   auto KafkaMetadata = KafkaConsumer.queryMetadata();
-  Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata};
+  Metadata::Cluster ClusterMetadata{KafkaConsumer, KafkaMetadata,
+                                    TopicViewsEnabled};
 
   sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "kafkacow");
   window.setFramerateLimit(60);
@@ -122,7 +139,9 @@ void initGUI(std::string const &Broker) {
     bool ShowDemoWindow = true;
     ImGui::ShowDemoWindow(&ShowDemoWindow);
 
-    metadataWindow(KafkaConsumer, KafkaMetadata, ClusterMetadata);
+    metadataWindow(KafkaConsumer, KafkaMetadata, ClusterMetadata,
+                   TopicViewsEnabled);
+    viewDataWindows(TopicViewsEnabled);
 
     window.clear(sf::Color(100, 200, 255, 255));
     ImGui::SFML::Render(window);

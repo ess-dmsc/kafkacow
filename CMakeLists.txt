@@ -9,6 +9,16 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 
+# Use gold linker if available on system (it is faster than default GNU linker)
+if (UNIX AND NOT APPLE)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -fuse-ld=gold -Wl,--version ERROR_QUIET OUTPUT_VARIABLE ld_version)
+    if ("${ld_version}" MATCHES "GNU gold")
+        message(STATUS "Using gold linker")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold -Wl,--disable-new-dtags")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold -Wl,--disable-new-dtags")
+    endif()
+endif()
+
 file(GLOB listOfSchemas "${PROJECT_SOURCE_DIR}/streaming-data-types/schemas/*.fbs" )
 list(REMOVE_DUPLICATES listOfSchemas)
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/schemas/")

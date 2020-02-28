@@ -5,7 +5,8 @@
 
 namespace Metadata {
 Cluster::Cluster(Kafka::Consumer const &Consumer,
-                 std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata) {
+                 std::unique_ptr<RdKafka::Metadata> const &KafkaMetadata,
+                 std::map<std::string, bool> &TopicViewsEnabled) {
   for (auto KafkaBroker : *KafkaMetadata->brokers()) {
     Brokers.push_back(
         {KafkaBroker->id(), KafkaBroker->host(), KafkaBroker->port()});
@@ -15,6 +16,13 @@ Cluster::Cluster(Kafka::Consumer const &Consumer,
   for (auto KafkaTopic : *KafkaMetadata->topics()) {
     std::vector<Partition> PartitionsList;
     PartitionsList.reserve(KafkaTopic->partitions()->size());
+
+    // Add topic to map if not already present
+    if (TopicViewsEnabled.find(KafkaTopic->topic()) ==
+        TopicViewsEnabled.end()) {
+      TopicViewsEnabled.emplace(KafkaTopic->topic(), false);
+    }
+
     for (auto Partition : *KafkaTopic->partitions()) {
       PartitionsList.insert(
           PartitionsList.cbegin() + static_cast<size_t>(Partition->id()),
