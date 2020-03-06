@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
   try {
     std::string SchemaPath = getSchemaPath();
     if (GUIMode) {
-        initGUI(UserArguments.Broker);
+      runGUI(UserArguments.Broker);
     } else {
         RequestHandler MainRequestHandler(UserArguments, SchemaPath);
         MainRequestHandler.checkAndRun();

@@ -117,7 +117,7 @@ void viewDataWindows(std::map<std::string, bool> &TopicViewsEnabled) {
 }
 } // namespace
 
-void initGUI(std::string const &Broker) {
+void runGUI(std::string const &Broker) {
   std::map<std::string, bool> TopicViewsEnabled;
   Kafka::Consumer KafkaConsumer{Broker};
   auto KafkaMetadata = KafkaConsumer.queryMetadata();

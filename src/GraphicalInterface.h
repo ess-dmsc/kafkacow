@@ -2,4 +2,4 @@
 
 #include <string>
 
-void initGUI(std::string const &Broker);
+void runGUI(std::string const &Broker);
