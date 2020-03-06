@@ -47,7 +47,7 @@ void topicsTable(Metadata::Cluster const &Metadata,
       if (filter.PassFilter(Topic.Name.c_str())) {
         ImGui::Text("%s", Topic.Name.c_str());
         ImGui::SameLine();
-        auto ToggleViewData = ImGui::Button("Toggle view data");
+        auto ToggleViewData = ImGui::Button("View data");
         if (ToggleViewData) {
           TopicViewsEnabled[Topic.Name] = !TopicViewsEnabled[Topic.Name];
         }
@@ -103,15 +103,15 @@ void metadataWindow(Kafka::Consumer const &KafkaConsumer,
   ImGui::End();
 }
 
-void viewDataWindow(std::string const &Topic) {
-  ImGui::Begin(Topic.c_str());
+void viewDataWindow(std::string const &Topic, bool &WindowOpen) {
+  ImGui::Begin(Topic.c_str(), &WindowOpen);
   ImGui::End();
 }
 
 void viewDataWindows(std::map<std::string, bool> &TopicViewsEnabled) {
-  for (auto const &TopicAndViewEnabled : TopicViewsEnabled) {
+  for (auto &TopicAndViewEnabled : TopicViewsEnabled) {
     if (TopicAndViewEnabled.second) {
-      viewDataWindow(TopicAndViewEnabled.first);
+      viewDataWindow(TopicAndViewEnabled.first, TopicAndViewEnabled.second);
     }
   }
 }
