@@ -21,4 +21,5 @@ struct UserArgumentStruct {
   bool MetadataMode = false;
   bool ProducerMode = false;
   bool ShowEntireMessage = false;
+  bool ShowCompactMessage = false;
 };
