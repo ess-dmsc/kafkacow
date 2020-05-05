@@ -76,7 +76,7 @@ builders = pipeline_builder.createBuilders { container ->
     }  // stage
   }  // if
 
-  if (container.key == clangformat_os) {
+  if (container.key == clangformat_os && env.CHANGE_ID) {
     pipeline_builder.stage("${container.key}: check formatting") {
     try {
       container.sh """
