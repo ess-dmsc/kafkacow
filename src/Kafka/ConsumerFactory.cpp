@@ -11,4 +11,4 @@ std::unique_ptr<ConsumerInterface> createConsumer(const std::string &Broker,
     return std::make_unique<FakeConsumer>(FakeConsumer());
   }
 }
-}
+} // namespace Kafka

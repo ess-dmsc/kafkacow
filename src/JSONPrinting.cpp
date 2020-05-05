@@ -22,7 +22,7 @@ void truncateJSONString(nlohmann::json &JSONMessage) {
                               StringValue.size() - STRING_TRUNCATION_LENGTH);
   }
 }
-}
+} // namespace
 
 /// Receives deserialized flatbuffers message, removes quotes and adds
 /// indentation for readability.

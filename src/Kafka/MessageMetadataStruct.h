@@ -16,4 +16,4 @@ struct MessageMetadataStruct {
   std::string Key;
   bool KeyPresent = false;
 };
-}
+} // namespace Kafka

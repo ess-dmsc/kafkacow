@@ -36,4 +36,4 @@ public:
   virtual int64_t getOffsetForDate(const std::string &Date,
                                    const std::string &Topic) = 0;
 };
-}
+} // namespace Kafka

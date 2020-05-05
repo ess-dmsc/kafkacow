@@ -16,4 +16,4 @@ public:
 private:
   flatbuffers::DetachedBuffer Buffer;
 };
-}
+} // namespace Kafka

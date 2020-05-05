@@ -14,4 +14,4 @@ public:
 private:
   std::shared_ptr<spdlog::logger> Logger = spdlog::get("LOG");
 };
-}
+} // namespace Kafka

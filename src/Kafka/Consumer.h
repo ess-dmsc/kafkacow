@@ -54,4 +54,4 @@ private:
   std::unique_ptr<RdKafka::Metadata> queryMetadata();
   std::vector<int32_t> getTopicPartitionNumbers(const std::string &Topic);
 };
-}
+} // namespace Kafka
