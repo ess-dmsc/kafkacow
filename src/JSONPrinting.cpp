@@ -74,15 +74,14 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
                               MessageWithNoQuotes.end());
     if (Compact) {
       bool InArray{false};
-      for (auto i = 0; i < MessageWithNoQuotes.size(); i++) {
-        if (MessageWithNoQuotes[i] == '[') {
+      for (auto &Character : MessageWithNoQuotes) {
+        if (Character == '[') {
           InArray = true;
-        }
-        if (MessageWithNoQuotes[i] == ']') {
+        } else if (Character == ']') {
           InArray = false;
         }
-        if (InArray and MessageWithNoQuotes[i] == '\n') {
-          MessageWithNoQuotes[i] = ' ';
+        if (InArray and Character == '\n') {
+          Character = ' ';
         }
       }
     }
