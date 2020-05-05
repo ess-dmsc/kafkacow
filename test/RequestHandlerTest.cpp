@@ -1,8 +1,8 @@
+#include "../src/RequestHandler.h"
 #include "../src/CustomExceptions.h"
 #include "../src/GetSchemaPath.h"
 #include "../src/Kafka/ConsumerInterface.h"
 #include "../src/Kafka/FakeProducer.h"
-#include "../src/RequestHandler.h"
 #include <flatbuffers/idl.h>
 #include <gtest/gtest.h>
 

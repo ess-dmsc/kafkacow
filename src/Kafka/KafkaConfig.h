@@ -36,4 +36,4 @@ createGlobalConfiguration(const std::string &BrokerAddr) {
 
   return conf;
 }
-}
+} // namespace

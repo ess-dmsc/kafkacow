@@ -15,7 +15,7 @@ long isoDateToTimestamp(const std::string &Date) {
                             "e.g.[2019-07-05T08:18:14.366].");
   return tp.time_since_epoch().count();
 }
-}
+} // namespace
 
 namespace Kafka {
 
@@ -286,4 +286,4 @@ int64_t Consumer::getOffsetForDate(const std::string &Date,
       operator*()
       ->offset();
 }
-}
+} // namespace Kafka

@@ -14,7 +14,7 @@ std::string getMessageFromFile(const std::string &JSONPath) {
   StringStream << IfStream.rdbuf();
   return StringStream.str();
 }
-}
+} // namespace
 
 /// Serializes message found in file JSONPath.
 /// \param JSONPath
