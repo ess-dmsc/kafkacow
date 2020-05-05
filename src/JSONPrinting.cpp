@@ -25,7 +25,7 @@ void truncateJSONString(nlohmann::json &JSONMessage) {
                               StringValue.size() - STRING_TRUNCATION_LENGTH);
   }
 }
-}
+} // namespace
 
 /// Receives deserialized flatbuffers message, removes quotes and adds
 /// indentation for readability.
@@ -105,15 +105,12 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
   if (JSONMessage.is_string()) {
     truncateJSONString(JSONMessage);
   } else if (JSONMessage.is_array()) {
-    (Compact)
-    ?  recursiveCompactJSONArray(JSONMessage)
-    :  recursiveTruncateJSONArray(JSONMessage);
+    (Compact) ? recursiveCompactJSONArray(JSONMessage)
+              : recursiveTruncateJSONArray(JSONMessage);
   } else if (JSONMessage.is_object()) {
     recursiveTruncateJSONMap(JSONMessage);
   }
 }
-
-
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
   const size_t MessageSize = JSONMessage.size();
