@@ -41,7 +41,7 @@ std::string timestampToISO8601(const int64_t &Timestamp) {
   strftime(DateString, 25, "%FT%T", gmtime(&Seconds));
   return fmt::format("{}.{}", DateString, Timestamp % 1000);
 }
-}
+} // namespace
 
 /// Checks which mode(consumer/metadata/producer) is chosen and
 /// calls method responsible for handling one of the modes or throws
@@ -212,13 +212,13 @@ void RequestHandler::printKafkaMessage(
     (UserArguments.ShowEntireMessage)
         ? std::cout << fmt::format(
               "{}", getEntireMessage(JSONMessage, UserArguments.Indentation))
-        : std::cout << fmt::format(
-              "{}", getTruncatedMessage(JSONMessage,
-                UserArguments.ShowCompactMessage
-                ? 1
-                : UserArguments.Indentation,
-                UserArguments.ShowCompactMessage))
-                << std::endl;
+        : std::cout << fmt::format("{}", getTruncatedMessage(
+                                             JSONMessage,
+                                             UserArguments.ShowCompactMessage
+                                                 ? 1
+                                                 : UserArguments.Indentation,
+                                             UserArguments.ShowCompactMessage))
+                    << std::endl;
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;
