@@ -58,4 +58,4 @@ int64_t FakeConsumer::getOffsetForDate(const std::string &Date,
                                        const std::string &Topic) {
   return 1;
 }
-}
+} // namespace Kafka

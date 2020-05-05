@@ -65,4 +65,4 @@ void Producer::produce(Kafka::Message Message) {
   auto TopicHandle = createTopicHandle(TopicConfiguration);
   produceMessage(Message, TopicHandle);
 }
-}
+} // namespace Kafka

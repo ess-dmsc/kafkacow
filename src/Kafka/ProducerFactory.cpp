@@ -12,4 +12,4 @@ createProducer(const std::string &Broker, const std::string &Topic, bool Real) {
     return std::make_unique<FakeProducer>(FakeProducer());
   }
 }
-}
+} // namespace Kafka
