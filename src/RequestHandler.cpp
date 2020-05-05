@@ -213,9 +213,12 @@ void RequestHandler::printKafkaMessage(
         ? std::cout << fmt::format(
               "{}", getEntireMessage(JSONMessage, UserArguments.Indentation))
         : std::cout << fmt::format(
-                           "{}", getTruncatedMessage(JSONMessage,
-                                                     UserArguments.Indentation))
-                    << std::endl;
+              "{}", getTruncatedMessage(JSONMessage,
+                UserArguments.ShowCompactMessage
+                ? 1
+                : UserArguments.Indentation,
+                UserArguments.ShowCompactMessage))
+                << std::endl;
   }
   if (MessageData.PartitionEOF)
     EOFPartitionCounter++;

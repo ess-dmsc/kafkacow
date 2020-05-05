@@ -5,6 +5,9 @@
 namespace {
 size_t STRING_TRUNCATION_LENGTH{50};
 size_t ARRAY_TRUNCATION_LENGTH{10};
+size_t ARRAY_COMPACTION_LENGTH{3};
+
+bool Compact{false};
 
 std::string truncateNONJSON(const std::string &Message) {
   if (Message.size() > STRING_TRUNCATION_LENGTH)
@@ -57,7 +60,8 @@ std::string getEntireMessage(const std::string &JSONMessage,
 /// by default)
 /// \return truncated readable message as string
 std::string getTruncatedMessage(const std::string &JSONMessage,
-                                const int &Indent) {
+                                const int &Indent, bool CompactMessage) {
+  Compact = CompactMessage;
   try {
     auto JSONModernMessage = nlohmann::json::parse(JSONMessage.c_str());
     recursiveTruncate(JSONModernMessage);
@@ -68,6 +72,20 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
     MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
                                           MessageWithNoQuotes.end(), ','),
                               MessageWithNoQuotes.end());
+    if (Compact) {
+      bool InArray{false};
+      for (auto i = 0; i < MessageWithNoQuotes.size(); i++) {
+        if (MessageWithNoQuotes[i] == '[') {
+          InArray = true;
+        }
+        if (MessageWithNoQuotes[i] == ']') {
+          InArray = false;
+        }
+        if (InArray and MessageWithNoQuotes[i] == '\n') {
+          MessageWithNoQuotes[i] = ' ';
+        }
+      }
+    }
     return MessageWithNoQuotes;
 
   } catch (nlohmann::json::exception &) {
@@ -88,11 +106,15 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
   if (JSONMessage.is_string()) {
     truncateJSONString(JSONMessage);
   } else if (JSONMessage.is_array()) {
-    recursiveTruncateJSONArray(JSONMessage);
+    (Compact)
+    ?  recursiveCompactJSONArray(JSONMessage)
+    :  recursiveTruncateJSONArray(JSONMessage);
   } else if (JSONMessage.is_object()) {
     recursiveTruncateJSONMap(JSONMessage);
   }
 }
+
+
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
   const size_t MessageSize = JSONMessage.size();
@@ -102,6 +124,24 @@ void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
     JSONMessage.push_back("...");
     JSONMessage.push_back(fmt::format("Truncated {} elements.",
                                       MessageSize - ARRAY_TRUNCATION_LENGTH));
+  }
+
+  for (auto &element : JSONMessage) {
+    recursiveTruncate(element);
+  }
+}
+
+void recursiveCompactJSONArray(nlohmann::json &JSONMessage) {
+  const size_t MessageSize = JSONMessage.size();
+  if (MessageSize > ARRAY_COMPACTION_LENGTH + 1) {
+    nlohmann::json::iterator it = JSONMessage.end();
+    --it;
+    auto last = *it;
+    JSONMessage.erase(JSONMessage.begin() + ARRAY_COMPACTION_LENGTH,
+                      JSONMessage.end());
+    JSONMessage.push_back(fmt::format("... truncated {} elements ...",
+                                      MessageSize - ARRAY_COMPACTION_LENGTH));
+    JSONMessage.push_back(last);
   }
 
   for (auto &element : JSONMessage) {
