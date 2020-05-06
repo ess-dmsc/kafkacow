@@ -46,9 +46,6 @@ int main(int argc, char **argv) {
   App.add_flag("-e, --entire", UserArguments.ShowEntireMessage,
                "Show all elements of array and entire string fields of a "
                "message (truncated by default).");
-  App.add_flag("--compact", UserArguments.ShowCompactMessage,
-               "Show only 3 first and one last elements of a  "
-               "message (off by default).");
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
 

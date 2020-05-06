@@ -13,7 +13,7 @@ struct UserArgumentStruct {
   std::int64_t OffsetToStart = -2;
 
   int PartitionToConsume = -1;
-  int Indentation = 4;
+  int Indentation = 2;
 
   std::string ISODate;
   bool ShowAllTopics = false;

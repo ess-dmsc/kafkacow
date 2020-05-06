@@ -4,10 +4,7 @@
 
 namespace {
 size_t STRING_TRUNCATION_LENGTH{50};
-size_t ARRAY_TRUNCATION_LENGTH{10};
-size_t ARRAY_COMPACTION_LENGTH{3};
-
-bool Compact{false};
+size_t ARRAY_TRUNCATION_LENGTH{3};
 
 std::string truncateNONJSON(const std::string &Message) {
   if (Message.size() > STRING_TRUNCATION_LENGTH)
@@ -56,12 +53,11 @@ std::string getEntireMessage(const std::string &JSONMessage,
 /// adds indentation for readability.
 ///
 /// \param JSONMessage
-/// \param Indent - number of characters of whitespace to use for indentation(4
+/// \param Indent - number of characters of whitespace to use for indentation(2
 /// by default)
 /// \return truncated readable message as string
 std::string getTruncatedMessage(const std::string &JSONMessage,
-                                const int &Indent, bool CompactMessage) {
-  Compact = CompactMessage;
+                                const int &Indent) {
   try {
     auto JSONModernMessage = nlohmann::json::parse(JSONMessage.c_str());
     recursiveTruncate(JSONModernMessage);
@@ -72,17 +68,15 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
     MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
                                           MessageWithNoQuotes.end(), ','),
                               MessageWithNoQuotes.end());
-    if (Compact) {
-      bool InArray{false};
-      for (auto &Character : MessageWithNoQuotes) {
-        if (Character == '[') {
-          InArray = true;
-        } else if (Character == ']') {
-          InArray = false;
-        }
-        if (InArray and Character == '\n') {
-          Character = ' ';
-        }
+    bool InArray{false};
+    for (auto &Character : MessageWithNoQuotes) {
+      if (Character == '[') {
+        InArray = true;
+      } else if (Character == ']') {
+        InArray = false;
+      }
+      if (InArray and Character == '\n') {
+        Character = ' ';
       }
     }
     return MessageWithNoQuotes;
@@ -105,8 +99,7 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
   if (JSONMessage.is_string()) {
     truncateJSONString(JSONMessage);
   } else if (JSONMessage.is_array()) {
-    (Compact) ? recursiveCompactJSONArray(JSONMessage)
-              : recursiveTruncateJSONArray(JSONMessage);
+    recursiveTruncateJSONArray(JSONMessage);
   } else if (JSONMessage.is_object()) {
     recursiveTruncateJSONMap(JSONMessage);
   }
@@ -114,29 +107,14 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
   const size_t MessageSize = JSONMessage.size();
-  if (MessageSize > ARRAY_TRUNCATION_LENGTH) {
-    JSONMessage.erase(JSONMessage.begin() + ARRAY_TRUNCATION_LENGTH,
-                      JSONMessage.end());
-    JSONMessage.push_back("...");
-    JSONMessage.push_back(fmt::format("Truncated {} elements.",
-                                      MessageSize - ARRAY_TRUNCATION_LENGTH));
-  }
-
-  for (auto &element : JSONMessage) {
-    recursiveTruncate(element);
-  }
-}
-
-void recursiveCompactJSONArray(nlohmann::json &JSONMessage) {
-  const size_t MessageSize = JSONMessage.size();
-  if (MessageSize > ARRAY_COMPACTION_LENGTH + 1) {
+  if (MessageSize > ARRAY_TRUNCATION_LENGTH + 1) {
     nlohmann::json::iterator it = JSONMessage.end();
     --it;
     auto last = *it;
-    JSONMessage.erase(JSONMessage.begin() + ARRAY_COMPACTION_LENGTH,
+    JSONMessage.erase(JSONMessage.begin() + ARRAY_TRUNCATION_LENGTH,
                       JSONMessage.end());
     JSONMessage.push_back(fmt::format("... truncated {} elements ...",
-                                      MessageSize - ARRAY_COMPACTION_LENGTH));
+                                      MessageSize - ARRAY_TRUNCATION_LENGTH));
     JSONMessage.push_back(last);
   }
 
