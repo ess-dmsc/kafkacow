@@ -4,8 +4,30 @@
 #include <CLI/CLI.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-int main(int argc, char **argv) {
+CLI::Option *SetKeyValueOptions(CLI::App &App, const std::string &Name,
+                                const std::string &Description, bool Defaulted,
+                                const CLI::callback_t &Fun) {
+  CLI::Option *Opt = App.add_option(Name, Fun, Description, Defaulted);
+  const auto RequireEvenNumberOfPairs = -2;
+  Opt->type_name("KEY VALUE");
+  Opt->type_size(RequireEvenNumberOfPairs);
+  return Opt;
+}
 
+CLI::Option *addKafkaOption(CLI::App &App, std::string const &Name,
+                            std::map<std::string, std::string> &ConfigMap,
+                            std::string const &Description,
+                            bool Defaulted = false) {
+  CLI::callback_t Fun = [&ConfigMap](CLI::results_t Results) {
+    for (size_t i = 0; i < Results.size() / 2; i++) {
+      ConfigMap[Results.at(i * 2)] = Results.at(i * 2 + 1);
+    }
+    return true;
+  };
+  return SetKeyValueOptions(App, Name, Description, Defaulted, Fun);
+}
+
+int main(int argc, char **argv) {
   CLI::App App{"From Kafka with love"};
 
   UserArgumentStruct UserArguments;
@@ -48,6 +70,8 @@ int main(int argc, char **argv) {
                "message (truncated by default).");
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
+  addKafkaOption(App, "-X,--kafka-config", UserArguments.KafkaConfiguration,
+                 "LibRDKafka client configuration");
 
   CLI11_PARSE(App, argc, argv)
 

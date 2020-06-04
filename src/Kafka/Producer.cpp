@@ -1,16 +1,16 @@
 #include "Producer.h"
 #include "KafkaConfig.h"
 #include <memory>
-#include <sstream>
 
 namespace Kafka {
 
-Producer::Producer(std::string Broker, std::string Topic)
-    : TopicToProduce(Topic) {
+Producer::Producer(const std::string &Broker, std::string Topic,
+                   const std::map<std::string, std::string> &KafkaConfiguration)
+    : TopicToProduce(std::move(Topic)) {
   std::string ErrStr;
   this->KafkaProducer =
       std::shared_ptr<RdKafka::Producer>(RdKafka::Producer::create(
-          createGlobalConfiguration(Broker).get(), ErrStr));
+          createGlobalConfiguration(Broker, KafkaConfiguration).get(), ErrStr));
   if (!ErrStr.empty()) {
     ErrStr.append("Error creating KafkaProducer in Kafka::Producer::Producer.");
     Logger->error(ErrStr);

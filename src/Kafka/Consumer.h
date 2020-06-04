@@ -8,7 +8,8 @@ namespace Kafka {
 
 class Consumer : public ConsumerInterface {
 public:
-  explicit Consumer(std::string Broker);
+  Consumer(const std::string &Broker,
+           const std::map<std::string, std::string> &KafkaConfiguration);
 
   ~Consumer() override {
     if (KafkaConsumer) {

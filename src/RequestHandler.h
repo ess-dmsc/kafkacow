@@ -27,10 +27,12 @@ public:
                               !UserArguments.MetadataMode;
 
     if (ConsumerModeChosen || MetadataModeChosen) {
-      KafkaConsumer = Kafka::createConsumer(UserArguments.Broker, Real);
+      KafkaConsumer = Kafka::createConsumer(
+          UserArguments.Broker, UserArguments.KafkaConfiguration, Real);
     } else if (ProducerModeChosen) {
-      KafkaProducer = Kafka::createProducer(UserArguments.Broker,
-                                            UserArguments.TopicName, Real);
+      KafkaProducer =
+          Kafka::createProducer(UserArguments.Broker, UserArguments.TopicName,
+                                UserArguments.KafkaConfiguration, Real);
     } else {
       throw ArgumentException("Program can run in one and only one mode: "
                               "--consumer, --metadata or --producer");
