@@ -16,24 +16,25 @@ public:
                           std::string FullSchemaPath, bool Real = true)
       : Logger(spdlog::get("LOG")), UserArguments(UserArguments),
         SchemaPath(std::move(FullSchemaPath)) {
-    // check input if ConsumerMode chosen
-    if (UserArguments.ConsumerMode && !UserArguments.MetadataMode &&
-        !UserArguments.ProducerMode) {
+    bool ConsumerModeChosen = UserArguments.ConsumerMode &&
+                              !UserArguments.MetadataMode &&
+                              !UserArguments.ProducerMode;
+    bool MetadataModeChosen = !UserArguments.ConsumerMode &&
+                              UserArguments.MetadataMode &&
+                              !UserArguments.ProducerMode;
+    bool ProducerModeChosen = UserArguments.ProducerMode &&
+                              !UserArguments.ConsumerMode &&
+                              !UserArguments.MetadataMode;
+
+    if (ConsumerModeChosen || MetadataModeChosen) {
       KafkaConsumer = Kafka::createConsumer(UserArguments.Broker, Real);
-    }
-    // check input if MetadataMode chosen
-    else if (!UserArguments.ConsumerMode && UserArguments.MetadataMode &&
-             !UserArguments.ProducerMode) {
-      KafkaConsumer = Kafka::createConsumer(UserArguments.Broker, Real);
-    } else if (UserArguments.ProducerMode && !UserArguments.ConsumerMode &&
-               !UserArguments.MetadataMode) {
+    } else if (ProducerModeChosen) {
       KafkaProducer = Kafka::createProducer(UserArguments.Broker,
                                             UserArguments.TopicName, Real);
-    }
-    // no MetadataMode or ConsumerMode chosen
-    else
+    } else {
       throw ArgumentException("Program can run in one and only one mode: "
                               "--consumer, --metadata or --producer");
+    }
   }
 
   void checkAndRun();
