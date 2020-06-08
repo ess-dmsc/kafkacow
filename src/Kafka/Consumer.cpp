@@ -39,11 +39,13 @@ std::unique_ptr<RdKafka::Metadata> Consumer::queryMetadata() {
   return metadata;
 }
 
-Consumer::Consumer(std::string Broker) : Logger(spdlog::get("LOG")) {
+Consumer::Consumer(const std::string &Broker,
+                   const std::map<std::string, std::string> &KafkaConfiguration)
+    : Logger(spdlog::get("LOG")) {
   std::string ErrStr;
   KafkaConsumer =
       std::shared_ptr<RdKafka::KafkaConsumer>(RdKafka::KafkaConsumer::create(
-          createGlobalConfiguration(Broker).get(), ErrStr));
+          createGlobalConfiguration(Broker, KafkaConfiguration).get(), ErrStr));
   if (!ErrStr.empty()) {
     ErrStr.append("Error creating KafkaConsumer in Consumer::Consumer.");
     Logger->error(ErrStr);

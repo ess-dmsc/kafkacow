@@ -2,6 +2,7 @@
 
 #include "ProducerInterface.h"
 #include <librdkafka/rdkafkacpp.h>
+#include <map>
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
@@ -9,9 +10,10 @@ namespace Kafka {
 
 class Producer : public ProducerInterface {
 public:
-  Producer(std::string Broker, std::string Topic);
+  Producer(const std::string &Broker, std::string Topic,
+           const std::map<std::string, std::string> &KafkaConfiguration);
 
-  ~Producer() {
+  ~Producer() override {
     if (KafkaProducer) {
       KafkaProducer->flush(500);
       RdKafka::wait_destroyed(5000);

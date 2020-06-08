@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 struct UserArgumentStruct {
@@ -14,6 +15,21 @@ struct UserArgumentStruct {
 
   int PartitionToConsume = -1;
   int Indentation = 2;
+
+  std::map<std::string, std::string> KafkaConfiguration = {
+      {"metadata.request.timeout.ms", "2000"},
+      {"socket.timeout.ms", "10000"},
+      {"message.max.bytes", "100000000"},
+      {"fetch.message.max.bytes", "100000000"},
+      {"fetch.max.bytes", "100000000"},
+      {"receive.message.max.bytes",
+       "100000512"}, // must be at least fetch.max.bytes + 512
+      {"queue.buffering.max.ms", "50"},
+      {"api.version.request", "true"},
+      {"enable.auto.commit", "false"},
+      {"enable.auto.offset.store", "false"},
+      {"auto.offset.reset", "largest"},
+      {"session.timeout.ms", "10000"}};
 
   std::string ISODate;
   bool ShowAllTopics = false;
