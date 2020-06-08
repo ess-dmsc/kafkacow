@@ -16,12 +16,17 @@ TEST(JSONPrintingTest, print_truncated_array_message_test) {
       "32972,\n    79344,\n    22827,\n    32972,\n    79344,\n    22827,\n    "
       "32972,\n    79344,\n    22827,\n    32972,\n    79344,\n    22827,\n    "
       "37233\n]}";
-  EXPECT_EQ(getTruncatedMessage(InputMessage, 4),
-            "{\n    time_of_flight: [\n        15579\n        91072\n        "
-            "32972\n        79344\n        22827\n        32972\n        "
-            "79344\n        22827\n        32972\n        79344\n        "
-            "...\n        Truncated 5 elements.\n    "
-            "]\n}");
+  EXPECT_EQ(getTruncatedMessage(InputMessage, 1),
+            "{\n time_of_flight: [   15579   91072   32972   "
+            "... truncated 12 elements ...   37233  ]\n}");
+}
+
+TEST(JSONPrintingTest, print_truncated_short_array_message_test) {
+  std::string InputMessage =
+      "{\"time_of_flight\": [\n    15579,\n    91072,\n    "
+      "32972,\n    79344\n]}";
+  EXPECT_EQ(getTruncatedMessage(InputMessage, 1),
+            "{\n time_of_flight: [   15579   91072   32972   79344  ]\n}");
 }
 
 TEST(JSONPrintingTest, print_truncated_string_message_test) {

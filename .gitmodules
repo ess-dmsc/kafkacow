@@ -1,4 +1,0 @@
-[submodule "streaming-data-types"]
-	path = streaming-data-types
-	url = https://github.com/ess-dmsc/streaming-data-types.git
-	branch = master

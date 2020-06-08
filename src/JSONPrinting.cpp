@@ -4,7 +4,7 @@
 
 namespace {
 size_t STRING_TRUNCATION_LENGTH{50};
-size_t ARRAY_TRUNCATION_LENGTH{10};
+size_t ARRAY_TRUNCATION_LENGTH{3};
 
 std::string truncateNONJSON(const std::string &Message) {
   if (Message.size() > STRING_TRUNCATION_LENGTH)
@@ -22,7 +22,7 @@ void truncateJSONString(nlohmann::json &JSONMessage) {
                               StringValue.size() - STRING_TRUNCATION_LENGTH);
   }
 }
-}
+} // namespace
 
 /// Receives deserialized flatbuffers message, removes quotes and adds
 /// indentation for readability.
@@ -53,7 +53,7 @@ std::string getEntireMessage(const std::string &JSONMessage,
 /// adds indentation for readability.
 ///
 /// \param JSONMessage
-/// \param Indent - number of characters of whitespace to use for indentation(4
+/// \param Indent - number of characters of whitespace to use for indentation(2
 /// by default)
 /// \return truncated readable message as string
 std::string getTruncatedMessage(const std::string &JSONMessage,
@@ -68,6 +68,17 @@ std::string getTruncatedMessage(const std::string &JSONMessage,
     MessageWithNoQuotes.erase(std::remove(MessageWithNoQuotes.begin(),
                                           MessageWithNoQuotes.end(), ','),
                               MessageWithNoQuotes.end());
+    bool InArray{false};
+    for (auto &Character : MessageWithNoQuotes) {
+      if (Character == '[') {
+        InArray = true;
+      } else if (Character == ']') {
+        InArray = false;
+      }
+      if (InArray and Character == '\n') {
+        Character = ' ';
+      }
+    }
     return MessageWithNoQuotes;
 
   } catch (nlohmann::json::exception &) {
@@ -96,12 +107,15 @@ void recursiveTruncate(nlohmann::json &JSONMessage) {
 
 void recursiveTruncateJSONArray(nlohmann::json &JSONMessage) {
   const size_t MessageSize = JSONMessage.size();
-  if (MessageSize > ARRAY_TRUNCATION_LENGTH) {
+  if (MessageSize > ARRAY_TRUNCATION_LENGTH + 1) {
+    nlohmann::json::iterator it = JSONMessage.end();
+    --it;
+    auto last = *it;
     JSONMessage.erase(JSONMessage.begin() + ARRAY_TRUNCATION_LENGTH,
                       JSONMessage.end());
-    JSONMessage.push_back("...");
-    JSONMessage.push_back(fmt::format("Truncated {} elements.",
+    JSONMessage.push_back(fmt::format("... truncated {} elements ...",
                                       MessageSize - ARRAY_TRUNCATION_LENGTH));
+    JSONMessage.push_back(last);
   }
 
   for (auto &element : JSONMessage) {
