@@ -1,10 +1,10 @@
 #include <flatbuffers/flatbuffers.h>
-#include <json_json_generated.h>
 #include <fstream>
+#include <json_json_generated.h>
 
-#include "FlatbuffersTranslator.h"
 #include "CustomExceptions.h"
 #include "Filesystem.h"
+#include "FlatbuffersTranslator.h"
 
 namespace {
 /// Reads JSONPath file and returns message to serialize.
