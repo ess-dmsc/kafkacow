@@ -28,6 +28,6 @@ add_executable(kafkacow main.cpp
         Kafka/FakeProducer.h
         Kafka/Message.h)
 
-target_link_libraries(kafkacow
+target_link_libraries(kafkacow PRIVATE
         ${CONAN_PACKAGES}
         CONAN_PKG::fmt)

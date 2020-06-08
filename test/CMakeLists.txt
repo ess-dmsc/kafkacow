@@ -15,6 +15,6 @@ add_executable(UnitTests
         UnitTests.cpp
         MessageTest.cpp)
 
-target_link_libraries(UnitTests
+target_link_libraries(UnitTests PRIVATE
         ${CONAN_PACKAGES}
         CONAN_PKG::gtest)
