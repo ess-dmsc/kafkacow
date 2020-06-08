@@ -19,6 +19,7 @@ CLI::Option *addKafkaOption(CLI::App &App, std::string const &Name,
                             std::string const &Description,
                             bool Defaulted = false) {
   CLI::callback_t Fun = [&ConfigMap](CLI::results_t Results) {
+    // Loop through key-value pairs
     for (size_t i = 0; i < Results.size() / 2; i++) {
       ConfigMap[Results.at(i * 2)] = Results.at(i * 2 + 1);
     }
