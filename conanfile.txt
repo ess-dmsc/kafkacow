@@ -1,11 +1,11 @@
 [requires]
 CLI11/1.9.0@cliutils/stable
-librdkafka/1.2.0@ess-dmsc/stable
+librdkafka/1.5.0@ess-dmsc/stable
 gtest/1.8.1@bincrafters/stable
 fmt/6.0.0
 spdlog/1.4.2
 jsonformoderncpp/3.7.3@vthiery/stable
-streaming-data-types/c670575@ess-dmsc/stable
+streaming-data-types/3966e53@ess-dmsc/stable
 date/2.4.1@bincrafters/stable
 OpenSSL/1.1.1c@conan/stable
 
