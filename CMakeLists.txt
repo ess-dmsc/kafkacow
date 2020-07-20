@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(kafkacow)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall" )
 if (NOT WIN32)
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -pedantic" )
@@ -45,9 +45,6 @@ endif()
 set(CONAN_PACKAGES
     CONAN_PKG::CLI11
     CONAN_PKG::librdkafka
-    CONAN_PKG::boost_filesystem
-    CONAN_PKG::boost_system
-    CONAN_PKG::boost_dll
     CONAN_PKG::flatbuffers
     CONAN_PKG::spdlog
     CONAN_PKG::jsonformoderncpp
