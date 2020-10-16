@@ -9,7 +9,8 @@ test_os = "centos7"
 
 container_build_nodes = [
     'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
-    'ubuntu1804': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804-gcc8')
+    'ubuntu1804': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804-gcc8'),
+    'ubuntu2004' : ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2004')
 ]
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
