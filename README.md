@@ -61,18 +61,10 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   
   If you don't have ```pip``` on your computer please refer to [conan installation guide](https://docs.conan.io/en/latest/installation.html).
   
-  
-  Add remote repositories to __conan__ using:
-  ```conan remote add <local-name> <remote-url>```
 
- creating a new unique __local name__ for each of the __remote-urls__:
-   
-   
-* https://api.bintray.com/conan/ess-dmsc/conan
+ ### Add the Conan remote repositories
 
-* https://api.bintray.com/conan/conan-community/conan
- 
-* https://api.bintray.com/conan/bincrafters/public-conan
+Follow the README [here](https://github.com/ess-dmsc/conan-configuration)
 
  ## Build
  ```cmake <path-to-source>```
