@@ -62,6 +62,20 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   
   If you don't have ```pip``` on your computer please refer to [conan installation guide](https://docs.conan.io/en/latest/installation.html).
   
+  If Conan fails to detector your installed compiler, or you have multiple compilers, you may need
+  to edit your [Conan profile](https://docs.conan.io/en/1.34/reference/profiles.html).
+  For example on Linux your profile file is at `~/.conan/profiles/default` and to use gcc 9 should look like this:
+  ```ini
+  [settings]
+  os=Linux
+  os_build=Linux
+  arch=x86_64
+  arch_build=x86_64
+  build_type=Release
+  compiler=gcc
+  compiler.version=9
+  compiler.libcxx=libstdc++11
+  ```
 
  ### Add the Conan remote repositories
 
