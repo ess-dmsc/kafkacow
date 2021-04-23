@@ -7,7 +7,9 @@ if (NOT WIN32)
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -pedantic" )
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
+set(SRC_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH ${SRC_CMAKE_MODULE_PATH})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
 # Use gold linker if available on system (it is faster than default GNU linker)
 if (UNIX AND NOT APPLE)
@@ -27,7 +29,7 @@ foreach(schema ${listOfSchemas})
 endforeach()
 
 if(NOT CONAN_DISABLE)
-    include(${CMAKE_MODULE_PATH}/conan.cmake)
+    include(${SRC_CMAKE_MODULE_PATH}/conan.cmake)
     conan_cmake_run(CONANFILE conanfile.txt
             PROFILE default
             BASIC_SETUP CMAKE_TARGETS SKIP_RPATH
@@ -43,11 +45,11 @@ if(CMAKE_COMPILER_IS_GNUCXX AND COV)
 endif()
 
 set(CONAN_PACKAGES
-    CONAN_PKG::CLI11
+    CONAN_PKG::cli11
     CONAN_PKG::librdkafka
     CONAN_PKG::flatbuffers
     CONAN_PKG::spdlog
-    CONAN_PKG::jsonformoderncpp
+    CONAN_PKG::nlohmann_json
     CONAN_PKG::streaming-data-types
     CONAN_PKG::date)
 
