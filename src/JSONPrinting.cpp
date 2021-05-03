@@ -1,4 +1,5 @@
 #include "JSONPrinting.h"
+#include <ciso646>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
