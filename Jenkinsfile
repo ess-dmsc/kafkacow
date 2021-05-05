@@ -72,7 +72,9 @@ builders = pipeline_builder.createBuilders { container ->
       
       withCredentials([string(credentialsId: 'kafkacow-codecov-token', variable: 'TOKEN')]) {
         sh "cp ${project}/codecov.yml codecov.yml"
-        sh "curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t ${TOKEN} -C ${scm_vars.GIT_COMMIT}"
+        withEnv(["GIT_COMMIT=${scm_vars.GIT_COMMIT}"]) {
+          sh 'curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t $TOKEN -C $GIT_COMMIT'
+        }
       }
     }  // stage
   }  // if
