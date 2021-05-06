@@ -72,7 +72,9 @@ builders = pipeline_builder.createBuilders { container ->
       
       withCredentials([string(credentialsId: 'kafkacow-codecov-token', variable: 'TOKEN')]) {
         sh "cp ${project}/codecov.yml codecov.yml"
-        sh "curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t ${TOKEN} -C ${scm_vars.GIT_COMMIT}"
+        withEnv(["GIT_COMMIT=${scm_vars.GIT_COMMIT}"]) {
+          sh 'curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t $TOKEN -C $GIT_COMMIT'
+        }
       }
     }  // stage
   }  // if
@@ -101,16 +103,18 @@ builders = pipeline_builder.createBuilders { container ->
       try {
         withCredentials([
           usernamePassword(
-          credentialsId: 'cow-bot-username',
+          credentialsId: 'cow-bot-username-with-token',
           usernameVariable: 'USERNAME',
           passwordVariable: 'PASSWORD'
           )
         ]) {
-          container.sh """
-            cd ${project}
-            git push https://${USERNAME}:${PASSWORD}@github.com/ess-dmsc/kafkacow.git HEAD:${CHANGE_BRANCH}
-          """
-        } // withCredentials
+          withEnv(["PROJECT=${pipeline_builder.project}"]) {
+            container.sh '''
+              cd $PROJECT
+              git push https://$USERNAME:$PASSWORD@github.com/ess-dmsc/kafkacow.git HEAD:$CHANGE_BRANCH
+            '''
+          }  // withEnv
+        }  // withCredentials
       } catch (e) {
         // Okay to fail; there may be nothing to push
       } finally {
