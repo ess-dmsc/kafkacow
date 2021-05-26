@@ -82,16 +82,15 @@ builders = pipeline_builder.createBuilders { container ->
   if (container.key == clangformat_os && env.CHANGE_ID) {
     pipeline_builder.stage("${container.key}: check formatting") {
     try {
+      container.setupLocalGitUser(pipeline_builder.project)
       container.sh """
           clang-format -version
           cd ${pipeline_builder.project}
           find . \\\\( -name '*.cpp' -or -name '*.cxx' -or -name '*.h' -or -name '*.hpp' \\\\) \\
-          -exec clang-format -i {} +
-                    git config user.email 'dm-jenkins-integration@esss.se'
-                    git config user.name 'cow-bot'
-                    git status -s
-                    git add -u
-                    git commit -m 'GO FORMAT YOURSELF (clang-format)'
+            -exec clang-format -i {} +
+          git status -s
+          git add -u
+          git commit -m 'GO FORMAT YOURSELF (clang-format)'
         """
       } catch (e) {
         // Okay to fail as there could be no badly formatted files to commit
