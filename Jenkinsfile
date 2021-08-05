@@ -6,9 +6,11 @@ project = "kafkacow"
 
 clangformat_os = "ubuntu1804"
 test_os = "centos7"
+release_os = "centos7-release"
 
 container_build_nodes = [
     'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
+    'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
     'ubuntu1804': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804-gcc8'),
     'ubuntu2004' : ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2004')
 ]
@@ -78,6 +80,33 @@ builders = pipeline_builder.createBuilders { container ->
       }
     }  // stage
   }  // if
+
+  if (container.key == release_os) {
+    pipeline_builder.stage("${container.key}: Archiving") {
+      def archive_output = "${pipeline_builder.project}-${container.key}.tar.gz"
+      container.sh """
+        mkdir archive
+        cd archive
+        mkdir -p ${pipeline_builder.project}/bin
+        cp ../build/bin/kafkacow ${pipeline_builder.project}/bin/
+        cp -r ../build/lib ${pipeline_builder.project}/
+        cp -r ../build/licenses ${pipeline_builder.project}/
+
+        # Create file with build information
+        cd ${pipeline_builder.project}
+        touch BUILD_INFO
+        echo 'Repository: ${pipeline_builder.project}/${env.BRANCH_NAME}' >> BUILD_INFO
+        echo 'Commit: ${scm_vars.GIT_COMMIT}' >> BUILD_INFO
+        echo 'Jenkins build: ${env.BUILD_NUMBER}' >> BUILD_INFO
+        cd ..
+
+        tar czf ${archive_output} ${pipeline_builder.project}
+      """
+
+      container.copyFrom("archive/${archive_output}", '.')
+      archiveArtifacts "${archive_output}"
+    }  // stage
+  }
 
   if (container.key == clangformat_os && env.CHANGE_ID) {
     pipeline_builder.stage("${container.key}: check formatting") {
