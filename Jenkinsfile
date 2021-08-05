@@ -91,6 +91,7 @@ builders = pipeline_builder.createBuilders { container ->
         cp ../build/bin/kafkacow ${pipeline_builder.project}/bin/
         cp -r ../build/lib ${pipeline_builder.project}/
         cp -r ../build/licenses ${pipeline_builder.project}/
+        cp -r ../build/schemas ${pipeline_builder.project}/
 
         # Create file with build information
         cd ${pipeline_builder.project}
