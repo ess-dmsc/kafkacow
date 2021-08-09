@@ -28,7 +28,7 @@ builders = pipeline_builder.createBuilders { container ->
   }  // stage
 
   // Use static libraries for archived artefact
-  if (container_key == release_os) {
+  if (container.key == release_os) {
     container.sh """
       cd ${pipeline_builder.project}
       sed -i 's/shared=True/shared=False/' conanfile.txt
