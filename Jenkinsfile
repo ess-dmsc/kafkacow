@@ -27,6 +27,15 @@ builders = pipeline_builder.createBuilders { container ->
     container.copyTo(pipeline_builder.project, pipeline_builder.project)
   }  // stage
 
+  // Use static libraries for archived artefact
+  if (container.key == release_os) {
+    container.sh """
+      cd ${pipeline_builder.project}
+      sed -i 's/shared=True/shared=False/' conanfile.txt
+      cat conanfile.txt
+    """
+  }
+
   pipeline_builder.stage("${container.key}: get dependencies") {
     container.sh """
       mkdir build
@@ -89,7 +98,6 @@ builders = pipeline_builder.createBuilders { container ->
         cd archive
         mkdir -p ${pipeline_builder.project}/bin
         cp ../build/bin/kafkacow ${pipeline_builder.project}/bin/
-        cp -r ../build/lib ${pipeline_builder.project}/
         cp -r ../build/licenses ${pipeline_builder.project}/
         cp -r ../build/schemas ${pipeline_builder.project}/
 
@@ -219,6 +227,8 @@ def get_macos_pipeline()
 
                 dir("${project}/build") {
                     try {
+                        // Workaround for issue due to case-sensitivity in package names.
+                        sh "conan remove --force 'cli11*'"
                         sh "conan install --build=outdated ../code"
                         sh "source activate_run.sh && cmake ../code"
                     } catch (e) {
