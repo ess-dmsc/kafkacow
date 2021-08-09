@@ -27,6 +27,15 @@ builders = pipeline_builder.createBuilders { container ->
     container.copyTo(pipeline_builder.project, pipeline_builder.project)
   }  // stage
 
+  // Use static libraries for archived artefact
+  if (container_key == release_os) {
+    container.sh """
+      cd ${pipeline_builder.project}
+      sed -i 's/shared=True/shared=False/' conanfile.txt
+      cat conanfile.txt
+    """
+  }
+
   pipeline_builder.stage("${container.key}: get dependencies") {
     container.sh """
       mkdir build
