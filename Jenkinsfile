@@ -229,7 +229,7 @@ def get_macos_pipeline()
                 dir("${project}/build") {
                     try {
                         // Workaround for issue due to case-sensitivity in package names.
-                        sh "conan remove --force 'cli11*'
+                        sh "conan remove --force 'cli11*'"
                         sh "conan install --build=outdated ../code"
                         sh "source activate_run.sh && cmake ../code"
                     } catch (e) {
