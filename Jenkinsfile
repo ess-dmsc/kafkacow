@@ -210,6 +210,7 @@ def get_macos_pipeline()
                     try {
                         // Conan remove is temporary until all projects have moved to lowercase package name
                         sh "conan remove -f FlatBuffers/*"
+                        sh "conan remove -f OpenSSL/*"
                         checkout scm
                     } catch (e) {
                         failure_function(e, 'MacOSX / Checkout failed')
