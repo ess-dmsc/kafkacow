@@ -73,18 +73,22 @@ builders = pipeline_builder.createBuilders { container ->
         . ./activate_run.sh
         ./bin/UnitTests --gtest_output=xml:${test_output}
         make coverage
-        lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info '*_generated.h' '*/.conan/data/*' '*/usr/*' '*Test.cpp' '*gmock*' '*gtest*' --output-file coverage.info
       """
       container.copyFrom('build', '.')
       junit "build/${test_output}"
       
-      withCredentials([string(credentialsId: 'kafkacow-codecov-token', variable: 'TOKEN')]) {
-        sh "cp ${project}/codecov.yml codecov.yml"
-        withEnv(["GIT_COMMIT=${scm_vars.GIT_COMMIT}"]) {
-          sh 'curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t $TOKEN -C $GIT_COMMIT'
-        }
-      }
+      step([
+          $class: 'CoberturaPublisher',
+          autoUpdateHealth: true,
+          autoUpdateStability: true,
+          coberturaReportFile: 'build/coverage.xml',
+          failUnhealthy: false,
+          failUnstable: false,
+          maxNumberOfBuilds: 0,
+          onlyStable: false,
+          sourceEncoding: 'ASCII',
+          zoomCoverageChart: true
+      ])
     }  // stage
   }  // if
 
