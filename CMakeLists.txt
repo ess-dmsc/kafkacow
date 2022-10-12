@@ -42,7 +42,7 @@ set(HTML_COVERAGE_REPORT OFF CACHE BOOL "Generate test coverage report as html, 
 if(CMAKE_COMPILER_IS_GNUCXX AND COV OR HTML_COVERAGE_REPORT)
   include(CodeCoverage)
   append_coverage_compiler_flags()
-  set(COVERAGE_EXCLUDE test)  # Exclude tests from test coverage
+  set(COVERAGE_EXCLUDE test)
   if (HTML_COVERAGE_REPORT)
     setup_target_for_coverage_gcovr_html(NAME coverage
                                          EXECUTABLE UnitTests
