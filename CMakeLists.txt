@@ -38,10 +38,22 @@ if(NOT CONAN_DISABLE)
             KEEP_RPATHS)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX AND COV)
-    include(CodeCoverage)
-    setup_target_for_coverage(coverage UnitTests coverage)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_COVERAGE}")
+set(HTML_COVERAGE_REPORT OFF CACHE BOOL "Generate test coverage report as html, find in <BUILD_DIR>/coverage/index.html")
+if(CMAKE_COMPILER_IS_GNUCXX AND COV OR HTML_COVERAGE_REPORT)
+  include(CodeCoverage)
+  append_coverage_compiler_flags()
+  set(COVERAGE_EXCLUDE test)
+  if (HTML_COVERAGE_REPORT)
+    setup_target_for_coverage_gcovr_html(NAME coverage
+                                         EXECUTABLE UnitTests
+                                         EXCLUDE ${COVERAGE_EXCLUDE}
+                                         DEPENDENCIES UnitTests)
+  else()
+    setup_target_for_coverage_gcovr_xml(NAME coverage
+                                        EXECUTABLE UnitTests
+                                        EXCLUDE ${COVERAGE_EXCLUDE}
+                                        DEPENDENCIES UnitTests)
+  endif()
 endif()
 
 set(CONAN_PACKAGES

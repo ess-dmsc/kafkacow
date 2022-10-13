@@ -9,8 +9,8 @@ test_os = "centos7"
 release_os = "centos7-release"
 
 container_build_nodes = [
-    'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
-    'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
+    'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11'),
+    'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11'),
     'ubuntu2004' : ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2004')
 ]
 
@@ -73,18 +73,22 @@ builders = pipeline_builder.createBuilders { container ->
         . ./activate_run.sh
         ./bin/UnitTests --gtest_output=xml:${test_output}
         make coverage
-        lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info '*_generated.h' '*/.conan/data/*' '*/usr/*' '*Test.cpp' '*gmock*' '*gtest*' --output-file coverage.info
       """
       container.copyFrom('build', '.')
       junit "build/${test_output}"
       
-      withCredentials([string(credentialsId: 'kafkacow-codecov-token', variable: 'TOKEN')]) {
-        sh "cp ${project}/codecov.yml codecov.yml"
-        withEnv(["GIT_COMMIT=${scm_vars.GIT_COMMIT}"]) {
-          sh 'curl -s https://codecov.io/bash | bash -s - -f build/coverage.info -t $TOKEN -C $GIT_COMMIT'
-        }
-      }
+      step([
+          $class: 'CoberturaPublisher',
+          autoUpdateHealth: true,
+          autoUpdateStability: true,
+          coberturaReportFile: 'build/coverage.xml',
+          failUnhealthy: false,
+          failUnstable: false,
+          maxNumberOfBuilds: 0,
+          onlyStable: false,
+          sourceEncoding: 'ASCII',
+          zoomCoverageChart: true
+      ])
     }  // stage
   }  // if
 
@@ -210,6 +214,7 @@ def get_macos_pipeline()
                     try {
                         // Conan remove is temporary until all projects have moved to lowercase package name
                         sh "conan remove -f FlatBuffers/*"
+                        sh "conan remove -f OpenSSL/*"
                         checkout scm
                     } catch (e) {
                         failure_function(e, 'MacOSX / Checkout failed')
