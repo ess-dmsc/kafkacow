@@ -25,7 +25,7 @@ Options:
   -a,--all                    Show a list of topics. To be used in "-L" mode.
   -e,--entire                 Show all records of a message(truncated by default).
   -c,--config-file TEXT       Read configuration from an ini file.
-  -X,--kafka-config           LibRDKafka client configuration
+  -X,--kafka-config           LibRDKafka client configuration (e.g. `-X security.protocol SASL_PLAINTEXT -X sasl.mechanism SCRAM-SHA-256`)
   ```
   
   #### Usage example

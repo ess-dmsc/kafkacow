@@ -72,7 +72,8 @@ int main(int argc, char **argv) {
   App.set_config("-c,--config-file", "", "Read configuration from an ini file.",
                  false);
   addKafkaOption(App, "-X,--kafka-config", UserArguments.KafkaConfiguration,
-                 "LibRDKafka client configuration");
+                 "LibRDKafka client configuration (e.g. -X security.protocol "
+                 "SASL_PLAINTEXT -X sasl.mechanism SCRAM-SHA-256)");
 
   CLI11_PARSE(App, argc, argv)
 
