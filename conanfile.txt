@@ -1,6 +1,6 @@
 [requires]
 cli11/1.9.1
-librdkafka/1.6.0
+librdkafka/1.9.2
 gtest/1.10.0
 fmt/6.2.0
 spdlog/1.8.5
