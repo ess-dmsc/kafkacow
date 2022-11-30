@@ -4,14 +4,14 @@ import ecdcpipeline.PipelineBuilder
 
 project = "kafkacow"
 
-clangformat_os = "ubuntu2004"
+clangformat_os = "ubuntu2204"
 test_os = "centos7"
 release_os = "centos7-release"
 
 container_build_nodes = [
     'centos7': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11'),
     'centos7-release': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11'),
-    'ubuntu2004' : ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2004')
+    'ubuntu2204' : ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2204')
 ]
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)

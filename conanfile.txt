@@ -1,12 +1,14 @@
 [requires]
 cli11/1.9.1
-librdkafka/1.6.0
+librdkafka/1.9.2
 gtest/1.10.0
 fmt/6.2.0
 spdlog/1.8.5
 nlohmann_json/3.9.1
 streaming-data-types/6a41aee@ess-dmsc/stable
 date/2.4.1
+# Override openssl due to conflicting requirements from libcurl and cyrus-sasl
+openssl/1.1.1s
 
 [generators]
 cmake
