@@ -146,7 +146,7 @@ builders = pipeline_builder.createBuilders { container ->
           gitToolName: 'Default'
         )]) {
           withEnv(["PROJECT=${pipeline_builder.project}"]) {
-            container.sh '''
+            sh '''
               cd clang-formatted-code
               git push https://github.com/ess-dmsc/kafkacow.git HEAD:$CHANGE_BRANCH
             '''
