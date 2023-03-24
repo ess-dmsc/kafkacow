@@ -25,7 +25,7 @@ CLI::Option *addKafkaOption(CLI::App &App, std::string const &Name,
     }
     return true;
   };
-  return SetKeyValueOptions(App,     Name, Description, Defaulted, Fun);
+  return SetKeyValueOptions(App, Name, Description, Defaulted, Fun);
 }
 
 int main(int argc, char **argv) {
