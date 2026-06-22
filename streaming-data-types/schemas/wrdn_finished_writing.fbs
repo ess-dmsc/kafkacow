@@ -1,0 +1,14 @@
+// A message to tell the world that the (current) filewriter is done writing to file (for whatever reason).
+
+file_identifier "wrdn";
+
+table FinishedWriting {
+    service_id : string (required);     // The identifier for the instance of the file-writer that has sent this update
+    job_id : string (required);         // Uuid of the file writing job.
+    error_encountered : bool;           // True if stopped due to error
+    file_name : string (required);      // Name of file that was just closed.
+    metadata : string;                  // JSON string with metadata about the file that was just closed.
+    message : string;                   // Must hold an error message if filewriting was stopped due to an error, is optional otherwise.
+}
+
+root_type FinishedWriting;

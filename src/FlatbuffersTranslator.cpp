@@ -1,4 +1,5 @@
 #include <flatbuffers/flatbuffers.h>
+#include <iostream>
 #include <fstream>
 #include <json_json_generated.h>
 
@@ -104,6 +105,7 @@ FlatbuffersTranslator::getSchemaPathForID(const std::string &FileID) {
   fs::directory_iterator DirectoryIterator(SchemaPath), e;
   std::vector<fs::path> Paths(DirectoryIterator, e);
   for (auto &DirectoryEntry : Paths) {
+    std::cout << DirectoryEntry.string() << " + " << FileID << std::endl;
     if (DirectoryEntry.filename().string().find(FileID) != std::string::npos) {
       // if schema found, return TRUE and path
       return std::make_pair(true, DirectoryEntry.string());
