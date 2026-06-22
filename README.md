@@ -48,7 +48,11 @@ bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -C -g 10 -t MULTIPART_events
   ```
   bin/kafkacow -b hinata.isis.cclrc.ac.uk:9092 -P -t TopicToProduceTo -f /home/user/SendMe.json
   ```
-  
+
+  An example that works at ESS as of June 2026 is (with missing parameters provided via k2n config):
+  ```
+  kafkacow --consumer --broker <kafkabroker> --topic loki_detector -d 2026-06-22T14:00:00.000 -X security.protocol <proto> -X sasl.mechanism <mech> -X sasl.username <user> -X sasl.password <pass> -X ssl.ca.location <location> -X ssl.endpoint.identification.algorithm <algo>
+  ```
   
   ## Install
   
@@ -90,6 +94,10 @@ Follow the README [here](https://github.com/ess-dmsc/conan-configuration)
 Kafkacow uses messages schemas from a repository included as a git subtree.
 To update the schemas from the remote repository run
 ```
-git subtree pull --prefix streaming-data-types git@github.com:ess-dmsc/streaming-data-types.git master --squash 
+git subtree pull \
+  --prefix=streaming-data-types \
+  https://github.com/ess-dmsc/streaming-data-types.git \
+  master \
+  --squash
 ```
  
